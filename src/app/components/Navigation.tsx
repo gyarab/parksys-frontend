@@ -9,6 +9,7 @@ import { IStore } from "../redux/IStore";
 import { translationsSelector } from "../selectors/translationsSelector";
 import { ConnectedLink } from "react-router5";
 import { routes } from "../routes/routes";
+import { Footer } from "./Footer";
 
 const classNames = stylesheet({
   nav: {
@@ -17,6 +18,7 @@ const classNames = stylesheet({
     height: "100%",
     color: Color.WHITE,
     backgroundColor: Color.MAIN_BG,
+    position: "relative",
     $nest: {
       ul: {
         display: "table",
@@ -25,27 +27,32 @@ const classNames = stylesheet({
       },
     },
   },
-  activeLink: {
-    textDecoration: "underline",
-    backgroundColor: Color.GREY,
-  },
   navItem: {
     width: "100%",
     marginBottom: "10px",
     $nest: {
       a: {
-        padding: "0.4em 0 0.3em 0.2em",
+        color: Color.WHITE,
+        padding: "0.4em 0 0.3em 0.4em",
         fontWeight: "bold",
         width: "100%",
         display: "block",
         $nest: {
           "&:hover": {
-            textDecoration: "underline",
-          }
-        }
+            backgroundColor: Color.GREY,
+          },
+        },
       },
     }
-  }
+  },
+  activeLink: {
+    backgroundColor: Color.AQUAMARINE,
+    $nest: {
+      "&:hover": {
+        backgroundColor: Color.AQUAMARINE,
+      },
+    },
+  },
 });
 
 interface IStateToProps {
@@ -86,6 +93,7 @@ class Navigation extends React.Component<IStateToProps> {
           <NavLink linkText={pages.revenue} route={routes.revenuePage} />
           <NavLink linkText={pages.history} route={routes.historyPage} />
         </ul>
+        <Footer />
       </nav>
     );
   }

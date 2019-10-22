@@ -49,7 +49,7 @@ class App extends React.Component<IStateToProps> {
       page: HomePage,
     },
     statisticsPage: {
-      page: AboutPage,
+      page: CounterPage,
     },
     rulesPage: {
       page: CounterPage,
