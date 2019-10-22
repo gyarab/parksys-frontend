@@ -16,7 +16,6 @@ import {StarsPage} from "../pages/StarsPage";
 import {IStore} from "../redux/IStore";
 import {RoutePageMap} from "../routes/routes";
 import {translationsSelector} from "../selectors/translationsSelector";
-import {Header} from "./Header";
 import { NotFoundPage } from "../pages/NotFoundPage";
 import { SimpleLayout } from "../layouts/SimpleLayout";
 import { Navigation } from "../components/Navigation";
@@ -27,7 +26,6 @@ const classNames = stylesheet({
   container: {
     margin: 0,
     padding: 0,
-    textAlign: "center",
     height: "100%",
   },
 });
@@ -41,21 +39,29 @@ interface IStateToProps {
 
 class App extends React.Component<IStateToProps> {
   private components: RoutePageMap = {
-    aboutPage: {
-      page: AboutPage,
-    },
-    counterPage: {
-      page: CounterPage,
-    },
     homePage: {
       page: HomePage,
     },
-    starsPage: {
+    accountPage: {
+      page: AboutPage,
+    },
+    dashboardPage: {
+      page: HomePage,
+    },
+    statisticsPage: {
+      page: AboutPage,
+    },
+    rulesPage: {
+      page: CounterPage,
+    },
+      revenuePage: {
       page: StarsPage,
-      nav: Navigation,
+    },
+    historyPage: {
+      page: StarsPage,
     }
   };
-  private defaultNavigation = Header;
+  private defaultNavigation = Navigation;
   private defaultLayout = SimpleLayout;
 
   private getDisplay(): JSX.Element {

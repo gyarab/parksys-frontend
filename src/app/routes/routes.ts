@@ -8,9 +8,12 @@ interface IRoute {
   path: string;
 }
 type RoutablePages = "homePage"
-| "aboutPage"
-| "counterPage"
-| "starsPage";
+| "accountPage"
+| "dashboardPage"
+| "statisticsPage"
+| "rulesPage"
+| "revenuePage"
+| "historyPage";
 interface PageRecord {
   page: ComponentClass;
   nav?: ComponentClass;
@@ -41,17 +44,23 @@ function getNavigateAction<T extends {[key: string]: any}>(routeName: RoutablePa
 }
 
 const config: RouteConfig = {
-  aboutPage: {path: "/about"},
-  counterPage: {path: "/counter"},
   homePage: {path: "/"},
-  starsPage: {path: "/stars"}
+  accountPage: {path: "/account"},
+  dashboardPage: {path: "/dashboard"},
+  statisticsPage: {path: "/statistics"},
+  rulesPage: {path: "/rules"},
+  revenuePage: {path: "/revenue"},
+  historyPage: {path: "/history"},
 };
 
 export const routes = getRoutes(config);
 
 export const navigate: RouteNavigate = {
-  aboutPage: () => getNavigateAction(routes.aboutPage.name),
-  counterPage: () => getNavigateAction(routes.counterPage.name),
   homePage: () => getNavigateAction(routes.homePage.name),
-  starsPage: () => getNavigateAction(routes.starsPage.name)
+  accountPage: () => getNavigateAction(routes.accountPage.name),
+  dashboardPage: () => getNavigateAction(routes.dashboardPage.name),
+  statisticsPage: () => getNavigateAction(routes.statisticsPage.name),
+  rulesPage: () => getNavigateAction(routes.rulesPage.name),
+  revenuePage: () => getNavigateAction(routes.revenuePage.name),
+  historyPage: () => getNavigateAction(routes.historyPage.name),
 };
