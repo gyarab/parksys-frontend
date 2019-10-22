@@ -1,0 +1,149 @@
+{
+  "name": "ts-react-boilerplate",
+  "description": "A universal boilerplate for building web applications w/ TypeScript, React, Redux and more.",
+  "main": "build/server.js",
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "npm run lint"
+    }
+  },
+  "scripts": {
+    "prepush": "npm run build && npm run build:prod && npm run test:no-cache",
+    "clean": "rimraf build && rimraf .jest/cache",
+    "prebuild": "npm run clean -s",
+    "build": "webpack --config config/webpack/index.js",
+    "build:prod": "cross-env NODE_ENV=production npm run build && node ./config/utils/replaceWithProdScripts",
+    "postbuild": "webpack --config config/webpack/server.js",
+    "prestart": "npm run build -s",
+    "start": "node build/server.js",
+    "start:prod": "npm run build:prod && cross-env NODE_ENV=production node build/server.js",
+    "test": "jest",
+    "test:no-cache": "jest --no-cache",
+    "test:watch": "jest --watch",
+    "lint": "eslint \"src/**/**.ts*\"",
+    "lint:fix": "npm run lint -s -- --fix",
+    "doc": "start-storybook -p 6060"
+  },
+  "author": "Crazy Factory <dev@crazy-factory.com>",
+  "homepage": "https://github.com/crazyfactory/ts-react-boilerplate.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/crazyfactory/ts-react-boilerplate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/crazyfactory/ts-react-boilerplate/issues"
+  },
+  "keywords": [
+    "react",
+    "redux",
+    "typescript",
+    "webpack",
+    "universal",
+    "isomorphic",
+    "starter",
+    "kit",
+    "boilerplate",
+    "hot reload",
+    "react-hot-loader",
+    "enzyme",
+    "jest"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
+    "@crazyfactory/tslint-rules": "^1.6.1",
+    "@storybook/addon-docs": "^5.3.0-alpha.3",
+    "@storybook/react": "^5.2.1",
+    "@types/enzyme": "^3.10.3",
+    "@types/express": "^4.17.1",
+    "@types/jest": "^24.0.18",
+    "@types/node": "^12.7.5",
+    "@types/prop-types": "^15.7.2",
+    "@types/react": "^16.9.2",
+    "@types/react-dom": "^16.9.0",
+    "@types/react-helmet": "^5.0.10",
+    "@types/react-redux": "^7.1.2",
+    "@types/serialize-javascript": "^1.5.0",
+    "@types/storybook__react": "^4.0.2",
+    "@typescript-eslint/eslint-plugin": "^2.3.3",
+    "@typescript-eslint/eslint-plugin-tslint": "^2.3.3",
+    "@typescript-eslint/parser": "^2.3.3",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.0.6",
+    "cross-env": "^6.0.0",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.14.0",
+    "eslint": "^6.5.1",
+    "eslint-loader": "^3.0.0",
+    "file-loader": "^4.2.0",
+    "husky": "^3.0.5",
+    "jest": "^24.9.0",
+    "jest-enzyme": "^7.1.1",
+    "react-docgen-typescript-loader": "^3.2.1",
+    "react-hot-loader": "^4.12.15",
+    "rimraf": "^3.0.0",
+    "ts-jest": "^24.1.0",
+    "ts-loader": "^6.1.0",
+    "tslint": "^5.20.0",
+    "tslint-microsoft-contrib": "^6.2.0",
+    "tslint-react": "^4.1.0",
+    "typescript": "^3.6.3",
+    "url-loader": "^2.1.0",
+    "webpack": "^4.40.2",
+    "webpack-bundle-analyzer": "^3.5.0",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-middleware": "^3.7.1",
+    "webpack-hot-middleware": "^2.25.0",
+    "webpack-manifest-plugin": "^2.0.4"
+  },
+  "dependencies": {
+    "@sentry/browser": "^5.6.3",
+    "autobind-decorator": "^2.4.0",
+    "chalk": "^2.4.2",
+    "es6-promise": "^4.2.8",
+    "express": "^4.17.1",
+    "isomorphic-fetch": "^2.2.1",
+    "prop-types": "^15.7.2",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-helmet": "^5.2.1",
+    "react-redux": "^7.1.1",
+    "react-router5": "^7.1.0",
+    "redux": "^4.0.4",
+    "redux-logger": "^3.0.6",
+    "redux-router5": "^7.0.2",
+    "redux-saga": "^1.0.5",
+    "reselect": "^4.0.0",
+    "router5": "^7.0.2",
+    "router5-plugin-browser": "^7.0.2",
+    "serialize-javascript": "^2.1.0",
+    "serve-favicon": "^2.5.0",
+    "typesafe-actions": "^4.4.2",
+    "typestyle": "^2.0.4"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "cacheDirectory": "<rootDir>/.jest/cache",
+    "collectCoverage": true,
+    "coverageDirectory": "<rootDir>/coverage",
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js"
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "json"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "./"
+    ],
+    "setupFilesAfterEnv": [
+      "./src/app/helpers/JestBootstrap.ts"
+    ]
+  }
+}
