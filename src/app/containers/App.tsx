@@ -9,16 +9,15 @@ import {config as appConfig} from "../../../config";
 import {setupCss} from "../helpers/setupCss";
 import {Translator} from "../models/Translator";
 import {ITranslator} from "../models/TranslatorInterfaces";
-import {AboutPage} from "../pages/AboutPage";
 import {CounterPage} from "../pages/CounterPage";
-import {HomePage} from "../pages/HomePage";
-import {StarsPage} from "../pages/StarsPage";
 import {IStore} from "../redux/IStore";
 import {RoutePageMap} from "../routes/routes";
 import {translationsSelector} from "../selectors/translationsSelector";
 import { NotFoundPage } from "../pages/NotFoundPage";
 import { SimpleLayout } from "../layouts/SimpleLayout";
 import { Navigation } from "../components/Navigation";
+import { BlankPage } from "../pages/BlankPage";
+import { StarsPage } from "../pages/StarsPage";
 
 setupCss();
 
@@ -40,25 +39,25 @@ interface IStateToProps {
 class App extends React.Component<IStateToProps> {
   private components: RoutePageMap = {
     homePage: {
-      page: HomePage,
+      page: BlankPage,
     },
     accountPage: {
-      page: AboutPage,
+      page: BlankPage,
     },
     dashboardPage: {
-      page: HomePage,
+      page: BlankPage,
     },
     statisticsPage: {
-      page: CounterPage,
+      page: BlankPage,
     },
     rulesPage: {
-      page: CounterPage,
+      page: BlankPage,
     },
       revenuePage: {
       page: StarsPage,
     },
     historyPage: {
-      page: StarsPage,
+      page: CounterPage,
     }
   };
   private defaultNavigation = Navigation;

@@ -1,10 +1,10 @@
 import {shallow} from "enzyme";
 import * as React from "react";
 import {State as IRouteState} from "router5";
-import {HomePage} from "../pages/HomePage";
 import {ISettingsState} from "../redux/modules/settingsModule";
 import {routes} from "../routes/routes";
 import {classNames, mapStateToProps, UnconnectedApp} from "./App";
+import { NotFoundPage } from "../pages/NotFoundPage";
 
 describe("<App />", () => {
   const route: IRouteState = {
@@ -41,18 +41,8 @@ describe("<App />", () => {
     expect(wrapper.find("section")).toHaveClassName(classNames.container);
   });
 
-  it("renders HomePage", () => {
-    const wrapper = shallow(<UnconnectedApp route={route} translations={translations}/>);
-    expect(wrapper.find(HomePage).length).toBe(1);
-  });
-
-  it("renders Not Found when route is null", () => {
-    const wrapper = shallow(<UnconnectedApp route={null} translations={translations}/>);
-    expect(wrapper.find("div")).toHaveText("Not Found");
-  });
-
   it("renders Not Found when segment is undefined", () => {
     const wrapper = shallow(<UnconnectedApp route={routeUnavailable} translations={translations}/>);
-    expect(wrapper.find("div")).toHaveText("Not Found");
+    expect(wrapper.find(NotFoundPage).length).toBe(1);
   });
 });
