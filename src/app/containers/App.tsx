@@ -63,18 +63,23 @@ class App extends React.Component<IStateToProps> {
   private defaultNavigation = Navigation;
   private defaultLayout = SimpleLayout;
 
+  private getNavigation(segment): JSX.Element {
+    // navigation is optional (can be explicitly set to be null), layout is not optional
+    const navigation = this.components[segment].hasOwnProperty("nav") ? this.components[segment].nav : this.defaultNavigation;
+    if (navigation) {
+      return React.createElement(navigation);
+    } else {
+      return null;
+    }
+  }
+
   private getDisplay(): JSX.Element {
     const {route, translations: {notFound}} = this.props;
     const segment = route ? route.name.split(".")[0] : undefined;
     if (segment && this.components[segment]) {
       // Display content
-      // navigation is optional (can be explicitly set to be null), layout is not optional
-      const navigation = this.components[segment].hasOwnProperty("nav") ? this.components[segment].nav : this.defaultNavigation;
       const layout = this.components[segment].layout ? this.components[segment].layout : this.defaultLayout;
-
-      return React.createElement(layout, {navigation: navigation ? React.createElement(navigation): null}, [
-        React.createElement(this.components[segment].page)
-      ])
+      return React.createElement(layout, {navigation: this.getNavigation(segment)}, React.createElement(this.components[segment].page))
     } else {
       // Not Found
       return <NotFoundPage message={notFound} />

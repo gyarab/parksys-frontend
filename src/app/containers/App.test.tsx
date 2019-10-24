@@ -41,7 +41,7 @@ describe("<App />", () => {
     expect(wrapper.find("section")).toHaveClassName(classNames.container);
   });
 
-  it("renders Not Found when segment is undefined", () => {
+  it("renders NotFoundPage when segment is undefined", () => {
     const wrapper = shallow(<UnconnectedApp route={routeUnavailable} translations={translations}/>);
     expect(wrapper.find(NotFoundPage).length).toBe(1);
   });
