@@ -18,6 +18,7 @@ import { SimpleLayout } from "../layouts/SimpleLayout";
 import { Navigation } from "../components/Navigation";
 import { BlankPage } from "../pages/BlankPage";
 import { StarsPage } from "../pages/StarsPage";
+import { LoginPage } from "../pages/LoginPage";
 
 setupCss();
 
@@ -58,19 +59,17 @@ class App extends React.Component<IStateToProps> {
     },
     historyPage: {
       page: CounterPage,
+    },
+    loginPage: {
+      page: LoginPage,
+      layout: null,
     }
   };
   private defaultNavigation = Navigation;
   private defaultLayout = SimpleLayout;
 
-  private getNavigation(segment): JSX.Element {
-    // navigation is optional (can be explicitly set to be null), layout is not optional
-    const navigation = this.components[segment].hasOwnProperty("nav") ? this.components[segment].nav : this.defaultNavigation;
-    if (navigation) {
-      return React.createElement(navigation);
-    } else {
-      return null;
-    }
+  private optionalPageOption(segment, option: string, defaultIfUndefined: any): React.ComponentClass<any, any> {
+    return this.components[segment].hasOwnProperty(option) ? this.components[segment][option] : defaultIfUndefined;
   }
 
   private getDisplay(): JSX.Element {
@@ -78,8 +77,16 @@ class App extends React.Component<IStateToProps> {
     const segment = route ? route.name.split(".")[0] : undefined;
     if (segment && this.components[segment]) {
       // Display content
-      const layout = this.components[segment].layout ? this.components[segment].layout : this.defaultLayout;
-      return React.createElement(layout, {navigation: this.getNavigation(segment)}, React.createElement(this.components[segment].page))
+      const layout = this.optionalPageOption(segment, "layout", this.defaultLayout);
+      const page = React.createElement(this.components[segment].page);
+      if (layout == null) {
+        return page;
+      } else {
+        const nav = this.optionalPageOption(segment, "nav", this.defaultNavigation);
+        const navRendered = nav ? React.createElement(nav) : null;
+        console.log(navRendered);
+        return React.createElement(layout, { navigation: navRendered }, page);
+      }
     } else {
       // Not Found
       return <NotFoundPage message={notFound} />

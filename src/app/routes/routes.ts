@@ -13,7 +13,8 @@ type RoutablePages = "homePage"
 | "statisticsPage"
 | "rulesPage"
 | "revenuePage"
-| "historyPage";
+| "historyPage"
+| "loginPage";
 interface PageRecord {
   page: ComponentClass;
   nav?: ComponentClass;
@@ -44,13 +45,14 @@ function getNavigateAction<T extends {[key: string]: any}>(routeName: RoutablePa
 }
 
 const config: RouteConfig = {
-  homePage: {path: "/"},
+  homePage: {path: "/home"},
   accountPage: {path: "/account"},
   dashboardPage: {path: "/dashboard"},
   statisticsPage: {path: "/statistics"},
   rulesPage: {path: "/rules"},
   revenuePage: {path: "/revenue"},
   historyPage: {path: "/history"},
+  loginPage: {path: "/"}
 };
 
 export const routes = getRoutes(config);
@@ -63,4 +65,5 @@ export const navigate: RouteNavigate = {
   rulesPage: () => getNavigateAction(routes.rulesPage.name),
   revenuePage: () => getNavigateAction(routes.revenuePage.name),
   historyPage: () => getNavigateAction(routes.historyPage.name),
+  loginPage: () => getNavigateAction(routes.loginPage.name),
 };
