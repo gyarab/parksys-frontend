@@ -1,6 +1,7 @@
 import React from "react";
 import { ILayoutProps, LayoutComponent } from "./Layout";
 import { stylesheet } from "typestyle";
+import { UserNavigation } from "../components/UserNavigation";
 
 // Sidebar src: https://every-layout.dev/layouts/sidebar/
 const classNames = stylesheet({
@@ -48,6 +49,7 @@ class SimpleLayout extends LayoutComponent {
           </div>
           <div className={classNames.mainContent}>
             {this.props.children}
+            <UserNavigation />
           </div>
         </div>
       </div>

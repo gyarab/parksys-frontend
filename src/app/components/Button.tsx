@@ -38,7 +38,7 @@ interface IProps extends React.HTMLProps<HTMLButtonElement> {
 
 export class Button extends React.Component<IProps> {
   public static defaultProps: Partial<IProps> = {
-    type: "primary"
+    type: "primary",
   };
 
   public render(): JSX.Element {
