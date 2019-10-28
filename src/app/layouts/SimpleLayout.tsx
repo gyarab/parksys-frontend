@@ -15,25 +15,25 @@ const classNames = stylesheet({
         margin: "-0.5rem",
         $nest: {
           "&>*": {
-            margin: "0.5rem",
-          },
-        },
-      },
-    },
+            margin: "0.5rem"
+          }
+        }
+      }
+    }
   },
   navigationContainer: {
     marginBottom: "-0.5rem",
     flexBasis: "20rem",
-    flexGrow: 1,
+    flexGrow: 1
   },
   mainContent: {
     flexBasis: 0,
     flexGrow: 999,
-    minWidth: "calc(50% - 1rem)",
+    minWidth: "calc(50% - 1rem)"
   },
   wrapper: {
-    height: "100%",
-  },
+    height: "100%"
+  }
 });
 
 class SimpleLayout extends LayoutComponent {

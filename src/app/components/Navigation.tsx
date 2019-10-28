@@ -23,9 +23,9 @@ const classNames = stylesheet({
       ul: {
         display: "table",
         width: "100%",
-        listStyleType: "none",
-      },
-    },
+        listStyleType: "none"
+      }
+    }
   },
   navItem: {
     width: "100%",
@@ -39,20 +39,20 @@ const classNames = stylesheet({
         display: "block",
         $nest: {
           "&:hover": {
-            backgroundColor: Color.GREY,
-          },
-        },
-      },
+            backgroundColor: Color.GREY
+          }
+        }
+      }
     }
   },
   activeLink: {
     backgroundColor: Color.AQUAMARINE,
     $nest: {
       "&:hover": {
-        backgroundColor: Color.AQUAMARINE,
-      },
-    },
-  },
+        backgroundColor: Color.AQUAMARINE
+      }
+    }
+  }
 });
 
 interface IStateToProps {
@@ -65,7 +65,7 @@ interface IStateToProps {
       rules: string;
       revenue: string;
       history: string;
-    },
+    };
   };
 }
 
@@ -73,16 +73,21 @@ const NavLink = ({ linkText, route }) => {
   // TODO: Use props.children for sublinks
   return (
     <li className={classNames.navItem}>
-      <ConnectedLink activeClassName={classNames.activeLink} routeName={route.name}>
+      <ConnectedLink
+        activeClassName={classNames.activeLink}
+        routeName={route.name}
+      >
         {linkText}
       </ConnectedLink>
     </li>
-  )
-}
+  );
+};
 
 class Navigation extends React.Component<IStateToProps> {
   render(): JSX.Element {
-    const {translations: {pages}} = this.props
+    const {
+      translations: { pages }
+    } = this.props;
     return (
       <nav className={classNames.nav}>
         <ul>
@@ -124,4 +129,4 @@ function mapStateToProps(state: Pick<IStore, "settings">): IStateToProps {
 }
 
 const connected = connect(mapStateToProps)(Navigation);
-export {connected as Navigation, Navigation as UnconnectedNavigation};
+export { connected as Navigation, Navigation as UnconnectedNavigation };

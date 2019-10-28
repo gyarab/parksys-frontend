@@ -1,5 +1,5 @@
-import {ITranslations} from "../redux/modules/settingsModule";
-import {ITranslator} from "./TranslatorInterfaces";
+import { ITranslations } from "../redux/modules/settingsModule";
+import { ITranslator } from "./TranslatorInterfaces";
 
 export class Translator implements ITranslator {
   private readonly translations: ITranslations;

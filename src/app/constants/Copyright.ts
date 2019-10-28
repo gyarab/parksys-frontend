@@ -3,4 +3,3 @@ export enum Copyright {
   EMAIL = "tmscer@gmail.com",
   WEBSITE = "https://tmscer.cz"
 }
-  

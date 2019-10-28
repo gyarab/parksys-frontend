@@ -1,9 +1,13 @@
-import {shallow} from "enzyme";
+import { shallow } from "enzyme";
 import * as React from "react";
-import {ISettingsState} from "../redux/modules/settingsModule";
-import {loadStarsCount} from "../redux/modules/starsActionCreators";
-import {IStarsState} from "../redux/modules/starsModule";
-import {mapDispatchToProps, mapStateToProps, UnconnectedStarsPage} from "./StarsPage";
+import { ISettingsState } from "../redux/modules/settingsModule";
+import { loadStarsCount } from "../redux/modules/starsActionCreators";
+import { IStarsState } from "../redux/modules/starsModule";
+import {
+  mapDispatchToProps,
+  mapStateToProps,
+  UnconnectedStarsPage
+} from "./StarsPage";
 
 describe("<Stars />", () => {
   const translations = {
@@ -16,7 +20,7 @@ describe("<Stars />", () => {
       language: "en",
       loaded: true,
       pending: false,
-      translations: {"Fetching stars...": "Fetching Stars..."}
+      translations: { "Fetching stars...": "Fetching Stars..." }
     };
     const stars: IStarsState = {
       count: 100,
@@ -24,7 +28,7 @@ describe("<Stars />", () => {
       loaded: true,
       pending: false
     };
-    const props = mapStateToProps({settings, stars});
+    const props = mapStateToProps({ settings, stars });
     expect(props).toEqual({
       count: 100,
       error: "",
@@ -84,7 +88,9 @@ describe("<Stars />", () => {
         translations={translations}
       />
     );
-    expect(wrapper.containsMatchingElement(<div>Fetching Stars...</div>)).toBeTruthy();
+    expect(
+      wrapper.containsMatchingElement(<div>Fetching Stars...</div>)
+    ).toBeTruthy();
   });
 
   it("shows error if error is not empty", () => {

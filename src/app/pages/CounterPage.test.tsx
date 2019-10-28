@@ -1,12 +1,16 @@
-import {shallow} from "enzyme";
+import { shallow } from "enzyme";
 import * as React from "react";
 import {
   decrement as decrementActionCreator,
   increment as incrementActionCreator
 } from "../redux/modules/counterActionCreators";
-import {ICounterState} from "../redux/modules/counterModule";
-import {ISettingsState} from "../redux/modules/settingsModule";
-import {mapDispatchToProps, mapStateToProps, UnconnectedCounterPage} from "./CounterPage";
+import { ICounterState } from "../redux/modules/counterModule";
+import { ISettingsState } from "../redux/modules/settingsModule";
+import {
+  mapDispatchToProps,
+  mapStateToProps,
+  UnconnectedCounterPage
+} from "./CounterPage";
 
 describe("<Counter />", () => {
   const translations = {
@@ -21,7 +25,11 @@ describe("<Counter />", () => {
       language: "en",
       loaded: true,
       pending: false,
-      translations: {Counter: "Counter", Decrement: "Decrement", Increment: "Increment"}
+      translations: {
+        Counter: "Counter",
+        Decrement: "Decrement",
+        Increment: "Increment"
+      }
     };
     const counter: ICounterState = {
       count: 10,
@@ -29,7 +37,7 @@ describe("<Counter />", () => {
       loaded: false,
       pending: false
     };
-    const props = mapStateToProps({counter, settings});
+    const props = mapStateToProps({ counter, settings });
     expect(props).toEqual({
       count: 10,
       translations
@@ -52,22 +60,32 @@ describe("<Counter />", () => {
   it("calls increment() when increment button is clicked", () => {
     const spied = jest.fn();
     const wrapper = shallow(
-      <UnconnectedCounterPage count={0} increment={spied} decrement={jest.fn()} translations={translations}/>
+      <UnconnectedCounterPage
+        count={0}
+        increment={spied}
+        decrement={jest.fn()}
+        translations={translations}
+      />
     );
-    expect(wrapper.find({name: "incBtn"})).toBeDefined();
+    expect(wrapper.find({ name: "incBtn" })).toBeDefined();
     expect(spied).not.toHaveBeenCalled();
-    wrapper.find({name: "incBtn"}).simulate("click");
+    wrapper.find({ name: "incBtn" }).simulate("click");
     expect(spied).toHaveBeenCalled();
   });
 
   it("calls decrement() when decrement button is clicked", () => {
     const spied = jest.fn();
     const wrapper = shallow(
-      <UnconnectedCounterPage count={0} increment={jest.fn()} decrement={spied} translations={translations}/>
+      <UnconnectedCounterPage
+        count={0}
+        increment={jest.fn()}
+        decrement={spied}
+        translations={translations}
+      />
     );
-    expect(wrapper.find({name: "decBtn"})).toBeDefined();
+    expect(wrapper.find({ name: "decBtn" })).toBeDefined();
     expect(spied).not.toHaveBeenCalled();
-    wrapper.find({name: "decBtn"}).simulate("click");
+    wrapper.find({ name: "decBtn" }).simulate("click");
     expect(spied).toHaveBeenCalled();
   });
 });

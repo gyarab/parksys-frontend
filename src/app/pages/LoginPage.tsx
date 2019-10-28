@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
-import { connect } from 'react-redux'
-import { Dispatch } from 'redux'
+import React, { useState } from "react";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import { loginUser as loginUserActionCreator } from "../redux/modules/userActionCreators";
-import { getInputValue } from '../helpers/componentHelpers';
-import { Button } from '../components/Button';
+import { getInputValue } from "../helpers/componentHelpers";
+import { Button } from "../components/Button";
 
 interface IDispatchToProps {
   login: (user: string, password: string) => void;
@@ -17,37 +17,44 @@ const LoginPage = (props: IProps) => {
 
   const submit = () => {
     props.login(user, password);
-  }
+  };
   return (
     <div>
       <div>
         <label>Email/Username</label>
-        <input onChange={getInputValue(setUser)}
+        <input
+          onChange={getInputValue(setUser)}
           value={user}
-          name="user" type="text"></input>
+          name="user"
+          type="text"
+        ></input>
       </div>
       <div>
         <label>Password</label>
-        <input onChange={getInputValue(setPassword)}
+        <input
+          onChange={getInputValue(setPassword)}
           value={password}
-          name="password" type="password"></input>
+          name="password"
+          type="password"
+        ></input>
       </div>
       <Button name="loginButton" onClick={submit}>
         Login
       </Button>
     </div>
-  )
+  );
 };
 
 function mapDispatchToProps(dispatch: Dispatch): IDispatchToProps {
   return {
-    login: (user, password) => dispatch(loginUserActionCreator.invoke({ user, password })),
-  }
+    login: (user, password) =>
+      dispatch(loginUserActionCreator.invoke({ user, password }))
+  };
 }
 
-const connected = connect(null, mapDispatchToProps)(LoginPage);
+const connected = connect(
+  null,
+  mapDispatchToProps
+)(LoginPage);
 
-export {
-  connected as LoginPage,
-  LoginPage as UnconnectedLoginPage,
-}
+export { connected as LoginPage, LoginPage as UnconnectedLoginPage };

@@ -13,12 +13,6 @@ import {
 } from "../redux/modules/counterActionCreators";
 import {translationsSelector} from "../selectors/translationsSelector";
 
-const classNames = stylesheet({
-  moveRight: {
-    marginLeft: "8px"
-  }
-});
-
 interface IStateToProps {
   count: number;
   translations: {
@@ -30,29 +24,12 @@ interface IStateToProps {
 
 interface IDispatchToProps {
   decrement: () => void;
-  increment: () => void;
+  increment: (by?: number) => void;
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
 
-class CounterPage extends React.Component<IProps> {
-  public render(): JSX.Element {
-    const {count, decrement, increment, translations} = this.props;
-    return (
-      <div>
-        <h4>{translations.counter}</h4>
-        <Button name="decBtn" onClick={decrement} disabled={count <= 0}>
-          {translations.decrement}
-        </Button>
-        <Button className={classNames.moveRight} name="incBtn" onClick={increment}>
-          {translations.increment}
-        </Button>
-        <p>{count}</p>
-      </div>
-    );
-  }
-}
-
+// TODO: Understand *createSelector*
 const componentTranslationsSelector = createSelector(
   translationsSelector,
   (translations) => {
@@ -72,11 +49,36 @@ function mapStateToProps(state: Pick<IStore, "counter" | "settings">): IStateToP
   };
 }
 
+// TODO: Understand ActionCreators and *createAction* from 'typesafe-actions'
 function mapDispatchToProps(dispatch: Dispatch): IDispatchToProps {
   return {
     decrement: () => dispatch(decrementActionCreator()),
-    increment: () => dispatch(incrementActionCreator())
+    increment: (by = 1) => dispatch(incrementActionCreator(by)),
   };
+}
+
+const classNames = stylesheet({
+  moveRight: {
+    marginLeft: "8px"
+  }
+});
+
+class CounterPage extends React.Component<IProps> {
+  public render(): JSX.Element {
+    const {count, decrement, increment, translations} = this.props;
+    return (
+      <div>
+        <h4>{translations.counter}</h4>
+        <Button name="decBtn" onClick={decrement} disabled={count <= 0}>
+          {translations.decrement}
+        </Button>
+        <Button className={classNames.moveRight} name="incBtn" onClick={(_) => increment(10)}>
+          {translations.increment}
+        </Button>
+        <p>{count}</p>
+      </div>
+    );
+  }
 }
 
 const connected = connect(mapStateToProps, mapDispatchToProps)(CounterPage);

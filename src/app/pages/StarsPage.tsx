@@ -1,12 +1,12 @@
 import * as React from "react";
-import {connect} from "react-redux";
-import {Dispatch} from "redux";
-import {createSelector} from "reselect";
-import {Translator} from "../models/Translator";
-import {ITranslator} from "../models/TranslatorInterfaces";
-import {IStore} from "../redux/IStore";
-import {loadStarsCount as loadStarsActionCreator} from "../redux/modules/starsActionCreators";
-import {translationsSelector} from "../selectors/translationsSelector";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
+import { createSelector } from "reselect";
+import { Translator } from "../models/Translator";
+import { ITranslator } from "../models/TranslatorInterfaces";
+import { IStore } from "../redux/IStore";
+import { loadStarsCount as loadStarsActionCreator } from "../redux/modules/starsActionCreators";
+import { translationsSelector } from "../selectors/translationsSelector";
 
 interface IStateToProps {
   count: number;
@@ -33,7 +33,7 @@ class StarsPage extends React.Component<IProps> {
   }
 
   public render(): JSX.Element {
-    const {count, error, pending, translations} = this.props;
+    const { count, error, pending, translations } = this.props;
     if (pending) {
       return <div>{translations.fetchingStars}</div>;
     } else if (error) {
@@ -51,7 +51,7 @@ class StarsPage extends React.Component<IProps> {
 
 const componentTranslationsSelector = createSelector(
   translationsSelector,
-  (translations) => {
+  translations => {
     const translator: ITranslator = new Translator(translations);
     return {
       fetchingStars: translator.translate("Fetching stars...")
@@ -59,7 +59,9 @@ const componentTranslationsSelector = createSelector(
   }
 );
 
-function mapStateToProps(state: Pick<IStore, "settings" | "stars">): IStateToProps {
+function mapStateToProps(
+  state: Pick<IStore, "settings" | "stars">
+): IStateToProps {
   return {
     count: state.stars.count,
     error: state.stars.error,
@@ -75,5 +77,13 @@ function mapDispatchToProps(dispatch: Dispatch): IDispatchToProps {
   };
 }
 
-const connected = connect(mapStateToProps, mapDispatchToProps)(StarsPage);
-export {connected as StarsPage, mapDispatchToProps, mapStateToProps, StarsPage as UnconnectedStarsPage};
+const connected = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(StarsPage);
+export {
+  connected as StarsPage,
+  mapDispatchToProps,
+  mapStateToProps,
+  StarsPage as UnconnectedStarsPage
+};

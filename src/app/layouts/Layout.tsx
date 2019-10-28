@@ -5,6 +5,8 @@ interface ILayoutProps {
   children: JSX.Element;
 }
 
-class LayoutComponent<T extends ILayoutProps = ILayoutProps> extends React.Component<T> {}
+class LayoutComponent<
+  T extends ILayoutProps = ILayoutProps
+> extends React.Component<T> {}
 
 export { LayoutComponent, ILayoutProps };

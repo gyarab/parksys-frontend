@@ -1,6 +1,6 @@
 import * as React from "react";
-import {classes, stylesheet} from "typestyle";
-import {Color} from "../constants/Color";
+import { classes, stylesheet } from "typestyle";
+import { Color } from "../constants/Color";
 
 const classNames = stylesheet({
   button: {
@@ -38,14 +38,18 @@ interface IProps extends React.HTMLProps<HTMLButtonElement> {
 
 export class Button extends React.Component<IProps> {
   public static defaultProps: Partial<IProps> = {
-    type: "primary",
+    type: "primary"
   };
 
   public render(): JSX.Element {
-    const {children, className, disabled, type, ...rest} = this.props;
+    const { children, className, disabled, type, ...rest } = this.props;
     return (
       <button
-        className={classes(classNames.button, disabled ? classNames.disabled : classNames[type], className)}
+        className={classes(
+          classNames.button,
+          disabled ? classNames.disabled : classNames[type],
+          className
+        )}
         disabled={disabled}
         {...rest}
       >

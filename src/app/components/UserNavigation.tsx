@@ -11,7 +11,7 @@ interface IStateToProps {
   user?: {
     name: string;
     email: string;
-  },
+  };
 }
 
 interface IDispatchToProps {
@@ -25,20 +25,20 @@ function mapStateToProps(state: Pick<IStore, "user">): IStateToProps {
     return {
       user: {
         name: state.user.user.name,
-        email: state.user.user.email,
+        email: state.user.user.email
       }
-    }
+    };
   } else {
     return {
-      user: null,
-    }
+      user: null
+    };
   }
 }
 
 function mapDispatchToProps(dispatch: Dispatch): IDispatchToProps {
   return {
     logout: () => dispatch(logoutUserActionCreator())
-  }
+  };
 }
 
 const classNames = stylesheet({
@@ -48,7 +48,7 @@ const classNames = stylesheet({
     top: 0,
     margin: "0.3em",
     padding: "0.3em",
-    backgroundColor: Color.GREY,
+    backgroundColor: Color.GREY
   }
 });
 
@@ -60,27 +60,26 @@ class UserNavigation extends React.Component<IProps> {
         <>
           <p>{this.props.user.name}</p>
           <p>{this.props.user.email}</p>
-          <Button name="logoutButton" onClick={this.props.logout}>Logout</Button>
+          <Button name="logoutButton" onClick={this.props.logout}>
+            Logout
+          </Button>
         </>
       );
     } else {
-      body = (
-        <p>Not Logged In</p>
-      )
+      body = <p>Not Logged In</p>;
     }
-    return (
-      <div className={classNames.userNavigation}>
-        {body}
-      </div>
-    );
+    return <div className={classNames.userNavigation}>{body}</div>;
   }
 }
 
-const connected = connect(mapStateToProps, mapDispatchToProps)(UserNavigation);
+const connected = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(UserNavigation);
 
 export {
   UserNavigation as UnconnectedUserNavigation,
   connected as UserNavigation,
   mapStateToProps,
-  mapDispatchToProps,
+  mapDispatchToProps
 };

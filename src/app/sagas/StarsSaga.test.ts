@@ -1,10 +1,10 @@
 jest.mock("./dummyApi");
-import {runSaga} from "redux-saga";
+import { runSaga } from "redux-saga";
 import * as ReduxSagaEffects from "redux-saga/effects";
-import {getType} from "typesafe-actions";
-import {loadStarsCount} from "../redux/modules/starsActionCreators";
-import {dummyApi} from "./dummyApi";
-import {StarsSaga} from "./StarsSaga";
+import { getType } from "typesafe-actions";
+import { loadStarsCount } from "../redux/modules/starsActionCreators";
+import { dummyApi } from "./dummyApi";
+import { StarsSaga } from "./StarsSaga";
 
 describe("StarsSaga", () => {
   describe("fetchStarsCount", () => {
@@ -14,15 +14,17 @@ describe("StarsSaga", () => {
       (dummyApi as any).getStarsCount.mockResolvedValue(10);
       return runSaga(
         {
-          dispatch: (action) => dispatched.push(action)
+          dispatch: action => dispatched.push(action)
         },
-        (new StarsSaga()).fetchStarsCount
-      ).toPromise().then(() => {
-        expect(dispatched).toEqual([
-          {payload: null, type: "STARS/LOAD_STARS_COUNT_PENDING"},
-          {payload: 10, type: "STARS/LOAD_STARS_COUNT_FULFILLED"}
-        ]);
-      });
+        new StarsSaga().fetchStarsCount
+      )
+        .toPromise()
+        .then(() => {
+          expect(dispatched).toEqual([
+            { payload: null, type: "STARS/LOAD_STARS_COUNT_PENDING" },
+            { payload: 10, type: "STARS/LOAD_STARS_COUNT_FULFILLED" }
+          ]);
+        });
     });
 
     it("gets rejected and sets rejected", () => {
@@ -31,15 +33,21 @@ describe("StarsSaga", () => {
       (dummyApi as any).getStarsCount.mockRejectedValue("Error");
       return runSaga(
         {
-          dispatch: (action) => dispatched.push(action)
+          dispatch: action => dispatched.push(action)
         },
-        (new StarsSaga()).fetchStarsCount
-      ).toPromise().then(() => {
-        expect(dispatched).toEqual([
-          {payload: null, type: "STARS/LOAD_STARS_COUNT_PENDING"},
-          {message: "Error", payload: null, type: "STARS/LOAD_STARS_COUNT_REJECTED"}
-        ]);
-      });
+        new StarsSaga().fetchStarsCount
+      )
+        .toPromise()
+        .then(() => {
+          expect(dispatched).toEqual([
+            { payload: null, type: "STARS/LOAD_STARS_COUNT_PENDING" },
+            {
+              message: "Error",
+              payload: null,
+              type: "STARS/LOAD_STARS_COUNT_REJECTED"
+            }
+          ]);
+        });
     });
 
     describe("registerListeners", () => {
@@ -48,9 +56,12 @@ describe("StarsSaga", () => {
         const starsSaga = new StarsSaga();
         starsSaga.watch();
         const gen = (spied.mock.calls[0][0] as any)();
-        expect(
-          gen.next().value
-        ).toEqual(ReduxSagaEffects.takeLatest(getType(loadStarsCount.invoke), starsSaga.fetchStarsCount));
+        expect(gen.next().value).toEqual(
+          ReduxSagaEffects.takeLatest(
+            getType(loadStarsCount.invoke),
+            starsSaga.fetchStarsCount
+          )
+        );
       });
     });
   });

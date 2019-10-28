@@ -13,6 +13,7 @@ const initialState: ICounterState = {
   pending: false
 };
 
+// TODO: handleAction chain API?
 export function counterReducer(
   state: ICounterState = initialState,
   action: ActionType<typeof counterActionCreators>
@@ -21,7 +22,7 @@ export function counterReducer(
     case getType(counterActionCreators.increment):
       return {
         ...state,
-        count: state.count + 1
+        count: state.count + action.payload.by || 1
       };
     case getType(counterActionCreators.decrement):
       return {

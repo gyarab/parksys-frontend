@@ -1,4 +1,4 @@
-import {fork, ForkEffect} from "redux-saga/effects";
+import { fork, ForkEffect } from "redux-saga/effects";
 
 export abstract class BaseSaga {
   constructor() {

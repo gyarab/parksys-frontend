@@ -1,15 +1,7 @@
 const tslintRules = {
-  "align": [
-    true,
-    "parameters",
-    "arguments",
-    "statements"
-  ],
+  align: [true, "parameters", "arguments", "statements"],
   "chai-vague-errors": true,
-  "comment-format": [
-    true,
-    "check-space"
-  ],
+  "comment-format": [true, "check-space"],
   "create-async-actions": true,
   "export-name": true,
   "function-constructor": true,
@@ -28,24 +20,15 @@ const tslintRules = {
   "jquery-deferred-must-complete": true,
   "jsdoc-format": true,
   "jsx-boolean-value": true,
-  "jsx-curly-spacing": [
-    true,
-    "never"
-  ],
-  "jsx-equals-spacing": [
-    true,
-    "never"
-  ],
+  "jsx-curly-spacing": [true, "never"],
+  "jsx-equals-spacing": [true, "never"],
   "jsx-key": true,
   "jsx-no-bind": true,
   "jsx-no-lambda": true,
   "jsx-no-multiline-js": true,
   "jsx-no-string-ref": true,
   "jsx-self-close": true,
-  "jsx-space-before-closing-tag": [
-    true,
-    "never"
-  ],
+  "jsx-space-before-closing-tag": [true, "never"],
   "jsx-wrap-multiline": true,
   "max-func-body-length": [
     true,
@@ -54,10 +37,7 @@ const tslintRules = {
       "ignore-parameters-to-function-regex": "describe"
     }
   ],
-  "max-line-length": [
-    true,
-    120
-  ],
+  "max-line-length": [true, 120],
   "mocha-avoid-only": true,
   "no-backbone-get-set-outside-model": true,
   "no-cookies": true,
@@ -72,10 +52,7 @@ const tslintRules = {
   "no-for-in": true,
   "no-function-expression": true,
   "no-http-string": true,
-  "no-implicit-dependencies": [
-    true,
-    "dev"
-  ],
+  "no-implicit-dependencies": [true, "dev"],
   "no-inner-html": true,
   "no-jquery-raw-elements": true,
   "no-reference-import": true,
@@ -96,11 +73,7 @@ const tslintRules = {
     "check-else",
     "check-whitespace"
   ],
-  "only-arrow-functions": [
-    true,
-    "allow-declarations",
-    "allow-named-functions"
-  ],
+  "only-arrow-functions": [true, "allow-declarations", "allow-named-functions"],
   "ordered-imports": [
     true,
     {
@@ -112,41 +85,29 @@ const tslintRules = {
   "prefer-array-literal": true,
   "prefer-conditional-expression": true,
   "promise-must-complete": true,
-  "quotemark": [
-    true,
-    "double"
-  ],
+  quotemark: [true, "double"],
   "react-no-dangerous-html": [
     true,
     [
       {
-        "file": "./src/app/containers/Html.tsx",
-        "method": "render",
-        "comment": "string comes from trusted source - our initial state"
+        file: "./src/app/containers/Html.tsx",
+        method: "render",
+        comment: "string comes from trusted source - our initial state"
       }
     ]
   ],
   "react-this-binding-issue": true,
-  "semicolon": [
-    true,
-    "always"
-  ],
-  "space-within-parens": [
-    true,
-    0
-  ],
+  semicolon: [true, "always"],
+  "space-within-parens": [true, 0],
   "trailing-comma": [
     true,
     {
-      "singleline": "never",
-      "multiline": "never"
+      singleline: "never",
+      multiline: "never"
     }
   ],
-  "triple-equals": [
-    true,
-    "allow-null-check"
-  ],
-  "typedef": [
+  "triple-equals": [true, "allow-null-check"],
+  typedef: [
     true,
     "call-signature",
     "parameter",
@@ -162,7 +123,7 @@ const tslintRules = {
     "allow-leading-underscore",
     "allow-pascal-case"
   ],
-  "whitespace": [
+  whitespace: [
     true,
     "check-branch",
     "check-decl",
@@ -173,43 +134,40 @@ const tslintRules = {
 };
 
 module.exports = {
-  "env": {
-    "browser": true,
-    "node": true
+  env: {
+    browser: true,
+    node: true
   },
-  "overrides": [
+  overrides: [
     {
-      "files": ["*.stories.tsx"],
-      "rules": {
+      files: ["*.stories.tsx"],
+      rules: {
         "@typescript-eslint/tslint/config": [
           "error",
           {
-            "rulesDirectory": [
+            rulesDirectory: [
               "node_modules/tslint-react/rules",
               "node_modules/tslint-microsoft-contrib",
               "node_modules/@crazyfactory/tslint-rules/lib"
             ],
-            "rules": {
+            rules: {
               ...tslintRules,
               "export-name": false,
               "jsx-no-lambda": false,
-              "react-this-binding-issue": false,
+              "react-this-binding-issue": false
             }
           }
         ]
       }
     }
   ],
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "project": "tsconfig.json",
-    "sourceType": "module"
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    project: "tsconfig.json",
+    sourceType: "module"
   },
-  "plugins": [
-    "@typescript-eslint",
-    "@typescript-eslint/tslint"
-  ],
-  "rules": {
+  plugins: ["@typescript-eslint", "@typescript-eslint/tslint"],
+  rules: {
     "@typescript-eslint/adjacent-overload-signatures": "error",
     "@typescript-eslint/array-type": "error",
     "@typescript-eslint/ban-types": "error",
@@ -218,8 +176,8 @@ module.exports = {
     "@typescript-eslint/explicit-member-accessibility": [
       "error",
       {
-        "overrides": {
-          "constructors": "off"
+        overrides: {
+          constructors: "off"
         }
       }
     ],
@@ -248,21 +206,15 @@ module.exports = {
     "@typescript-eslint/prefer-namespace-keyword": "off",
     "@typescript-eslint/type-annotation-spacing": "error",
     "@typescript-eslint/unified-signatures": "error",
-    "arrow-parens": [
-      "error",
-      "always"
-    ],
-    "complexity": "off",
+    "arrow-parens": ["error", "always"],
+    complexity: "off",
     "constructor-super": "error",
-    "curly": "error",
+    curly: "error",
     "default-case": "error",
     "dot-notation": "error",
     "eol-last": "off",
     "guard-for-in": "error",
-    "max-classes-per-file": [
-      "error",
-      1
-    ],
+    "max-classes-per-file": ["error", 1],
     "member-ordering": "off",
     "new-parens": "error",
     "no-bitwise": "error",
@@ -271,15 +223,7 @@ module.exports = {
     "no-console": [
       "error",
       {
-        "allow": [
-          "error",
-          "debug",
-          "info",
-          "time",
-          "timeEnd",
-          "trace",
-          "warn"
-        ]
+        allow: ["error", "debug", "info", "time", "timeEnd", "trace", "warn"]
       }
     ],
     "no-constant-condition": "error",
@@ -314,23 +258,20 @@ module.exports = {
     "one-var": "off",
     "prefer-const": "error",
     "prefer-object-spread": "error",
-    "quote-props": [
-      "error",
-      "consistent-as-needed"
-    ],
-    "radix": "error",
+    "quote-props": ["warn", "consistent-as-needed"],
+    radix: "error",
     "space-before-function-paren": ["error", "never"],
     "use-isnan": "error",
     "valid-typeof": "off",
     "@typescript-eslint/tslint/config": [
       "error",
       {
-        "rulesDirectory": [
+        rulesDirectory: [
           "node_modules/tslint-react/rules",
           "node_modules/tslint-microsoft-contrib",
           "node_modules/@crazyfactory/tslint-rules/lib"
         ],
-        "rules": tslintRules
+        rules: tslintRules
       }
     ]
   }

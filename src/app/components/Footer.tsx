@@ -1,6 +1,6 @@
 import { stylesheet } from "typestyle";
 import React from "react";
-import {Copyright} from "../constants/Copyright";
+import { Copyright } from "../constants/Copyright";
 import { Color } from "../constants";
 
 const classNames = stylesheet({
@@ -19,10 +19,10 @@ const classNames = stylesheet({
         fontFamily: "Arial",
         fontSize: "0.9em",
         color: Color.WHITE,
-        margin: "auto",
-      },
-    },
-  },
+        margin: "auto"
+      }
+    }
+  }
 });
 
 // Just renders constants from /src/app/constants/Copyright.ts
@@ -38,4 +38,4 @@ class Footer extends React.Component {
   }
 }
 
-export {Footer};
+export { Footer };

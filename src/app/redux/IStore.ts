@@ -1,7 +1,7 @@
-import {RouterState} from "redux-router5";
-import {ICounterState} from "./modules/counterModule";
-import {ISettingsState} from "./modules/settingsModule";
-import {IStarsState} from "./modules/starsModule";
+import { RouterState } from "redux-router5";
+import { ICounterState } from "./modules/counterModule";
+import { ISettingsState } from "./modules/settingsModule";
+import { IStarsState } from "./modules/starsModule";
 import { IUserState } from "./modules/userModule";
 
 export interface IStore {

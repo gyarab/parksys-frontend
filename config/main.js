@@ -6,26 +6,26 @@ const config = {
     head: {
       link: [
         {
-          href: 'https://fonts.googleapis.com/css?family=Roboto',
-          rel: 'stylesheet',
-          type: 'text/css'
+          href: "https://fonts.googleapis.com/css?family=Roboto",
+          rel: "stylesheet",
+          type: "text/css"
         }
       ],
       meta: [
-        {charset: 'utf-8'},
-        {'http-equiv': 'x-ua-compatible', content: 'ie=edge'},
-        {name: 'viewport', content: 'width=device-width, initial-scale=1'},
-        {name: 'description', content: 'React Redux Typescript'},
+        { charset: "utf-8" },
+        { "http-equiv": "x-ua-compatible", "content": "ie=edge" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        { name: "description", content: "React Redux Typescript" }
       ],
-      title: 'Parking System'
+      title: "Parking System"
     }
   },
-  env: process.env.NODE_ENV || 'development',
-  host: process.env.HOST || 'localhost',
+  env: process.env.NODE_ENV || "development",
+  host: process.env.HOST || "localhost",
   port: process.env.PORT || 8889,
   ssr: true,
   sentry: {
-    dsn: '', // your sentry dsn here
+    dsn: "", // your sentry dsn here
     options: {}
   }
 };

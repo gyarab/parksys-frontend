@@ -8,10 +8,10 @@ const classNames = stylesheet({
       "& > p": {
         width: "100%",
         textAlign: "center",
-        fontWeight: "bold",
-      },
-    },
-  },
+        fontWeight: "bold"
+      }
+    }
+  }
 });
 
 export class BlankPage extends React.Component {

@@ -1,6 +1,6 @@
-import {cssRaw} from "typestyle";
-import {Color} from "../constants/Color";
-import {FontSize} from "../constants/FontSize";
+import { cssRaw } from "typestyle";
+import { Color } from "../constants/Color";
+import { FontSize } from "../constants/FontSize";
 
 export function setupCss(): void {
   cssRaw(`

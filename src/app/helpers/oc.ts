@@ -71,9 +71,11 @@ export interface IArrayWrapper<T> {
  */
 export type DataWrapper<T> = T extends any[]
   ? IArrayWrapper<T[number]>
-  : T extends object ?
-    ObjectWrapper<T>
-    : T extends string | number | boolean ? IDataAccessor<T> : any;
+  : T extends object
+  ? ObjectWrapper<T>
+  : T extends string | number | boolean
+  ? IDataAccessor<T>
+  : any;
 
 /////////////////////////////////////
 //
@@ -112,7 +114,8 @@ export type OCType<T> = IDataAccessor<T> & DataWrapper<NonNullable<T>>;
  */
 export function oc<T>(data?: T): OCType<T> {
   return new Proxy(
-    ((defaultValue?: Defined<T>) => (data == null ? defaultValue : data)) as OCType<T>,
+    ((defaultValue?: Defined<T>) =>
+      data == null ? defaultValue : data) as OCType<T>,
     {
       get: (target, key) => {
         const obj: any = target();

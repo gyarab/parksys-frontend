@@ -1,20 +1,21 @@
-import {ComponentClass} from "react";
-import {Action} from "redux";
-import {actions} from "redux-router5";
+import { ComponentClass } from "react";
+import { Action } from "redux";
+import { actions } from "redux-router5";
 import { ILayoutProps } from "../layouts/Layout";
 
 interface IRoute {
   name: RoutablePages;
   path: string;
 }
-type RoutablePages = "homePage"
-| "accountPage"
-| "dashboardPage"
-| "statisticsPage"
-| "rulesPage"
-| "revenuePage"
-| "historyPage"
-| "loginPage";
+type RoutablePages =
+  | "homePage"
+  | "accountPage"
+  | "dashboardPage"
+  | "statisticsPage"
+  | "rulesPage"
+  | "revenuePage"
+  | "historyPage"
+  | "loginPage";
 interface PageRecord {
   page: ComponentClass;
   nav?: ComponentClass;
@@ -27,7 +28,7 @@ type RouteNavigate = Record<RoutablePages, (...params: any[]) => Action>;
 
 function getRoutes(routeConfig: RouteConfig): Record<RoutablePages, IRoute> {
   return Object.keys(routeConfig)
-    .map((key) => ({
+    .map(key => ({
       name: key,
       path: routeConfig[key].path
     }))
@@ -40,19 +41,22 @@ function getRoutes(routeConfig: RouteConfig): Record<RoutablePages, IRoute> {
     );
 }
 
-function getNavigateAction<T extends {[key: string]: any}>(routeName: RoutablePages, params?: T): Action {
+function getNavigateAction<T extends { [key: string]: any }>(
+  routeName: RoutablePages,
+  params?: T
+): Action {
   return actions.navigateTo(routeName, params);
 }
 
 const config: RouteConfig = {
-  homePage: {path: "/home"},
-  accountPage: {path: "/account"},
-  dashboardPage: {path: "/dashboard"},
-  statisticsPage: {path: "/statistics"},
-  rulesPage: {path: "/rules"},
-  revenuePage: {path: "/revenue"},
-  historyPage: {path: "/history"},
-  loginPage: {path: "/"}
+  homePage: { path: "/home" },
+  accountPage: { path: "/account" },
+  dashboardPage: { path: "/dashboard" },
+  statisticsPage: { path: "/statistics" },
+  rulesPage: { path: "/rules" },
+  revenuePage: { path: "/revenue" },
+  historyPage: { path: "/history" },
+  loginPage: { path: "/" }
 };
 
 export const routes = getRoutes(config);
@@ -65,5 +69,5 @@ export const navigate: RouteNavigate = {
   rulesPage: () => getNavigateAction(routes.rulesPage.name),
   revenuePage: () => getNavigateAction(routes.revenuePage.name),
   historyPage: () => getNavigateAction(routes.historyPage.name),
-  loginPage: () => getNavigateAction(routes.loginPage.name),
+  loginPage: () => getNavigateAction(routes.loginPage.name)
 };

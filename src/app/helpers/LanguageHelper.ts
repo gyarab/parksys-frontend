@@ -24,12 +24,18 @@ export class LanguageHelper {
   }
 
   private static getTranslations(language: string): object {
-    return JSON.parse(fs.readFileSync(LanguageHelper.getLanguageFileLocation(language)).toString());
+    return JSON.parse(
+      fs
+        .readFileSync(LanguageHelper.getLanguageFileLocation(language))
+        .toString()
+    );
   }
 
   public getTranslations(): any {
     return LanguageHelper.getTranslations(
-      LanguageHelper.isSupported(this.preferredLanguage) ? this.preferredLanguage : "en"
+      LanguageHelper.isSupported(this.preferredLanguage)
+        ? this.preferredLanguage
+        : "en"
     );
   }
 
