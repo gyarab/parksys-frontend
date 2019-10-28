@@ -1,4 +1,4 @@
-jest.mock("./dummyApi");
+jest.mock("../apis/dummyApi");
 import { runSaga } from "redux-saga";
 import * as ReduxSagaEffects from "redux-saga/effects";
 import { getType } from "typesafe-actions";

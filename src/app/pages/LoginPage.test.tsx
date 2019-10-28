@@ -19,8 +19,6 @@ describe("<LoginPage />", () => {
     const wrapper = shallow(
       <UnconnectedLoginPage login={spied} state={initialState} />
     );
-    const buttonSelector = { name: "loginButton" };
-    expect(wrapper.find(buttonSelector)).toBeDefined();
     expect(spied).not.toHaveBeenCalled();
 
     wrapper
@@ -29,7 +27,11 @@ describe("<LoginPage />", () => {
     wrapper
       .find({ name: "password", type: "password" })
       .simulate("change", { target: { value: "qwerty123" } });
-    wrapper.find(buttonSelector).simulate("click");
+    let calledPreventDefault = false;
+    const event = { preventDefault: () => (calledPreventDefault = true) };
+    wrapper.find("form").simulate("submit", event);
+
+    expect(calledPreventDefault).toBe(true);
     expect(spied).toHaveBeenCalled();
     expect(spied.mock.calls[0]).toEqual(["user1", "qwerty123"]);
   });
