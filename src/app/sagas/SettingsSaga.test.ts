@@ -3,7 +3,7 @@ import { runSaga } from "redux-saga";
 import * as ReduxSagaEffects from "redux-saga/effects";
 import { getType } from "typesafe-actions";
 import { setLanguage } from "../redux/modules/settingsActionCreators";
-import { dummyApi } from "./dummyApi";
+import { dummyApi } from "../apis/dummyApi";
 import { SettingsSaga } from "./SettingsSaga";
 
 describe("SettingsSaga", () => {

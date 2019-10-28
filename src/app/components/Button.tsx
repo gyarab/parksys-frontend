@@ -5,7 +5,8 @@ import { Color } from "../constants/Color";
 const classNames = stylesheet({
   button: {
     outline: "none",
-    padding: "10px 25px"
+    padding: "10px 25px",
+    border: "none"
   },
   disabled: {
     backgroundColor: Color.GREY,

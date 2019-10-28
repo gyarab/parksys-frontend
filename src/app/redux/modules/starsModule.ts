@@ -1,5 +1,5 @@
-import {ActionType, getType} from "typesafe-actions";
-import {IBaseState} from "./baseModule";
+import { ActionType, getType } from "typesafe-actions";
+import { IBaseState } from "./baseModule";
 import * as starsActionCreators from "./starsActionCreators";
 
 export interface IStarsState extends IBaseState {

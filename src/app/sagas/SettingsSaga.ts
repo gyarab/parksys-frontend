@@ -10,7 +10,7 @@ import {
 import { getType } from "typesafe-actions";
 import { setLanguage } from "../redux/modules/settingsActionCreators";
 import { BaseSaga } from "./BaseSaga";
-import { dummyApi } from "./dummyApi";
+import { dummyApi } from "../apis/dummyApi";
 
 export class SettingsSaga extends BaseSaga {
   @autobind

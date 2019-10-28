@@ -3,7 +3,7 @@ import { runSaga } from "redux-saga";
 import * as ReduxSagaEffects from "redux-saga/effects";
 import { getType } from "typesafe-actions";
 import { loadStarsCount } from "../redux/modules/starsActionCreators";
-import { dummyApi } from "./dummyApi";
+import { dummyApi } from "../apis/dummyApi";
 import { StarsSaga } from "./StarsSaga";
 
 describe("StarsSaga", () => {

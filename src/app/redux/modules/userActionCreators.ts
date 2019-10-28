@@ -1,7 +1,7 @@
-import {createAction} from "typesafe-actions";
-import {createAsyncActions} from "./baseModule";
+import { createAction } from "typesafe-actions";
+import { createAsyncActions } from "./baseModule";
 
-export const logoutUser = createAction("USER/LOGOUT", (resolve) => {
+export const logoutUser = createAction("USER/LOGOUT", resolve => {
   return () => resolve();
 });
 
@@ -12,4 +12,4 @@ export const loginUser = createAsyncActions(
   loginLogoutPrefix + "_PENDING",
   loginLogoutPrefix + "_FULFILLED",
   loginLogoutPrefix + "_REJECTED"
-)<{ user: string, password: string }, null, number, null>();
+)<{ user: string; password: string }, null, string, string>();

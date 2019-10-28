@@ -10,7 +10,7 @@ import {
 import { getType } from "typesafe-actions";
 import { loadStarsCount } from "../redux/modules/starsActionCreators";
 import { BaseSaga } from "./BaseSaga";
-import { dummyApi } from "./dummyApi";
+import { dummyApi } from "../apis/dummyApi";
 
 // TODO: Understand this
 export class StarsSaga extends BaseSaga {
