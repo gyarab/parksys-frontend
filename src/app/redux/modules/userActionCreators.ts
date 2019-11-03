@@ -12,4 +12,4 @@ export const loginUser = createAsyncActions(
   loginLogoutPrefix + "_PENDING",
   loginLogoutPrefix + "_FULFILLED",
   loginLogoutPrefix + "_REJECTED"
-)<{ user: string; password: string }, null, string, string>();
+)<any, any, any, any>();

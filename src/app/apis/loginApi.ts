@@ -1,23 +1,26 @@
-function fillArray<T>(n: number, value: T): T[] {
-  const array: Array<T> = new Array(n);
-  array.fill(value, 0, n);
-  return array;
-}
+import { config } from "../../../config";
 
 export const loginApi = {
   loginUser: (user: string, password: string) => (): Promise<{
-    token: string;
+    accessToken: string;
+    refreshToken: string;
   }> => {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        console.log(
-          `LOGGED IN ${user} with password ${fillArray(
-            password.length,
-            "*"
-          ).join("")}`
-        );
-        resolve({ token: "header.payload.signature" });
-      }, 200);
-    });
+    return fetch(config.backendApi.root + "/login/password", {
+      method: "POST",
+      body: JSON.stringify({
+        user,
+        password
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(json => {
+        return {
+          accessToken: json.accessToken,
+          refreshToken: json.refreshToken
+        };
+      });
   }
 };

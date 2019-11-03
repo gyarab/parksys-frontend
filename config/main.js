@@ -13,7 +13,7 @@ const config = {
       ],
       meta: [
         { charset: "utf-8" },
-        { "http-equiv": "x-ua-compatible", "content": "ie=edge" },
+        { "http-equiv": "x-ua-compatible", content: "ie=edge" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         { name: "description", content: "React Redux Typescript" }
       ],
@@ -27,6 +27,9 @@ const config = {
   sentry: {
     dsn: "", // your sentry dsn here
     options: {}
+  },
+  backendApi: {
+    root: "http://localhost:8080"
   }
 };
 

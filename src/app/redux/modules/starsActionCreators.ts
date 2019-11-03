@@ -1,4 +1,4 @@
-import {createAsyncActions} from "./baseModule";
+import { createAsyncActions } from "./baseModule";
 
 // tslint:disable-next-line:export-name
 export const loadStarsCount = createAsyncActions(
