@@ -9,6 +9,8 @@ import { IUserState } from "../redux/modules/userModule";
 import { stylesheet } from "typestyle";
 import { Input } from "../components/Input";
 import { Footer } from "../components/Footer";
+import lodash from "lodash";
+import { navigate } from "../routes/routes";
 
 interface IStateToProps {
   state: IUserState;
@@ -16,6 +18,7 @@ interface IStateToProps {
 
 interface IDispatchToProps {
   login: (user: string, password: string) => void;
+  switchPage: () => void;
 }
 
 interface IProps extends IStateToProps, IDispatchToProps {}
@@ -29,7 +32,8 @@ function mapStateToProps(state: Pick<IStore, "user">): IStateToProps {
 function mapDispatchToProps(dispatch: Dispatch): IDispatchToProps {
   return {
     login: (user, password) =>
-      dispatch(loginUserActionCreator.invoke({ user, password }))
+      dispatch(loginUserActionCreator.invoke({ user, password })),
+    switchPage: () => dispatch(navigate.dashboardPage())
   };
 }
 
@@ -69,10 +73,20 @@ const classNames = stylesheet({
   }
 });
 
+const switchPageIfTokens = (props: IProps) => {
+  const at = lodash.get(props, "state.accessToken", null);
+  const rt = lodash.get(props, "state.refreshToken", null);
+  if (at && rt) {
+    props.switchPage();
+  }
+};
+
 const LoginPage = (props: IProps) => {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [compError, setCompError] = useState("");
+
+  switchPageIfTokens(props);
 
   const submit = e => {
     e.preventDefault();
@@ -127,9 +141,6 @@ const LoginPage = (props: IProps) => {
   );
 };
 
-const connected = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(LoginPage);
+const connected = connect(mapStateToProps, mapDispatchToProps)(LoginPage);
 
 export { connected as LoginPage, LoginPage as UnconnectedLoginPage };

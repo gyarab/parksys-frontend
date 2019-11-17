@@ -18,8 +18,8 @@ export const loginApi = {
       .then(res => res.json())
       .then(json => {
         return {
-          accessToken: json.accessToken,
-          refreshToken: json.refreshToken
+          accessToken: json.data.accessToken,
+          refreshToken: json.data.refreshToken
         };
       });
   }

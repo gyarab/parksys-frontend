@@ -6,7 +6,11 @@ import { initialState } from "../redux/modules/userModule";
 describe("<LoginPage />", () => {
   it("password input is of type password", () => {
     const wrapper = shallow(
-      <UnconnectedLoginPage login={() => null} state={initialState} />
+      <UnconnectedLoginPage
+        login={() => null}
+        switchPage={fail}
+        state={initialState}
+      />
     );
     const typeAttr = wrapper
       .find({ name: "password", type: "password" })
@@ -17,7 +21,11 @@ describe("<LoginPage />", () => {
   it("calls login(user, password) when login button is clicked with input data", () => {
     const spied = jest.fn();
     const wrapper = shallow(
-      <UnconnectedLoginPage login={spied} state={initialState} />
+      <UnconnectedLoginPage
+        state={initialState}
+        login={spied}
+        switchPage={fail}
+      />
     );
     expect(spied).not.toHaveBeenCalled();
 
@@ -34,5 +42,20 @@ describe("<LoginPage />", () => {
     expect(calledPreventDefault).toBe(true);
     expect(spied).toHaveBeenCalled();
     expect(spied.mock.calls[0]).toEqual(["user1", "qwerty123"]);
+  });
+
+  it("calls switchPage if the user is logged in", () => {
+    const spied = jest.fn();
+    shallow(
+      <UnconnectedLoginPage
+        state={{
+          ...initialState,
+          ...{ refreshToken: "rt", accessToken: "at" }
+        }}
+        login={fail}
+        switchPage={spied}
+      />
+    );
+    expect(spied).toHaveBeenCalled();
   });
 });
