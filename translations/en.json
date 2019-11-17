@@ -10,5 +10,11 @@
   "Stars": "Stars",
   "Home": "Home",
   "Fetching stars...": "Fetching Stars...",
-  "Not found": "Not Found"
+  "Not found": "Not Found",
+  "Dashboard": "Dashboard",
+  "Account": "Account",
+  "Statistics": "Statistics",
+  "Rules": "Rules",
+  "Revenue": "Revenue",
+  "History": "History"
 }

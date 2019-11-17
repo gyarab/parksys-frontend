@@ -1,0 +1,20 @@
+{
+  "Hello": "Ahoj!",
+  "About": "O stránce",
+  "About us": "O nás",
+  "Change language": "Změnit jazyk",
+  "Counter": "Počítadlo",
+  "Increment": "Přičíst",
+  "Decrement": "Odečíst",
+  "Current language": "Zvolený jazyk",
+  "Stars": "Hvězdy",
+  "Home": "Domů",
+  "Fetching stars...": "Načítájí se hvězdy",
+  "Not found": "Nenalezeno",
+  "Dashboard": "Dashboard",
+  "Account": "Účet",
+  "Statistics": "Statistiky",
+  "Rules": "Pravidla",
+  "Revenue": "Příjem",
+  "History": "Historie"
+}
