@@ -19,6 +19,7 @@
     "start": "node build/server.js",
     "start:prod": "npm run build:prod && cross-env NODE_ENV=production node build/server.js",
     "test": "jest",
+    "test:cov": "jest --collectCoverage",
     "test:no-cache": "jest --no-cache",
     "test:watch": "jest --watch",
     "lint": "eslint \"src/**/**.ts*\"",
@@ -128,7 +129,6 @@
   "jest": {
     "preset": "ts-jest",
     "cacheDirectory": "<rootDir>/.jest/cache",
-    "collectCoverage": true,
     "coverageDirectory": "<rootDir>/coverage",
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
     "moduleNameMapper": {
