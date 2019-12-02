@@ -17,6 +17,8 @@ import { configureStore } from "./app/redux/configureStore";
 import { IStore } from "./app/redux/IStore";
 import { configureRouter } from "./app/routes/configureRouter";
 import rootSaga from "./app/sagas/rootSaga";
+import { ApolloProvider } from "react-apollo";
+import { createApolloClient } from "./app/apis/gql";
 
 const app = express();
 
@@ -84,6 +86,7 @@ app.get("*", (req: express.Request, res: express.Response) => {
         translations: languageHelper.getTranslations()
       }
     });
+    const apolloClient = createApolloClient(store);
 
     store
       .runSaga(rootSaga)
@@ -97,11 +100,13 @@ app.get("*", (req: express.Request, res: express.Response) => {
 
         // render again from the initial data
         const markup = renderToString(
-          <Provider store={store} key="provider">
-            <RouterProvider router={router}>
-              <App />
-            </RouterProvider>
-          </Provider>
+          <ApolloProvider client={apolloClient}>
+            <Provider store={store} key="provider">
+              <RouterProvider router={router}>
+                <App />
+              </RouterProvider>
+            </Provider>
+          </ApolloProvider>
         );
 
         // tslint:disable-next-line
@@ -119,11 +124,13 @@ app.get("*", (req: express.Request, res: express.Response) => {
 
     // first render to activate constructor to dispatch actions for loading initial data
     renderToString(
-      <Provider store={store} key="provider">
-        <RouterProvider router={router}>
-          <App />
-        </RouterProvider>
-      </Provider>
+      <ApolloProvider client={apolloClient}>
+        <Provider store={store} key="provider">
+          <RouterProvider router={router}>
+            <App />
+          </RouterProvider>
+        </Provider>
+      </ApolloProvider>
     );
 
     // tslint:disable-next-line

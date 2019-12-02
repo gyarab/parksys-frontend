@@ -11,6 +11,7 @@ import { getType } from "typesafe-actions";
 import * as userActions from "../redux/modules/userActionCreators";
 import { BaseSaga } from "./BaseSaga";
 import { loginApi } from "../apis/loginApi";
+import { navigate } from "../routes/routes";
 
 export class UserSaga extends BaseSaga {
   @autobind
@@ -27,7 +28,26 @@ export class UserSaga extends BaseSaga {
     }
   }
 
+  @autobind
+  public *logoutUser(
+    _: ReturnType<typeof userActions.logoutUser>
+  ): IterableIterator<CallEffect | PutEffect<any>> {
+    yield put(navigate.loginPage());
+  }
+
+  @autobind
+  public *switchPage(
+    _: ReturnType<typeof userActions.loginUser.setFulfilled>
+  ): IterableIterator<CallEffect | PutEffect<any>> {
+    yield put(navigate.dashboardPage());
+  }
+
   protected *registerListeners(): IterableIterator<ForkEffect> {
     yield takeLatest(getType(userActions.loginUser.invoke), this.loginUser);
+    yield takeLatest(
+      getType(userActions.loginUser.setFulfilled),
+      this.switchPage
+    );
+    yield takeLatest(getType(userActions.logoutUser), this.logoutUser);
   }
 }

@@ -1,11 +1,15 @@
 import { ActionType, getType } from "typesafe-actions";
 import { IBaseState } from "./baseModule";
-import { loginUser as loginUserActions } from "./userActionCreators";
+import {
+  loginUser as loginUserActions,
+  logoutUser
+} from "./userActionCreators";
 
 export interface IUserState extends IBaseState {
   user?: {
+    id: string;
     name: string;
-    email?: string;
+    email: string;
     permissions: string[];
   };
   refreshToken?: string;
@@ -21,6 +25,27 @@ export const initialState: IUserState = {
   pending: false
 };
 
+function fromBase64Url(payload: string): any {
+  let s = payload;
+  s = s.replace(/-/g, "+"); // 62nd char of encoding
+  s = s.replace(/_/g, "/"); // 63rd char of encoding
+  switch (
+    s.length % 4 // Pad with trailing '='s
+  ) {
+    case 0:
+      break; // No pad chars in this case
+    case 2:
+      s += "==";
+      break; // Two pad chars
+    case 3:
+      s += "=";
+      break; // One pad char
+    default:
+      throw new Error("Illegal base64url string!");
+  }
+  return Buffer.from(s, "base64"); // Standard base64 decoder
+}
+
 export function userReducer(
   state: IUserState = initialState,
   action: ActionType<typeof loginUserActions>
@@ -32,13 +57,15 @@ export function userReducer(
         pending: true
       };
     case getType(loginUserActions.setFulfilled):
-      const val = action.payload;
-      console.log(val);
       return {
-        // TODO: Update user fields
         ...state,
         accessToken: action.payload.accessToken,
         refreshToken: action.payload.refreshToken,
+        user: {
+          ...JSON.parse(fromBase64Url(action.payload.accessToken.split(".")[1]))
+            .user,
+          ...action.payload.user
+        },
         error: "",
         loaded: true,
         pending: false
@@ -49,6 +76,11 @@ export function userReducer(
         error: "",
         loaded: true,
         pending: false
+      };
+    case getType(logoutUser):
+      return {
+        ...state,
+        ...initialState
       };
     default:
       return state;

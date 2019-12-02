@@ -17,10 +17,7 @@ export const loginApi = {
     })
       .then(res => res.json())
       .then(json => {
-        return {
-          accessToken: json.data.accessToken,
-          refreshToken: json.data.refreshToken
-        };
+        return json.data;
       });
   }
 };

@@ -4,6 +4,7 @@ import { IUserState } from "../redux/modules/userModule";
 import { mapStateToProps, UnconnectedUserNavigation } from "./UserNavigation";
 
 const userProps = {
+  id: "1234",
   name: "user1",
   email: "user1@example.com"
 };
@@ -26,10 +27,12 @@ describe("<UserNavigation />", () => {
     };
     const props1 = mapStateToProps({ user: state1 });
     expect(props1).toEqual({
-      user: userProps
+      user: {
+        name: "user1",
+        email: "user1@example.com"
+      }
     });
     const props2 = mapStateToProps({ user: state2 });
-    expect(props2).toHaveProperty("user");
     expect(props2.user).toBeNull();
   });
 

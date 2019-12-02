@@ -1,5 +1,5 @@
-import {loadStarsCount} from "./starsActionCreators";
-import {IStarsState, starsReducer} from "./starsModule";
+import { loadStarsCount } from "../starsActionCreators";
+import { IStarsState, starsReducer } from "../starsModule";
 
 describe("starsModule", () => {
   describe("reducer", () => {
@@ -10,7 +10,9 @@ describe("starsModule", () => {
         loaded: false,
         pending: false
       };
-      expect(starsReducer(undefined, {type: undefined})).toEqual(initialState);
+      expect(starsReducer(undefined, { type: undefined })).toEqual(
+        initialState
+      );
     });
 
     it("handles pending action", () => {
@@ -50,7 +52,9 @@ describe("starsModule", () => {
         loaded: false,
         pending: true
       };
-      expect(starsReducer(state, loadStarsCount.setRejected(null, "Error"))).toEqual({
+      expect(
+        starsReducer(state, loadStarsCount.setRejected(null, "Error"))
+      ).toEqual({
         count: 0,
         error: "Error",
         loaded: true,
@@ -65,7 +69,7 @@ describe("starsModule", () => {
         loaded: true,
         pending: false
       };
-      expect(starsReducer(state, {type: "unknown"} as any)).toBe(state);
+      expect(starsReducer(state, { type: "unknown" } as any)).toBe(state);
     });
   });
 });

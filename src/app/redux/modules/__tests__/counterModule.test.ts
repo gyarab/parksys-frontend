@@ -1,5 +1,5 @@
-import {decrement, increment} from "./counterActionCreators";
-import {counterReducer, ICounterState} from "./counterModule";
+import { decrement, increment } from "../counterActionCreators";
+import { counterReducer, ICounterState } from "../counterModule";
 
 describe("counterModule", () => {
   describe("reducer", () => {
@@ -10,7 +10,9 @@ describe("counterModule", () => {
         loaded: false,
         pending: false
       };
-      expect(counterReducer(undefined, {type: undefined})).toEqual(initialState);
+      expect(counterReducer(undefined, { type: undefined })).toEqual(
+        initialState
+      );
     });
 
     it("handles action of type INCREMENT", () => {
@@ -65,7 +67,7 @@ describe("counterModule", () => {
         loaded: false,
         pending: false
       };
-      expect(counterReducer(state, {type: "unknown"} as any)).toBe(state);
+      expect(counterReducer(state, { type: "unknown" } as any)).toBe(state);
     });
   });
 });

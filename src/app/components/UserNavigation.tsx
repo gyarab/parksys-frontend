@@ -48,7 +48,13 @@ const classNames = stylesheet({
     top: 0,
     margin: "0.3em",
     padding: "0.3em",
-    backgroundColor: Color.GREY
+    backgroundColor: Color.GREY,
+    color: Color.WHITE,
+    $nest: {
+      "& p": {
+        textAlign: "center"
+      }
+    }
   }
 });
 
@@ -59,7 +65,6 @@ class UserNavigation extends React.Component<IProps> {
       body = (
         <>
           <p>{this.props.user.name}</p>
-          <p>{this.props.user.email}</p>
           <Button name="logoutButton" onClick={this.props.logout}>
             Logout
           </Button>
@@ -72,10 +77,7 @@ class UserNavigation extends React.Component<IProps> {
   }
 }
 
-const connected = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(UserNavigation);
+const connected = connect(mapStateToProps, mapDispatchToProps)(UserNavigation);
 
 export {
   UserNavigation as UnconnectedUserNavigation,
