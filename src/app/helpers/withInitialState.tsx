@@ -9,7 +9,7 @@ const Stage: React.FunctionComponent<{ initialState: any }> = ({
 };
 
 const renderChildrenFn = (story, context) => (state, setState) => {
-  const setCombinedState = updatedState =>
+  const setCombinedState = (updatedState) =>
     setState({ ...state, ...updatedState });
   return <div>{story({ ...context, state, setState: setCombinedState })}</div>;
 };

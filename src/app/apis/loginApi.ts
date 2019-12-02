@@ -15,8 +15,8 @@ export const loginApi = {
         "Content-Type": "application/json"
       }
     })
-      .then(res => res.json())
-      .then(json => {
+      .then((res) => res.json())
+      .then((json) => {
         return json.data;
       });
   }

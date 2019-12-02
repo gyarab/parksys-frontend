@@ -53,7 +53,7 @@ app.get(
 
 app.get("*", (req: express.Request, res: express.Response) => {
   if (!appConfig.ssr) {
-    res.sendFile(path.resolve("./build/index.html"), {}, error => {
+    res.sendFile(path.resolve("./build/index.html"), {}, (error) => {
       if (error) {
         console.error(error.message);
       }
@@ -141,7 +141,7 @@ app.get("*", (req: express.Request, res: express.Response) => {
   });
 });
 
-app.listen(appConfig.port, appConfig.host, err => {
+app.listen(appConfig.port, appConfig.host, (err) => {
   if (err) {
     console.error(Chalk.bgRed(err));
   } else {

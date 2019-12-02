@@ -74,7 +74,7 @@ const LoginPage = (props: IProps) => {
   const [password, setPassword] = useState("");
   const [compError, setCompError] = useState("");
 
-  const submit = e => {
+  const submit = (e) => {
     e.preventDefault();
     if (user.length > 0 && password.length > 0) {
       props.login(user, password);

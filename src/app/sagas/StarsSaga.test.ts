@@ -14,7 +14,7 @@ describe("StarsSaga", () => {
       (dummyApi as any).getStarsCount.mockResolvedValue(10);
       return runSaga(
         {
-          dispatch: action => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action)
         },
         new StarsSaga().fetchStarsCount
       )
@@ -33,7 +33,7 @@ describe("StarsSaga", () => {
       (dummyApi as any).getStarsCount.mockRejectedValue("Error");
       return runSaga(
         {
-          dispatch: action => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action)
         },
         new StarsSaga().fetchStarsCount
       )

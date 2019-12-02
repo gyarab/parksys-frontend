@@ -1,7 +1,7 @@
 import { createAction } from "typesafe-actions";
 import { createAsyncActions } from "./baseModule";
 
-export const logoutUser = createAction("USER/LOGOUT", resolve => {
+export const logoutUser = createAction("USER/LOGOUT", (resolve) => {
   return () => resolve();
 });
 

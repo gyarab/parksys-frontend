@@ -30,7 +30,7 @@ class DevicesPage extends React.Component<IProps> {
 
 const componentTranslationsSelector = createSelector(
   translationsSelector,
-  translations => {
+  (translations) => {
     const translator: ITranslator = new Translator(translations);
     return {
       devices: translator.translate("Devices"),
@@ -49,7 +49,7 @@ export const mapStateToProps = (
 
 export const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
-    fetchDevices: input => {
+    fetchDevices: (input) => {
       console.log(input);
       dispatch(null);
     }

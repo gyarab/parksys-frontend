@@ -56,7 +56,7 @@ class AboutPage extends React.Component<IProps> {
 
 const componentTranslationsSelector = createSelector(
   translationsSelector,
-  translations => {
+  (translations) => {
     const translator: ITranslator = new Translator(translations);
     return {
       aboutUs: translator.translate("About us"),

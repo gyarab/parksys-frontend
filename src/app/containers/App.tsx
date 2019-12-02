@@ -122,7 +122,7 @@ class App extends React.Component<IStateToProps> {
 
 const componentTranslationsSelector = createSelector(
   translationsSelector,
-  translations => {
+  (translations) => {
     const translator: ITranslator = new Translator(translations);
     return {
       notFound: translator.translate("Not found")

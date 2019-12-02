@@ -16,7 +16,7 @@ describe("SettingsSaga", () => {
       });
       return runSaga(
         {
-          dispatch: action => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action)
         },
         new SettingsSaga().fetchTranslations,
         {
@@ -42,7 +42,7 @@ describe("SettingsSaga", () => {
       (dummyApi as any).getTranslations.mockRejectedValue("Error");
       return runSaga(
         {
-          dispatch: action => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action)
         },
         new SettingsSaga().fetchTranslations,
         {

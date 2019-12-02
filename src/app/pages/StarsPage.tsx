@@ -51,7 +51,7 @@ class StarsPage extends React.Component<IProps> {
 
 const componentTranslationsSelector = createSelector(
   translationsSelector,
-  translations => {
+  (translations) => {
     const translator: ITranslator = new Translator(translations);
     return {
       fetchingStars: translator.translate("Fetching stars...")

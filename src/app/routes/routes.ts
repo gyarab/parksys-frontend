@@ -28,7 +28,7 @@ type RouteNavigate = Record<RoutablePages, (...params: any[]) => Action>;
 
 function getRoutes(routeConfig: RouteConfig): Record<RoutablePages, IRoute> {
   return Object.keys(routeConfig)
-    .map(key => ({
+    .map((key) => ({
       name: key,
       path: routeConfig[key].path
     }))

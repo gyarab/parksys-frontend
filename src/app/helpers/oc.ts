@@ -72,10 +72,10 @@ export interface IArrayWrapper<T> {
 export type DataWrapper<T> = T extends any[]
   ? IArrayWrapper<T[number]>
   : T extends object
-  ? ObjectWrapper<T>
-  : T extends string | number | boolean
-  ? IDataAccessor<T>
-  : any;
+    ? ObjectWrapper<T>
+    : T extends string | number | boolean
+      ? IDataAccessor<T>
+      : any;
 
 /////////////////////////////////////
 //
