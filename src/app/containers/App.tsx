@@ -101,7 +101,6 @@ class App extends React.Component<IStateToProps> {
           this.defaultNavigation
         );
         const navRendered = nav ? React.createElement(nav) : null;
-        console.log(navRendered);
         return React.createElement(layout, { navigation: navRendered }, page);
       }
     } else {
@@ -123,7 +122,7 @@ class App extends React.Component<IStateToProps> {
 
 const componentTranslationsSelector = createSelector(
   translationsSelector,
-  (translations) => {
+  translations => {
     const translator: ITranslator = new Translator(translations);
     return {
       notFound: translator.translate("Not found")
