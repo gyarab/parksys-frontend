@@ -6,6 +6,8 @@ import { Translator } from "../models/Translator";
 import { ITranslator } from "../models/TranslatorInterfaces";
 import { IStore } from "../redux/IStore";
 import { translationsSelector } from "../selectors/translationsSelector";
+import { fetchDevices } from "../redux/modules/devicesActionCreators";
+import { IDevicesState } from "../redux/modules/devicesModule";
 
 interface IStateToProps {
   translations: {
@@ -14,6 +16,7 @@ interface IStateToProps {
     config: string;
     qrCode: string;
   };
+  devices: IDevicesState;
 }
 
 interface IDispatchToProps {
@@ -22,15 +25,31 @@ interface IDispatchToProps {
 
 interface IProps extends IStateToProps, IDispatchToProps {}
 
-class DevicesPage extends React.Component<IProps> {
-  public render(): JSX.Element {
-    return <div></div>;
+const DevicesPage = (props: IProps): JSX.Element => {
+  let devicesDisplay = null;
+  if (props.devices.loaded && props.devices.error === "") {
+    devicesDisplay = props.devices.devices.map(device => (
+      <div key={device.id}>
+        <p>
+          [{device.id}] => {device.name} -{" "}
+          {device.activated ? props.translations.activated : "INACTIVE"}
+        </p>
+      </div>
+    ));
   }
-}
+  return (
+    <div>
+      <button onClick={() => props.fetchDevices({ name: "lg" })}>
+        Fetch Devices
+      </button>
+      <div>{devicesDisplay}</div>
+    </div>
+  );
+};
 
 const componentTranslationsSelector = createSelector(
   translationsSelector,
-  (translations) => {
+  translations => {
     const translator: ITranslator = new Translator(translations);
     return {
       devices: translator.translate("Devices"),
@@ -42,17 +61,15 @@ const componentTranslationsSelector = createSelector(
 );
 
 export const mapStateToProps = (
-  state: Pick<IStore, "settings">
+  state: Pick<IStore, "settings" | "devices">
 ): IStateToProps => ({
-  translations: componentTranslationsSelector(state)
+  translations: componentTranslationsSelector(state),
+  devices: state.devices
 });
 
 export const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
-    fetchDevices: (input) => {
-      console.log(input);
-      dispatch(null);
-    }
+    fetchDevices: input => dispatch(fetchDevices.invoke(input))
   };
 };
 

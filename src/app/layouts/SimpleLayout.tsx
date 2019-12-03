@@ -23,7 +23,7 @@ const classNames = stylesheet({
   },
   navigationContainer: {
     marginBottom: "-0.5rem",
-    flexBasis: "20rem",
+    flexBasis: "15rem",
     flexGrow: 1
   },
   mainContent: {

@@ -3,6 +3,7 @@ import { ICounterState } from "./modules/counterModule";
 import { ISettingsState } from "./modules/settingsModule";
 import { IStarsState } from "./modules/starsModule";
 import { IUserState } from "./modules/userModule";
+import { IDevicesState } from "./modules/devicesModule";
 
 export interface IStore {
   counter: ICounterState;
@@ -10,4 +11,5 @@ export interface IStore {
   settings: ISettingsState;
   stars: IStarsState;
   user: IUserState;
+  devices: IDevicesState;
 }

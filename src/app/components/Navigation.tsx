@@ -65,6 +65,7 @@ interface IStateToProps {
       rules: string;
       revenue: string;
       history: string;
+      devices: string;
     };
   };
 }
@@ -97,6 +98,7 @@ class Navigation extends React.Component<IStateToProps> {
           <NavLink linkText={pages.rules} route={routes.rulesPage} />
           <NavLink linkText={pages.revenue} route={routes.revenuePage} />
           <NavLink linkText={pages.history} route={routes.historyPage} />
+          <NavLink linkText={pages.devices} route={routes.devicesPage} />
         </ul>
         <Footer />
       </nav>
@@ -106,7 +108,7 @@ class Navigation extends React.Component<IStateToProps> {
 
 const componentTranslationsSelector = createSelector(
   translationsSelector,
-  (translations) => {
+  translations => {
     const translator: ITranslator = new Translator(translations);
     return {
       pages: {
@@ -116,7 +118,8 @@ const componentTranslationsSelector = createSelector(
         statistics: translator.translate("Statistics"),
         rules: translator.translate("Rules"),
         revenue: translator.translate("Revenue"),
-        history: translator.translate("History")
+        history: translator.translate("History"),
+        devices: translator.translate("Devices")
       }
     };
   }

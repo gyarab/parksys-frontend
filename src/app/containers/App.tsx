@@ -19,6 +19,7 @@ import { Navigation } from "../components/Navigation";
 import { BlankPage } from "../pages/BlankPage";
 import { StarsPage } from "../pages/StarsPage";
 import { LoginPage } from "../pages/LoginPage";
+import { DevicesPage } from "../pages/DevicesPage";
 
 setupCss();
 
@@ -63,6 +64,9 @@ class App extends React.Component<IStateToProps> {
     loginPage: {
       page: LoginPage,
       layout: null
+    },
+    devicesPage: {
+      page: DevicesPage
     }
   };
   private defaultNavigation = Navigation;
@@ -122,7 +126,7 @@ class App extends React.Component<IStateToProps> {
 
 const componentTranslationsSelector = createSelector(
   translationsSelector,
-  (translations) => {
+  translations => {
     const translator: ITranslator = new Translator(translations);
     return {
       notFound: translator.translate("Not found")

@@ -12,7 +12,6 @@ import { configureStore } from "./app/redux/configureStore";
 import { setLanguage } from "./app/redux/modules/settingsActionCreators";
 import { configureRouter } from "./app/routes/configureRouter";
 import rootSaga from "./app/sagas/rootSaga";
-import { ApolloProvider } from "react-apollo";
 import { createApolloClient } from "./app/apis/gql";
 
 const ReactHotLoader =
@@ -24,22 +23,20 @@ const renderOrHydrate = appConfig.ssr ? ReactDOM.hydrate : ReactDOM.render;
 
 const router = configureRouter();
 const store = configureStore(router, window.__INITIAL_STATE__);
-let sagaTask = store.runSaga(rootSaga);
+const apolloClient = createApolloClient(store);
+let sagaTask = store.runSaga(rootSaga(apolloClient));
 if (!appConfig.ssr) {
   store.dispatch(setLanguage.invoke("en"));
 }
 router.start();
-const apolloClient = createApolloClient(store);
 
 renderOrHydrate(
   <ReactHotLoader>
-    <ApolloProvider client={apolloClient}>
-      <Provider store={store} key="provider">
-        <RouterProvider router={router}>
-          <App />
-        </RouterProvider>
-      </Provider>
-    </ApolloProvider>
+    <Provider store={store} key="provider">
+      <RouterProvider router={router}>
+        <App />
+      </RouterProvider>
+    </Provider>
   </ReactHotLoader>,
   document.getElementById("app")
 );
@@ -51,13 +48,11 @@ if ((module as any).hot) {
     const { App: NewApp } = require("./app/containers/App");
     renderOrHydrate(
       <ReactHotLoader>
-        <ApolloProvider client={apolloClient}>
-          <Provider store={store}>
-            <RouterProvider router={router}>
-              <NewApp />
-            </RouterProvider>
-          </Provider>
-        </ApolloProvider>
+        <Provider store={store}>
+          <RouterProvider router={router}>
+            <NewApp />
+          </RouterProvider>
+        </Provider>
       </ReactHotLoader>,
       document.getElementById("app")
     );

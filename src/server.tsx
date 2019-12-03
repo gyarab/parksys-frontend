@@ -17,7 +17,6 @@ import { configureStore } from "./app/redux/configureStore";
 import { IStore } from "./app/redux/IStore";
 import { configureRouter } from "./app/routes/configureRouter";
 import rootSaga from "./app/sagas/rootSaga";
-import { ApolloProvider } from "react-apollo";
 import { createApolloClient } from "./app/apis/gql";
 
 const app = express();
@@ -53,7 +52,7 @@ app.get(
 
 app.get("*", (req: express.Request, res: express.Response) => {
   if (!appConfig.ssr) {
-    res.sendFile(path.resolve("./build/index.html"), {}, (error) => {
+    res.sendFile(path.resolve("./build/index.html"), {}, error => {
       if (error) {
         console.error(error.message);
       }
@@ -89,7 +88,7 @@ app.get("*", (req: express.Request, res: express.Response) => {
     const apolloClient = createApolloClient(store);
 
     store
-      .runSaga(rootSaga)
+      .runSaga(rootSaga(apolloClient))
       .toPromise()
       .then(() => {
         // deep clone state because store will be changed during the second render in constructor
@@ -100,13 +99,11 @@ app.get("*", (req: express.Request, res: express.Response) => {
 
         // render again from the initial data
         const markup = renderToString(
-          <ApolloProvider client={apolloClient}>
-            <Provider store={store} key="provider">
-              <RouterProvider router={router}>
-                <App />
-              </RouterProvider>
-            </Provider>
-          </ApolloProvider>
+          <Provider store={store} key="provider">
+            <RouterProvider router={router}>
+              <App />
+            </RouterProvider>
+          </Provider>
         );
 
         // tslint:disable-next-line
@@ -124,13 +121,11 @@ app.get("*", (req: express.Request, res: express.Response) => {
 
     // first render to activate constructor to dispatch actions for loading initial data
     renderToString(
-      <ApolloProvider client={apolloClient}>
-        <Provider store={store} key="provider">
-          <RouterProvider router={router}>
-            <App />
-          </RouterProvider>
-        </Provider>
-      </ApolloProvider>
+      <Provider store={store} key="provider">
+        <RouterProvider router={router}>
+          <App />
+        </RouterProvider>
+      </Provider>
     );
 
     // tslint:disable-next-line
@@ -141,7 +136,7 @@ app.get("*", (req: express.Request, res: express.Response) => {
   });
 });
 
-app.listen(appConfig.port, appConfig.host, (err) => {
+app.listen(appConfig.port, appConfig.host, err => {
   if (err) {
     console.error(Chalk.bgRed(err));
   } else {

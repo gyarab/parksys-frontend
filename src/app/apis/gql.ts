@@ -10,6 +10,10 @@ export const baseLink = new HttpLink({
   uri: "http://127.0.0.1:8080/graphql"
 });
 
+let apolloClient: ApolloClient<any> = null;
+
+export default apolloClient;
+
 export const createApolloClient = (store: IExtendedStore) => {
   // Taken from: https://medium.com/risan/set-authorization-header-with-apollo-client-e934e6517ccf
   const authLink = new ApolloLink((operation, forward) => {
