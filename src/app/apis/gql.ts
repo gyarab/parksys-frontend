@@ -10,16 +10,11 @@ export const baseLink = new HttpLink({
   uri: "http://127.0.0.1:8080/graphql"
 });
 
-let apolloClient: ApolloClient<any> = null;
-
-export default apolloClient;
-
 export const createApolloClient = (store: IExtendedStore) => {
   // Taken from: https://medium.com/risan/set-authorization-header-with-apollo-client-e934e6517ccf
   const authLink = new ApolloLink((operation, forward) => {
     // Retrieve the authorization token from state.
     const token = lodash.get(store.getState(), "user.accessToken");
-    console.log(token);
 
     // Use the setContext method to set the HTTP headers.
     operation.setContext({

@@ -8,6 +8,7 @@ import { IStore } from "../redux/IStore";
 import { translationsSelector } from "../selectors/translationsSelector";
 import { fetchDevices } from "../redux/modules/devicesActionCreators";
 import { IDevicesState } from "../redux/modules/devicesModule";
+import { useTrueFalseUndefined } from "../components/TrueFalseUndefined";
 
 interface IStateToProps {
   translations: {
@@ -26,6 +27,17 @@ interface IDispatchToProps {
 interface IProps extends IStateToProps, IDispatchToProps {}
 
 const DevicesPage = (props: IProps): JSX.Element => {
+  const activatedFilterOptions: [string, string, string] = [
+    "true",
+    "false",
+    "any"
+  ];
+  const [
+    activatedFilterDisplay,
+    activateFilter,
+    setActivatedFilter
+  ] = useTrueFalseUndefined(activatedFilterOptions);
+
   let devicesDisplay = null;
   if (props.devices.loaded && props.devices.error === "") {
     devicesDisplay = props.devices.devices.map(device => (
@@ -39,7 +51,23 @@ const DevicesPage = (props: IProps): JSX.Element => {
   }
   return (
     <div>
-      <button onClick={() => props.fetchDevices({ name: "lg" })}>
+      <label>
+        Activated
+        <select
+          value={String(activatedFilterDisplay)}
+          onChange={event => setActivatedFilter(event.target.value)}
+        >
+          {activatedFilterOptions.map((opt, i) => (
+            <option key={i}>{opt}</option>
+          ))}
+        </select>
+      </label>
+      <button
+        disabled={props.devices.pending}
+        onClick={() =>
+          props.fetchDevices({ name: "lg", activated: activateFilter })
+        }
+      >
         Fetch Devices
       </button>
       <div>{devicesDisplay}</div>
@@ -69,7 +97,7 @@ export const mapStateToProps = (
 
 export const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
-    fetchDevices: input => dispatch(fetchDevices.invoke(input))
+    fetchDevices: filter => dispatch(fetchDevices.invoke({ filter }))
   };
 };
 

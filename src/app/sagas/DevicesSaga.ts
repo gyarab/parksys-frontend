@@ -8,7 +8,10 @@ import {
   takeLatest
 } from "redux-saga/effects";
 import autobind from "autobind-decorator";
-import { fetchDevices } from "../redux/modules/devicesActionCreators";
+import {
+  fetchDevices,
+  FetchDevicesFulfilled
+} from "../redux/modules/devicesActionCreators";
 import gql from "graphql-tag";
 import { getType } from "typesafe-actions";
 
@@ -17,15 +20,17 @@ export class DevicesSaga extends BaseSaga {
   constructor(client) {
     super();
     this.client = client;
-    console.log(client);
   }
 
-  private fetchDevicesCall(name: string, activated: string) {
+  private fetchDevicesCall(
+    name: string,
+    activated: boolean
+  ): () => Promise<{ data: FetchDevicesFulfilled }> {
     return () =>
       this.client.query({
         query: gql`
-          query devices {
-            devices {
+          query devices($name: String, $activated: Boolean) {
+            devices(filter: { name: $name, activated: $activated }) {
               id
               name
               activated
@@ -47,7 +52,9 @@ export class DevicesSaga extends BaseSaga {
   ): IterableIterator<CallEffect | PutEffect> {
     try {
       yield put(fetchDevices.setPending(null));
-      const { name, activated } = action.payload;
+      const {
+        filter: { name, activated }
+      } = action.payload;
       const response = yield call(this.fetchDevicesCall(name, activated));
       yield put(fetchDevices.setFulfilled(response));
     } catch (e) {

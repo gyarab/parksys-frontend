@@ -72,13 +72,13 @@ const classNames = stylesheet({
 const LoginPage = (props: IProps) => {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
-  const [compError, setCompError] = useState("");
+  const [compError, setCompError] = useState(props.state.error);
 
-  const submit = (e) => {
+  const submit = e => {
     e.preventDefault();
     if (user.length > 0 && password.length > 0) {
-      props.login(user, password);
       setCompError("");
+      props.login(user, password);
     } else {
       setCompError("Please enter your username and password");
     }

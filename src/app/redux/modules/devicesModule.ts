@@ -1,15 +1,10 @@
 import { ActionType, getType } from "typesafe-actions";
 import { IBaseState } from "./baseModule";
-import { fetchDevices } from "./devicesActionCreators";
+import { fetchDevices, FetchDevicesFulfilled } from "./devicesActionCreators";
 
-export interface IDevicesState extends IBaseState {
-  devices?: {
-    id: string;
-    name: string;
-    activated: boolean;
-    activatedAt: string;
-  }[];
-}
+export interface IDevicesState
+  extends IBaseState,
+    Pick<FetchDevicesFulfilled, "devices"> {}
 
 export const initialState: IDevicesState = {
   devices: null,
@@ -26,23 +21,24 @@ export function deviceReducer(
     case getType(fetchDevices.setPending):
       return {
         ...state,
-        pending: true
+        pending: true,
+        loaded: false
       };
     case getType(fetchDevices.setRejected):
       return {
         ...state,
-        loaded: true,
         pending: false,
+        loaded: true,
         error: action.message
       };
     case getType(fetchDevices.setFulfilled):
-      console.log(action.payload.data);
+      const payload: FetchDevicesFulfilled = action.payload.data;
       return {
         ...state,
         pending: false,
         loaded: true,
         error: "",
-        devices: action.payload.data.devices
+        devices: payload.devices
       };
     default:
       return state;

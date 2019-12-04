@@ -73,7 +73,7 @@ export function userReducer(
     case getType(loginUserActions.setRejected):
       return {
         ...state,
-        error: "",
+        error: action.message,
         loaded: true,
         pending: false
       };
