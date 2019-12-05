@@ -11,11 +11,11 @@ const classNames = stylesheet({
     $nest: {
       "&>*": {
         display: "flex",
-        flexWrap: "wrap",
         margin: "-0.5rem",
         $nest: {
           "&>*": {
-            margin: "0.5rem"
+            margin: "0.5rem",
+            marginBottom: 0
           }
         }
       }
@@ -24,12 +24,19 @@ const classNames = stylesheet({
   navigationContainer: {
     marginBottom: "-0.5rem",
     flexBasis: "15rem",
-    flexGrow: 1
+    flexGrow: 1,
+    height: "100%"
   },
   mainContent: {
     flexBasis: 0,
     flexGrow: 999,
-    minWidth: "calc(50% - 1rem)"
+    minWidth: "calc(50% - 1rem)",
+    overflowY: "scroll",
+    $nest: {
+      "& > .spacer": {
+        height: "10em"
+      }
+    }
   },
   wrapper: {
     height: "100%"
@@ -50,6 +57,7 @@ class SimpleLayout extends LayoutComponent {
           <div className={classNames.mainContent}>
             {this.props.children}
             <UserNavigation />
+            <div className="spacer"></div>
           </div>
         </div>
       </div>
