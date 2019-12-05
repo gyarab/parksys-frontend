@@ -21,7 +21,9 @@ export class UserSaga extends BaseSaga {
     try {
       yield put(userActions.loginUser.setPending(null));
       const { user, password } = action.payload;
-      const payload = yield call(loginApi.loginUser(user, password));
+      const payload: any = yield call(loginApi.loginUser(user, password));
+      localStorage.setItem("accessToken", payload.accessToken);
+      localStorage.setItem("refreshToken", payload.refreshToken);
       yield put(userActions.loginUser.setFulfilled(payload));
     } catch (e) {
       yield put(userActions.loginUser.setRejected(null, e.toString()));
@@ -32,11 +34,13 @@ export class UserSaga extends BaseSaga {
   public *logoutUser(
     _: ReturnType<typeof userActions.logoutUser>
   ): IterableIterator<CallEffect | PutEffect<any>> {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
     yield put(navigate.loginPage());
   }
 
   @autobind
-  public *switchPage(
+  public *onSuccessfulLogin(
     _: ReturnType<typeof userActions.loginUser.setFulfilled>
   ): IterableIterator<CallEffect | PutEffect<any>> {
     yield put(navigate.dashboardPage());
@@ -46,7 +50,7 @@ export class UserSaga extends BaseSaga {
     yield takeLatest(getType(userActions.loginUser.invoke), this.loginUser);
     yield takeLatest(
       getType(userActions.loginUser.setFulfilled),
-      this.switchPage
+      this.onSuccessfulLogin
     );
     yield takeLatest(getType(userActions.logoutUser), this.logoutUser);
   }

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Fragment, useState } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { createSelector } from "reselect";
@@ -13,6 +14,7 @@ import {
 } from "../redux/modules/devicesActionCreators";
 import { IDevicesState } from "../redux/modules/devicesModule";
 import { useTrueFalseUndefined } from "../components/TrueFalseUndefined";
+import imageGetter from "../helpers/imageGetter";
 
 interface IStateToProps {
   translations: {
@@ -31,6 +33,54 @@ interface IDispatchToProps {
 
 interface IProps extends IStateToProps, IDispatchToProps {}
 
+const devicesShown = {};
+
+const DeviceDetail = ({ device }): JSX.Element => {
+  const [imageData, setImageData] = useState(null);
+  const [imageVisible, setImageVisible] = useState(devicesShown[device.id]);
+
+  const showQrCode = () => {
+    devicesShown[device.id] = true;
+    if (imageData) {
+      setImageVisible(true);
+      return;
+    }
+    imageGetter(device.activationQrUrl)
+      .then(response => response.blob())
+      .then(blob => {
+        setImageData(URL.createObjectURL(blob));
+        setImageVisible(true);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
+  const hideQrCode = () => {
+    setImageVisible(false);
+    devicesShown[device.id] = false;
+  };
+
+  if (imageVisible && imageData == null) {
+    showQrCode();
+  }
+
+  const button = imageVisible ? (
+    <button onClick={hideQrCode}>Hide QR Code</button>
+  ) : (
+    <button onClick={showQrCode}>Show QR Code</button>
+  );
+  const image = imageVisible ? <img src={imageData} /> : null;
+
+  return (
+    <div>
+      <span>{JSON.stringify(device)}</span>
+      {button}
+      <div>{image}</div>
+    </div>
+  );
+};
+
 const DevicesPage = (props: IProps): JSX.Element => {
   const activatedFilterOptions: [string, string, string] = [
     "true",
@@ -48,12 +98,9 @@ const DevicesPage = (props: IProps): JSX.Element => {
   let devicesDisplay = null;
   if (props.devices.loaded && props.devices.error === "") {
     devicesDisplay = props.devices.devices.map(device => (
-      <div key={device.id}>
-        <p>
-          [{device.id}] => {device.name} -{" "}
-          {device.activated ? props.translations.activated : "INACTIVE"}
-        </p>
-      </div>
+      <Fragment key={device.id}>
+        <DeviceDetail device={device} />
+      </Fragment>
     ));
   }
 

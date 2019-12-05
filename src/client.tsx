@@ -13,6 +13,7 @@ import { setLanguage } from "./app/redux/modules/settingsActionCreators";
 import { configureRouter } from "./app/routes/configureRouter";
 import rootSaga from "./app/sagas/rootSaga";
 import { createApolloClient } from "./app/apis/gql";
+import { ApolloProvider } from "@apollo/react-hooks";
 
 const ReactHotLoader =
   appConfig.env !== "production"
@@ -32,11 +33,13 @@ router.start();
 
 renderOrHydrate(
   <ReactHotLoader>
-    <Provider store={store} key="provider">
-      <RouterProvider router={router}>
-        <App />
-      </RouterProvider>
-    </Provider>
+    <ApolloProvider client={apolloClient}>
+      <Provider store={store} key="provider">
+        <RouterProvider router={router}>
+          <App />
+        </RouterProvider>
+      </Provider>
+    </ApolloProvider>
   </ReactHotLoader>,
   document.getElementById("app")
 );
@@ -48,11 +51,13 @@ if ((module as any).hot) {
     const { App: NewApp } = require("./app/containers/App");
     renderOrHydrate(
       <ReactHotLoader>
-        <Provider store={store}>
-          <RouterProvider router={router}>
-            <NewApp />
-          </RouterProvider>
-        </Provider>
+        <ApolloProvider client={apolloClient}>
+          <Provider store={store}>
+            <RouterProvider router={router}>
+              <NewApp />
+            </RouterProvider>
+          </Provider>
+        </ApolloProvider>
       </ReactHotLoader>,
       document.getElementById("app")
     );

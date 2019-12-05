@@ -20,6 +20,8 @@ export const initialState: IUserState = {
   user: null,
   refreshToken: null,
   accessToken: null,
+  // refreshToken: localStorage.get("refreshToken"),
+  // accessToken: localStorage.get("accessToken"),
   error: "",
   loaded: false,
   pending: false
@@ -80,7 +82,10 @@ export function userReducer(
     case getType(logoutUser):
       return {
         ...state,
-        ...initialState
+        ...initialState,
+        // localStorage may have not been emptied yet
+        refreshToken: null,
+        accessToken: null
       };
     default:
       return state;

@@ -13,6 +13,7 @@ export interface FetchDevicesFulfilled {
     name: string;
     activated: boolean;
     activatedAt: string;
+    activationQrUrl: string;
   }[];
 }
 
