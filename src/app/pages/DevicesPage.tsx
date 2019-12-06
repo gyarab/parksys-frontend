@@ -7,14 +7,12 @@ import { Translator } from "../models/Translator";
 import { ITranslator } from "../models/TranslatorInterfaces";
 import { IStore } from "../redux/IStore";
 import { translationsSelector } from "../selectors/translationsSelector";
-import {
-  fetchDevices,
-  createDevice,
-  CreateDeviceInvoke
-} from "../redux/modules/devicesActionCreators";
+import { fetchDevices } from "../redux/modules/devicesActionCreators";
 import { IDevicesState } from "../redux/modules/devicesModule";
 import { useTrueFalseUndefined } from "../components/TrueFalseUndefined";
 import imageGetter from "../helpers/imageGetter";
+import { useMutation, MutationTuple } from "@apollo/react-hooks";
+import gql from "graphql-tag";
 
 interface IStateToProps {
   translations: {
@@ -28,7 +26,7 @@ interface IStateToProps {
 
 interface IDispatchToProps {
   fetchDevices: (filter: { name?: string; activated?: boolean }) => void;
-  createDevice: (input: CreateDeviceInvoke) => void;
+  useCreateDevice: () => MutationTuple<any, { name: string }>;
 }
 
 interface IProps extends IStateToProps, IDispatchToProps {}
@@ -93,7 +91,8 @@ const DevicesPage = (props: IProps): JSX.Element => {
     setActivatedFilter
   ] = useTrueFalseUndefined(activatedFilterOptions);
 
-  const [name, setName] = React.useState("");
+  const [name, setName] = useState("");
+  const [addDevice] = props.useCreateDevice();
 
   let devicesDisplay = null;
   if (props.devices.loaded && props.devices.error === "") {
@@ -110,7 +109,9 @@ const DevicesPage = (props: IProps): JSX.Element => {
 
   const createDevice = e => {
     e.preventDefault();
-    props.createDevice({ input: { name } });
+    if (props.devices.devices) {
+      addDevice({ variables: { name } }).then(fetchDevices);
+    }
   };
 
   return (
@@ -171,7 +172,16 @@ export const mapStateToProps = (
 export const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
     fetchDevices: filter => dispatch(fetchDevices.invoke({ filter })),
-    createDevice: input => dispatch(createDevice.invoke(input))
+    useCreateDevice: () =>
+      useMutation(gql`
+        mutation addDevice($name: String!) {
+          addDevice(input: { name: $name }) {
+            id
+            name
+            activationQrUrl
+          }
+        }
+      `)
   };
 };
 
