@@ -25,7 +25,9 @@ const renderOrHydrate = appConfig.ssr ? ReactDOM.hydrate : ReactDOM.render;
 const router = configureRouter();
 const store = configureStore(router, window.__INITIAL_STATE__);
 const apolloClient = createApolloClient(store);
-let sagaTask = store.runSaga(rootSaga(apolloClient));
+const rootSagaGenerator = rootSaga(apolloClient);
+console.log(rootSagaGenerator);
+let sagaTask = store.runSaga(rootSagaGenerator);
 if (!appConfig.ssr) {
   store.dispatch(setLanguage.invoke("en"));
 }
@@ -66,7 +68,9 @@ if ((module as any).hot) {
   (module as any).hot.accept("./app/sagas/rootSaga", () => {
     sagaTask.cancel();
     sagaTask.toPromise().then(() => {
-      sagaTask = store.runSaga(require("./app/sagas/rootSaga").default);
+      sagaTask = store.runSaga(
+        require("./app/sagas/rootSaga").default(apolloClient)
+      );
     });
   });
 }
