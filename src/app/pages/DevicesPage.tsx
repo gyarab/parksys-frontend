@@ -1,5 +1,4 @@
-import * as React from "react";
-import { Fragment, useState } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { createSelector } from "reselect";
@@ -13,6 +12,8 @@ import { useTrueFalseUndefined } from "../components/TrueFalseUndefined";
 import imageGetter from "../helpers/imageGetter";
 import { useMutation, MutationTuple } from "@apollo/react-hooks";
 import gql from "graphql-tag";
+import DeviceTable from "../components/DeviceTable";
+import { Button } from "../components/Button";
 
 interface IStateToProps {
   translations: {
@@ -31,52 +32,27 @@ interface IDispatchToProps {
 
 interface IProps extends IStateToProps, IDispatchToProps {}
 
-const devicesShown = {};
-
-const DeviceDetail = ({ device }): JSX.Element => {
+const DeviceRowSubcomponent = ({ device }) => {
   const [imageData, setImageData] = useState(null);
-  const [imageVisible, setImageVisible] = useState(devicesShown[device.id]);
-
-  const showQrCode = () => {
-    devicesShown[device.id] = true;
-    if (imageData) {
-      setImageVisible(true);
-      return;
-    }
+  useEffect(() => {
     imageGetter(device.activationQrUrl)
       .then(response => response.blob())
       .then(blob => {
         setImageData(URL.createObjectURL(blob));
-        setImageVisible(true);
       })
       .catch(err => {
         console.log(err);
       });
-  };
+    return () => {
+      setImageData(null);
+    };
+  }, []);
 
-  const hideQrCode = () => {
-    setImageVisible(false);
-    devicesShown[device.id] = false;
-  };
-
-  if (imageVisible && imageData == null) {
-    showQrCode();
+  if (imageData == null) {
+    return <div>Loading QR Code...</div>;
+  } else {
+    return <img src={imageData}></img>;
   }
-
-  const button = imageVisible ? (
-    <button onClick={hideQrCode}>Hide QR Code</button>
-  ) : (
-    <button onClick={showQrCode}>Show QR Code</button>
-  );
-  const image = imageVisible ? <img src={imageData} /> : null;
-
-  return (
-    <div>
-      <span>{JSON.stringify(device)}</span>
-      {button}
-      <div>{image}</div>
-    </div>
-  );
 };
 
 const DevicesPage = (props: IProps): JSX.Element => {
@@ -94,15 +70,6 @@ const DevicesPage = (props: IProps): JSX.Element => {
   const [name, setName] = useState("");
   const [addDevice] = props.useCreateDevice();
 
-  let devicesDisplay = null;
-  if (props.devices.loaded && props.devices.error === "") {
-    devicesDisplay = props.devices.devices.map(device => (
-      <Fragment key={device.id}>
-        <DeviceDetail device={device} />
-      </Fragment>
-    ));
-  }
-
   const fetchDevices = () => {
     props.fetchDevices({ activated: activateFilter });
   };
@@ -113,6 +80,52 @@ const DevicesPage = (props: IProps): JSX.Element => {
       addDevice({ variables: { name } }).then(fetchDevices);
     }
   };
+
+  const columns = useMemo(
+    () => [
+      {
+        Header: "Name",
+        accessor: "name"
+      },
+      {
+        Header: "Activated",
+        accessor: "activated"
+      },
+      {
+        Header: "Activated At",
+        accessor: "activatedAt"
+      },
+      {
+        Header: "Actions",
+        Cell({ row }) {
+          const onClick = () => {
+            row.toggleExpanded();
+          };
+          return (
+            <>
+              <Button onClick={onClick}>Details</Button>
+            </>
+          );
+        }
+      }
+    ],
+    []
+  );
+
+  const table = (
+    <>
+      <DeviceTable
+        columns={columns}
+        data={props.devices.loaded ? props.devices.devices : []}
+        renderDeviceSubcomponent={({ row }) => (
+          <DeviceRowSubcomponent device={row.original} />
+        )}
+      />
+      {props.devices.loaded && props.devices.devices.length === 0 ? (
+        <p>No Devices Found</p>
+      ) : null}
+    </>
+  );
 
   return (
     <div>
@@ -128,11 +141,13 @@ const DevicesPage = (props: IProps): JSX.Element => {
             ))}
           </select>
         </label>
-        <button disabled={props.devices.pending} onClick={fetchDevices}>
+        <Button disabled={props.devices.pending} onClick={fetchDevices}>
           Fetch Devices
-        </button>
-        <div>{devicesDisplay}</div>
+        </Button>
       </div>
+
+      <hr />
+      {table}
       <hr />
       <form onSubmit={createDevice}>
         <label>
