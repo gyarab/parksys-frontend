@@ -1,4 +1,3 @@
-import { init } from "@sentry/browser";
 import {
   applyMiddleware,
   compose,
@@ -12,7 +11,6 @@ import createSagaMiddleware, { END, Task } from "redux-saga";
 import { Router } from "router5";
 import { config as appConfig } from "../../../config";
 import { IStore } from "./IStore";
-import { sentryMiddleware } from "./middlewares/sentryMiddleware";
 import rootReducer from "./rootReducer";
 
 export interface IExtendedStore extends Store<Partial<IStore>> {
@@ -31,15 +29,6 @@ export function configureStore(
   if (appConfig.env !== "production" && process.env.BROWSER) {
     const logger = createLogger();
     middlewares.push(logger);
-  }
-
-  if (appConfig.sentry && appConfig.sentry.dsn && process.env.BROWSER) {
-    middlewares.unshift(sentryMiddleware);
-
-    init({
-      dsn: appConfig.sentry.dsn,
-      ...appConfig.sentry.options
-    });
   }
 
   const composeEnhancers =
