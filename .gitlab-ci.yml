@@ -1,0 +1,11 @@
+image: node:12.13.0
+
+cache:
+  paths:
+    - node_modules/
+
+test:
+  script:
+    - npm run build
+    - npm run build:prod
+    - npm run test:no-cache -- --maxWorkers=4
