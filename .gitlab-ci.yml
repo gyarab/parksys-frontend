@@ -6,6 +6,7 @@ cache:
 
 test:
   script:
+    - npm install --silent
     - npm run build
     - npm run build:prod
     - npm run test:no-cache -- --maxWorkers=4

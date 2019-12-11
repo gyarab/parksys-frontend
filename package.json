@@ -4,7 +4,7 @@
   "main": "build/server.js",
   "scripts": {
     "prepush": "npm run build && npm run build:prod && npm run test:no-cache",
-    "clean": "npx rimraf build && npx rimraf .jest/cache",
+    "clean": "rimraf build && rimraf .jest/cache",
     "prebuild": "npm run clean -s",
     "build": "webpack --config config/webpack/index.js",
     "build:prod": "cross-env NODE_ENV=production npm run build && node ./config/utils/replaceWithProdScripts",
