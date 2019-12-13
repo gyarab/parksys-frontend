@@ -14,6 +14,27 @@ import { useMutation, MutationTuple } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import DeviceTable from "../components/DeviceTable";
 import { Button } from "../components/Button";
+import { stylesheet } from "typestyle";
+import { Color } from "../constants";
+
+const coloredStatus = (backgroundColor, textColor = Color.BLACK): any => {
+  return {
+    textAlign: "center",
+    $nest: {
+      span: {
+        borderRadius: "5px",
+        padding: "0.6em",
+        backgroundColor,
+        color: textColor
+      }
+    }
+  };
+};
+
+const classNames = stylesheet({
+  negativeStatus: coloredStatus(Color.LIGHT_RED),
+  positiveStatus: coloredStatus(Color.AQUAMARINE)
+});
 
 interface IStateToProps {
   translations: {
@@ -28,6 +49,7 @@ interface IStateToProps {
 interface IDispatchToProps {
   fetchDevices: (filter: { name?: string; activated?: boolean }) => void;
   useCreateDevice: () => MutationTuple<any, { name: string }>;
+  useDeleteDevice: () => MutationTuple<any, { id: string }>;
 }
 
 interface IProps extends IStateToProps, IDispatchToProps {}
@@ -68,7 +90,8 @@ const DevicesPage = (props: IProps): JSX.Element => {
   ] = useTrueFalseUndefined(activatedFilterOptions);
 
   const [name, setName] = useState("");
-  const [addDevice] = props.useCreateDevice();
+  const [createDeviceEffect] = props.useCreateDevice();
+  const [deleteDeviceEffect] = props.useDeleteDevice();
 
   const fetchDevices = () => {
     props.fetchDevices({ activated: activateFilter });
@@ -76,8 +99,9 @@ const DevicesPage = (props: IProps): JSX.Element => {
 
   const createDevice = e => {
     e.preventDefault();
+    setName("");
     if (props.devices.devices) {
-      addDevice({ variables: { name } }).then(fetchDevices);
+      createDeviceEffect({ variables: { name } }).then(fetchDevices);
     }
   };
 
@@ -89,7 +113,22 @@ const DevicesPage = (props: IProps): JSX.Element => {
       },
       {
         Header: "Activated",
-        accessor: "activated"
+        accessor: "activated",
+        Cell({
+          row: {
+            original: { activated }
+          }
+        }) {
+          const cls = activated
+            ? classNames.positiveStatus
+            : classNames.negativeStatus;
+          const text = activated ? "YES" : "NO";
+          return (
+            <div className={cls}>
+              <span>{text}</span>
+            </div>
+          );
+        }
       },
       {
         Header: "Activated At",
@@ -98,12 +137,20 @@ const DevicesPage = (props: IProps): JSX.Element => {
       {
         Header: "Actions",
         Cell({ row }) {
-          const onClick = () => {
+          const detailsClick = () => {
             row.toggleExpanded();
+          };
+          const deleteClick = () => {
+            deleteDeviceEffect({ variables: { id: row.original.id } }).then(
+              fetchDevices
+            );
           };
           return (
             <>
-              <Button onClick={onClick}>Details</Button>
+              <Button onClick={detailsClick}>Details</Button>
+              <Button type={"secondary"} onClick={deleteClick}>
+                Delete
+              </Button>
             </>
           );
         }
@@ -189,11 +236,19 @@ export const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
     fetchDevices: filter => dispatch(fetchDevices.invoke({ filter })),
     useCreateDevice: () =>
       useMutation(gql`
-        mutation addDevice($name: String!) {
-          addDevice(input: { name: $name }) {
+        mutation createDevice($name: String!) {
+          createDevice(input: { name: $name }) {
             id
             name
             activationQrUrl
+          }
+        }
+      `),
+    useDeleteDevice: () =>
+      useMutation(gql`
+        mutation deleteDevice($id: ID!) {
+          deleteDevice(id: $id) {
+            id
           }
         }
       `)

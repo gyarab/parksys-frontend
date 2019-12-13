@@ -21,8 +21,7 @@ export function deviceReducer(
     case getType(fetchDevices.setPending):
       return {
         ...state,
-        pending: true,
-        loaded: false
+        pending: true
       };
     case getType(fetchDevices.setRejected):
       return {
