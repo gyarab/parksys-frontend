@@ -10,6 +10,7 @@ import { translationsSelector } from "../selectors/translationsSelector";
 import { ConnectedLink } from "react-router5";
 import { routes } from "../routes/routes";
 import { Footer } from "./Footer";
+import { UserNavigation } from "./UserNavigation";
 
 const classNames = stylesheet({
   nav: {
@@ -52,6 +53,11 @@ const classNames = stylesheet({
         backgroundColor: Color.AQUAMARINE
       }
     }
+  },
+  userNavContainer: {
+    marginTop: "10em",
+    bottom: "0em",
+    right: "0"
   }
 });
 
@@ -100,6 +106,9 @@ class Navigation extends React.Component<IStateToProps> {
           <NavLink linkText={pages.history} route={routes.historyPage} />
           <NavLink linkText={pages.devices} route={routes.devicesPage} />
         </ul>
+        <div className={classNames.userNavContainer}>
+          <UserNavigation />
+        </div>
         <Footer />
       </nav>
     );

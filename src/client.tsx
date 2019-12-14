@@ -26,7 +26,6 @@ const router = configureRouter();
 const store = configureStore(router, window.__INITIAL_STATE__);
 const apolloClient = createApolloClient(store);
 const rootSagaGenerator = rootSaga(apolloClient);
-console.log(rootSagaGenerator);
 let sagaTask = store.runSaga(rootSagaGenerator);
 if (!appConfig.ssr) {
   store.dispatch(setLanguage.invoke("en"));

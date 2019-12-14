@@ -19,6 +19,7 @@ import { configureRouter } from "./app/routes/configureRouter";
 import rootSaga from "./app/sagas/rootSaga";
 import { createApolloClient } from "./app/apis/gql";
 import { ApolloProvider } from "@apollo/react-hooks";
+import compression from "compression";
 
 const app = express();
 
@@ -39,6 +40,7 @@ if (process.env.NODE_ENV !== "production") {
   app.use(require("webpack-hot-middleware")(webpackCompiler));
 }
 
+app.use(compression());
 app.use(favicon(path.join(__dirname, "public/favicon.ico")));
 
 app.use("/public", express.static(path.join(__dirname, "public")));

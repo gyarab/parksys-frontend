@@ -63,7 +63,6 @@ const DeviceRowSubcomponent = ({
   regenerateActivationPasswordEffect,
   device
 }) => {
-  console.log("SUBCOMP RERENDER");
   const [imageData, setImageData] = useState(null);
   useEffect(() => {
     imageGetter(device.activationQrUrl)

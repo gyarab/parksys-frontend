@@ -43,9 +43,6 @@ function mapDispatchToProps(dispatch: Dispatch): IDispatchToProps {
 
 const classNames = stylesheet({
   userNavigation: {
-    position: "absolute",
-    right: 0,
-    top: 0,
     margin: "0.3em",
     padding: "0.3em",
     backgroundColor: Color.GREY,

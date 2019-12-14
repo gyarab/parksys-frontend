@@ -1,7 +1,7 @@
 import React from "react";
 import { ILayoutProps, LayoutComponent } from "./Layout";
 import { stylesheet } from "typestyle";
-import { UserNavigation } from "../components/UserNavigation";
+// import { UserNavigation } from "../components/UserNavigation";
 
 // Sidebar src: https://every-layout.dev/layouts/sidebar/
 const classNames = stylesheet({
@@ -40,6 +40,11 @@ const classNames = stylesheet({
   },
   wrapper: {
     height: "100%"
+  },
+  userNavContainer: {
+    position: "absolute",
+    right: 0,
+    top: 0
   }
 });
 
@@ -56,7 +61,9 @@ class SimpleLayout extends LayoutComponent {
           </div>
           <div className={classNames.mainContent}>
             {this.props.children}
-            <UserNavigation />
+            {/* <div className={classNames.userNavContainer}>
+              <UserNavigation />
+            </div> */}
             <div className="spacer"></div>
           </div>
         </div>
