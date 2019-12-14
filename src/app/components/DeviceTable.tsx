@@ -66,6 +66,7 @@ const DeviceTable = ({ columns, data, renderDeviceSubcomponent }) => {
               <tr
                 {...row.getRowProps()}
                 className={row.isExpanded ? classNames.expandedRow : ""}
+                key={0}
               >
                 {row.cells.map(cell => {
                   return (
@@ -74,7 +75,7 @@ const DeviceTable = ({ columns, data, renderDeviceSubcomponent }) => {
                 })}
               </tr>
               {row.isExpanded ? (
-                <tr {...row.getRowProps()}>
+                <tr {...row.getRowProps()} key={1}>
                   <td colSpan={flatColumns.length}>
                     {renderDeviceSubcomponent({ row })}
                   </td>

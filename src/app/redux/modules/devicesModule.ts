@@ -1,6 +1,10 @@
 import { ActionType, getType } from "typesafe-actions";
 import { IBaseState } from "./baseModule";
-import { fetchDevices, FetchDevicesFulfilled } from "./devicesActionCreators";
+import {
+  fetchDevices,
+  FetchDevicesFulfilled,
+  updateDevice
+} from "./devicesActionCreators";
 
 export interface IDevicesState
   extends IBaseState,
@@ -38,6 +42,19 @@ export function deviceReducer(
         loaded: true,
         error: "",
         devices: payload.devices
+      };
+    case getType(updateDevice):
+      const { id, update } = action.payload;
+      let i = 0;
+      for (; i < state.devices.length; i++) {
+        if (state.devices[i].id == id) break;
+      }
+      return {
+        ...state,
+        devices: state.devices
+          .slice(0, i)
+          .concat([{ ...state.devices[i], ...update }])
+          .concat(state.devices.slice(i + 1))
       };
     default:
       return state;

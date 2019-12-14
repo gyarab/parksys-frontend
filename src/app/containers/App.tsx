@@ -9,7 +9,6 @@ import { config as appConfig } from "../../../config";
 import { setupCss } from "../helpers/setupCss";
 import { Translator } from "../models/Translator";
 import { ITranslator } from "../models/TranslatorInterfaces";
-import { CounterPage } from "../pages/CounterPage";
 import { IStore } from "../redux/IStore";
 import { RoutePageMap } from "../routes/routes";
 import { translationsSelector } from "../selectors/translationsSelector";
@@ -17,7 +16,6 @@ import { NotFoundPage } from "../pages/NotFoundPage";
 import { SimpleLayout } from "../layouts/SimpleLayout";
 import { Navigation } from "../components/Navigation";
 import { BlankPage } from "../pages/BlankPage";
-import { StarsPage } from "../pages/StarsPage";
 import { LoginPage } from "../pages/LoginPage";
 import { DevicesPage } from "../pages/DevicesPage";
 
@@ -56,10 +54,10 @@ class App extends React.Component<IStateToProps> {
       page: BlankPage
     },
     revenuePage: {
-      page: StarsPage
+      page: BlankPage
     },
     historyPage: {
-      page: CounterPage
+      page: BlankPage
     },
     loginPage: {
       page: LoginPage,

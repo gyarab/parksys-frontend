@@ -6,7 +6,10 @@ import { Translator } from "../models/Translator";
 import { ITranslator } from "../models/TranslatorInterfaces";
 import { IStore } from "../redux/IStore";
 import { translationsSelector } from "../selectors/translationsSelector";
-import { fetchDevices } from "../redux/modules/devicesActionCreators";
+import {
+  fetchDevices,
+  updateDevice
+} from "../redux/modules/devicesActionCreators";
 import { IDevicesState } from "../redux/modules/devicesModule";
 import { useTrueFalseUndefined } from "../components/TrueFalseUndefined";
 import imageGetter from "../helpers/imageGetter";
@@ -48,13 +51,19 @@ interface IStateToProps {
 
 interface IDispatchToProps {
   fetchDevices: (filter: { name?: string; activated?: boolean }) => void;
+  updateDevice: (id: string, update: object) => void;
   useCreateDevice: () => MutationTuple<any, { name: string }>;
   useDeleteDevice: () => MutationTuple<any, { id: string }>;
+  useRegenerateActivationPassword: () => MutationTuple<any, { id: string }>;
 }
 
 interface IProps extends IStateToProps, IDispatchToProps {}
 
-const DeviceRowSubcomponent = ({ device }) => {
+const DeviceRowSubcomponent = ({
+  regenerateActivationPasswordEffect,
+  device
+}) => {
+  console.log("SUBCOMP RERENDER");
   const [imageData, setImageData] = useState(null);
   useEffect(() => {
     imageGetter(device.activationQrUrl)
@@ -70,10 +79,37 @@ const DeviceRowSubcomponent = ({ device }) => {
     };
   }, []);
 
+  const expiration = new Date(device.activationPasswordExpiresAt);
+  const expired = expiration.getTime() <= new Date().getTime();
+  const onRegenerateClick = () => {
+    regenerateActivationPasswordEffect(device.id);
+  };
   if (imageData == null) {
     return <div>Loading QR Code...</div>;
+  } else if (expired) {
+    <div>
+      <span>Activation Qr code has expired.</span>
+      <Button onClick={onRegenerateClick}>
+        Regenerate Activation Password
+      </Button>
+      ;
+    </div>;
   } else {
-    return <img src={imageData}></img>;
+    return (
+      <div>
+        <span style={{ display: "block" }}>
+          Activation expires at{" "}
+          <u>
+            {expiration.toLocaleDateString("cs")}{" "}
+            {expiration.toLocaleTimeString("cs")}
+          </u>
+        </span>
+        <img src={imageData}></img>
+        <Button onClick={onRegenerateClick}>
+          Regenerate Activation Password
+        </Button>
+      </div>
+    );
   }
 };
 
@@ -92,6 +128,9 @@ const DevicesPage = (props: IProps): JSX.Element => {
   const [name, setName] = useState("");
   const [createDeviceEffect] = props.useCreateDevice();
   const [deleteDeviceEffect] = props.useDeleteDevice();
+  const [
+    regenerateActivationPasswordEffect
+  ] = props.useRegenerateActivationPassword();
 
   const fetchDevices = () => {
     props.fetchDevices({ activated: activateFilter });
@@ -165,7 +204,20 @@ const DevicesPage = (props: IProps): JSX.Element => {
         columns={columns}
         data={props.devices.loaded ? props.devices.devices : []}
         renderDeviceSubcomponent={({ row }) => (
-          <DeviceRowSubcomponent device={row.original} />
+          <DeviceRowSubcomponent
+            regenerateActivationPasswordEffect={id => {
+              regenerateActivationPasswordEffect({ variables: { id } }).then(
+                result => {
+                  console.log(result);
+                  props.updateDevice(
+                    id,
+                    result.data.deviceRegenerateActivationPassword
+                  );
+                }
+              );
+            }}
+            device={row.original}
+          />
         )}
       />
       {props.devices.loaded && props.devices.devices.length === 0 ? (
@@ -234,6 +286,7 @@ export const mapStateToProps = (
 export const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
     fetchDevices: filter => dispatch(fetchDevices.invoke({ filter })),
+    updateDevice: (id, update) => dispatch(updateDevice({ id, update })),
     useCreateDevice: () =>
       useMutation(gql`
         mutation createDevice($name: String!) {
@@ -249,6 +302,15 @@ export const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
         mutation deleteDevice($id: ID!) {
           deleteDevice(id: $id) {
             id
+          }
+        }
+      `),
+    useRegenerateActivationPassword: () =>
+      useMutation(gql`
+        mutation regenerateActivationPassword($id: ID!) {
+          deviceRegenerateActivationPassword(id: $id) {
+            activationQrUrl
+            activationPasswordExpiresAt
           }
         }
       `)
