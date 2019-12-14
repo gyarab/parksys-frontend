@@ -87,13 +87,14 @@ const DeviceRowSubcomponent = ({
   if (imageData == null) {
     return <div>Loading QR Code...</div>;
   } else if (expired) {
-    <div>
-      <span>Activation Qr code has expired.</span>
-      <Button onClick={onRegenerateClick}>
-        Regenerate Activation Password
-      </Button>
-      ;
-    </div>;
+    return (
+      <div>
+        <span>Activation Qr code has expired.</span>
+        <Button onClick={onRegenerateClick}>
+          Regenerate Activation Password
+        </Button>
+      </div>
+    );
   } else {
     return (
       <div>
