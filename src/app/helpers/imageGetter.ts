@@ -1,6 +1,9 @@
+import { config } from "../../../config";
+
 // TODO: Get hostname from config
 export default async (path: string) => {
-  const url = "http://localhost:8080" + path;
+  const url = `${config.backendApi.root}${path}`;
+  console.log(url);
   return fetch(url, {
     method: "GET",
     headers: {

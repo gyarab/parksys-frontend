@@ -5,10 +5,11 @@ import { ApolloLink } from "apollo-link";
 import lodash from "lodash";
 import { IExtendedStore } from "../redux/configureStore";
 import { onError } from "apollo-link-error";
+import { config } from "../../../config";
 
 // Taken from: https://www.robinwieruch.de/react-redux-apollo-client-state-management-tutorial
 export const baseLink = new HttpLink({
-  uri: "http://127.0.0.1:8080/graphql"
+  uri: `${config.backendApi.root}${config.backendApi.graphql}`
 });
 
 export const createApolloClient = (store: IExtendedStore) => {

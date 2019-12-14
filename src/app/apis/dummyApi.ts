@@ -8,11 +8,11 @@ export const dummyApi = {
     return fetch(
       "https://api.github.com/repos/crazyfactory/ts-react-boilerplate"
     )
-      .then((res) => res.json())
-      .then((json) => json.stargazers_count);
+      .then(res => res.json())
+      .then(json => json.stargazers_count);
   },
   getTranslations: (payload: string): Promise<ITranslations> => {
-    return fetch(`http://localhost:8889/translations/${payload}`).then((res) =>
+    return fetch(`http://localhost:8889/translations/${payload}`).then(res =>
       res.json()
     );
   }
