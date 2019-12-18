@@ -119,7 +119,12 @@ const DevicesPage = (props: IProps): JSX.Element => {
       },
       {
         Header: "Activated At",
-        accessor: "activatedAt"
+        accessor: "activatedAt",
+        Cell({ row }) {
+          return row.original.activatedAt == null
+            ? null
+            : row.original.activatedAt;
+        }
       },
       {
         Header: "Actions",
@@ -135,7 +140,10 @@ const DevicesPage = (props: IProps): JSX.Element => {
           };
           return (
             <>
-              <Button disabled={row.original.activated} onClick={detailsClick}>
+              <Button
+                disabled={row.original.activated && !row.isExpanded}
+                onClick={detailsClick}
+              >
                 Details
               </Button>
               <Button type={"secondary"} onClick={deleteClick}>
@@ -260,6 +268,8 @@ export const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
       useMutation(gql`
         mutation regenerateActivationPassword($id: ID!) {
           deviceRegenerateActivationPassword(id: $id) {
+            activated
+            activatedAt
             activationQrUrl
             activationPasswordExpiresAt
           }

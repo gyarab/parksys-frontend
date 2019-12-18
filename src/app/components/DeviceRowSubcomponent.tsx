@@ -81,16 +81,17 @@ const DeviceRowSubcomponent = ({
         </Button>
       </div>
     );
-  } else if (imageData == null) {
-    return <div>Loading QR Code...</div>;
   } else {
     return (
       <div>
         <span style={{ display: "block" }}>
-          Activation expires in{" "}
-          <u>{Math.round(expiresIn / 100) / 10} seconds</u>
+          Activation expires in <u>{Math.round(expiresIn / 1000)} seconds</u>
         </span>
-        <img src={imageData}></img>
+        {imageData == null ? (
+          <div>Loading QR Code...</div>
+        ) : (
+          <img src={imageData}></img>
+        )}
       </div>
     );
   }
