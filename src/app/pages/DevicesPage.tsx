@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { createSelector } from "reselect";
@@ -8,17 +8,18 @@ import { IStore } from "../redux/IStore";
 import { translationsSelector } from "../selectors/translationsSelector";
 import {
   fetchDevices,
-  updateDevice
+  updateDevice,
+  toggleDeviceExpand
 } from "../redux/modules/devicesActionCreators";
 import { IDevicesState } from "../redux/modules/devicesModule";
 import { useTrueFalseUndefined } from "../components/TrueFalseUndefined";
-import imageGetter from "../helpers/imageGetter";
 import { useMutation, MutationTuple } from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import DeviceTable from "../components/DeviceTable";
+import { DeviceTable } from "../components/DeviceTable";
 import { Button } from "../components/Button";
 import { stylesheet } from "typestyle";
 import { Color } from "../constants";
+import DeviceRowSubcomponent from "../components/DeviceRowSubcomponent";
 
 const coloredStatus = (backgroundColor, textColor = Color.BLACK): any => {
   return {
@@ -46,7 +47,7 @@ interface IStateToProps {
     config: string;
     qrCode: string;
   };
-  devices: IDevicesState;
+  devices: Omit<IDevicesState, "expandedDevices">;
 }
 
 interface IDispatchToProps {
@@ -55,63 +56,10 @@ interface IDispatchToProps {
   useCreateDevice: () => MutationTuple<any, { name: string }>;
   useDeleteDevice: () => MutationTuple<any, { id: string }>;
   useRegenerateActivationPassword: () => MutationTuple<any, { id: string }>;
+  toggleExpand: (id: string, isExpanded: boolean) => void;
 }
 
 interface IProps extends IStateToProps, IDispatchToProps {}
-
-const DeviceRowSubcomponent = ({
-  regenerateActivationPasswordEffect,
-  device
-}) => {
-  const [imageData, setImageData] = useState(null);
-  useEffect(() => {
-    imageGetter(device.activationQrUrl)
-      .then(response => response.blob())
-      .then(blob => {
-        setImageData(URL.createObjectURL(blob));
-      })
-      .catch(err => {
-        console.log(err);
-      });
-    return () => {
-      setImageData(null);
-    };
-  }, []);
-
-  const expiration = new Date(device.activationPasswordExpiresAt);
-  const expired = expiration.getTime() <= new Date().getTime();
-  const onRegenerateClick = () => {
-    regenerateActivationPasswordEffect(device.id);
-  };
-  if (imageData == null) {
-    return <div>Loading QR Code...</div>;
-  } else if (expired) {
-    return (
-      <div>
-        <span>Activation Qr code has expired.</span>
-        <Button onClick={onRegenerateClick}>
-          Regenerate Activation Password
-        </Button>
-      </div>
-    );
-  } else {
-    return (
-      <div>
-        <span style={{ display: "block" }}>
-          Activation expires at{" "}
-          <u>
-            {expiration.toLocaleDateString("cs")}{" "}
-            {expiration.toLocaleTimeString("cs")}
-          </u>
-        </span>
-        <img src={imageData}></img>
-        <Button onClick={onRegenerateClick}>
-          Regenerate Activation Password
-        </Button>
-      </div>
-    );
-  }
-};
 
 const DevicesPage = (props: IProps): JSX.Element => {
   const activatedFilterOptions: [string, string, string] = [
@@ -177,6 +125,7 @@ const DevicesPage = (props: IProps): JSX.Element => {
         Header: "Actions",
         Cell({ row }) {
           const detailsClick = () => {
+            props.toggleExpand(row.original.id, !row.isExpanded);
             row.toggleExpanded();
           };
           const deleteClick = () => {
@@ -186,7 +135,9 @@ const DevicesPage = (props: IProps): JSX.Element => {
           };
           return (
             <>
-              <Button onClick={detailsClick}>Details</Button>
+              <Button disabled={row.original.activated} onClick={detailsClick}>
+                Details
+              </Button>
               <Button type={"secondary"} onClick={deleteClick}>
                 Delete
               </Button>
@@ -205,18 +156,11 @@ const DevicesPage = (props: IProps): JSX.Element => {
         data={props.devices.loaded ? props.devices.devices : []}
         renderDeviceSubcomponent={({ row }) => (
           <DeviceRowSubcomponent
-            regenerateActivationPasswordEffect={id => {
-              regenerateActivationPasswordEffect({ variables: { id } }).then(
-                result => {
-                  console.log(result);
-                  props.updateDevice(
-                    id,
-                    result.data.deviceRegenerateActivationPassword
-                  );
-                }
-              );
-            }}
+            regenerateActivationPasswordEffect={
+              regenerateActivationPasswordEffect
+            }
             device={row.original}
+            updateDevice={props.updateDevice}
           />
         )}
       />
@@ -281,6 +225,13 @@ export const mapStateToProps = (
 ): IStateToProps => ({
   translations: componentTranslationsSelector(state),
   devices: state.devices
+    ? {
+        error: state.devices.error,
+        loaded: state.devices.loaded,
+        pending: state.devices.pending,
+        devices: state.devices.devices
+      }
+    : null
 });
 
 export const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
@@ -313,7 +264,9 @@ export const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
             activationPasswordExpiresAt
           }
         }
-      `)
+      `),
+    toggleExpand: (id, isExpanded) =>
+      dispatch(toggleDeviceExpand({ id, isExpanded }))
   };
 };
 

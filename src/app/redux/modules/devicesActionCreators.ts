@@ -23,6 +23,11 @@ export const updateDevice = createAction(
   payload => payload
 );
 
+export const toggleDeviceExpand = createAction(
+  "DEVICE/TOGGLE_EXPAND",
+  payload => payload
+);
+
 const devicesFetch = "DEVICES/FETCH";
 // tslint:disable-next-line:export-name
 export const fetchDevices = createAsyncActions(

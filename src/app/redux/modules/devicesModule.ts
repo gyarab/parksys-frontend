@@ -3,18 +3,24 @@ import { IBaseState } from "./baseModule";
 import {
   fetchDevices,
   FetchDevicesFulfilled,
-  updateDevice
+  updateDevice,
+  toggleDeviceExpand
 } from "./devicesActionCreators";
 
 export interface IDevicesState
   extends IBaseState,
-    Pick<FetchDevicesFulfilled, "devices"> {}
+    Pick<FetchDevicesFulfilled, "devices"> {
+  expandedDevices: {
+    [id: string]: boolean;
+  };
+}
 
 export const initialState: IDevicesState = {
   devices: null,
   error: "",
   loaded: false,
-  pending: false
+  pending: false,
+  expandedDevices: {}
 };
 
 export function deviceReducer(
@@ -55,6 +61,14 @@ export function deviceReducer(
           .slice(0, i)
           .concat([{ ...state.devices[i], ...update }])
           .concat(state.devices.slice(i + 1))
+      };
+    case getType(toggleDeviceExpand):
+      return {
+        ...state,
+        expandedDevices: {
+          ...state.expandedDevices,
+          [action.payload.id]: action.payload.isExpanded
+        }
       };
     default:
       return state;

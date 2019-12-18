@@ -1,6 +1,8 @@
 import React from "react";
 import { useTable, useExpanded } from "react-table";
 import { stylesheet } from "typestyle";
+import { connect } from "react-redux";
+import { IStore } from "../redux/IStore";
 
 const classNames = stylesheet({
   table: {
@@ -29,7 +31,18 @@ const classNames = stylesheet({
   }
 });
 
-const DeviceTable = ({ columns, data, renderDeviceSubcomponent }) => {
+interface IStateToProps {
+  expandedDevices: {
+    [id: string]: boolean;
+  };
+}
+
+const DeviceTable = ({
+  columns,
+  data,
+  renderDeviceSubcomponent,
+  expandedDevices
+}) => {
   // Use the state and functions returned from useTable to build your UI
   const {
     getTableProps,
@@ -61,6 +74,9 @@ const DeviceTable = ({ columns, data, renderDeviceSubcomponent }) => {
       <tbody {...getTableBodyProps()}>
         {rows.map((row, i) => {
           prepareRow(row);
+          if (expandedDevices[row.original.id] && !row.isExpanded) {
+            row.toggleExpanded();
+          }
           return (
             <React.Fragment key={i}>
               <tr
@@ -89,4 +105,12 @@ const DeviceTable = ({ columns, data, renderDeviceSubcomponent }) => {
   );
 };
 
-export default DeviceTable;
+export const mapStateToProps = (
+  state: Pick<IStore, "settings" | "devices">
+): IStateToProps => ({
+  expandedDevices: state.devices.expandedDevices
+});
+
+const connected = connect(mapStateToProps, null)(DeviceTable);
+
+export { connected as DeviceTable, DeviceTable as UnconnectedDeviceTable };
