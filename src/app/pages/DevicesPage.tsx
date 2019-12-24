@@ -40,7 +40,7 @@ const classNames = stylesheet({
   positiveStatus: coloredStatus(Color.AQUAMARINE)
 });
 
-interface IStateToProps {
+export interface IStateToProps {
   translations: {
     devices: string;
     activated: string;
@@ -50,7 +50,7 @@ interface IStateToProps {
   devices: Omit<IDevicesState, "expandedDevices">;
 }
 
-interface IDispatchToProps {
+export interface IDispatchToProps {
   fetchDevices: (filter: { name?: string; activated?: boolean }) => void;
   updateDevice: (id: string, update: object) => void;
   useCreateDevice: () => MutationTuple<any, { name: string }>;
@@ -59,7 +59,7 @@ interface IDispatchToProps {
   toggleExpand: (id: string, isExpanded: boolean) => void;
 }
 
-interface IProps extends IStateToProps, IDispatchToProps {}
+export interface IProps extends IStateToProps, IDispatchToProps {}
 
 const DevicesPage = (props: IProps): JSX.Element => {
   const activatedFilterOptions: [string, string, string] = [

@@ -1,11 +1,15 @@
 import { ApolloClient } from "apollo-client";
 import { HttpLink } from "apollo-link-http";
-import { InMemoryCache } from "apollo-cache-inmemory";
+import {
+  InMemoryCache,
+  IntrospectionFragmentMatcher
+} from "apollo-cache-inmemory";
 import { ApolloLink } from "apollo-link";
 import lodash from "lodash";
 import { IExtendedStore } from "../redux/configureStore";
 import { onError } from "apollo-link-error";
 import { config } from "../../../config";
+const introspectionQueryResultData = require("../../fragmentTypes.json");
 
 // Taken from: https://www.robinwieruch.de/react-redux-apollo-client-state-management-tutorial
 export const baseLink = new HttpLink({
@@ -40,9 +44,14 @@ export const createApolloClient = (store: IExtendedStore) => {
     return forward(operation);
   });
 
+  const fragmentMatcher = new IntrospectionFragmentMatcher({
+    introspectionQueryResultData
+  });
+
   const client = new ApolloClient({
     link: errorLink.concat(authLink.concat(baseLink)),
-    cache: new InMemoryCache()
+    cache: new InMemoryCache({ fragmentMatcher }),
+    connectToDevTools: true
   });
   return client;
 };

@@ -28,6 +28,9 @@ const classNames = stylesheet({
         borderBottom: 0
       }
     }
+  },
+  subrow: {
+    transition: "height 0.15s ease-out"
   }
 });
 
@@ -93,7 +96,9 @@ const DeviceTable = ({
               {row.isExpanded ? (
                 <tr {...row.getRowProps()} key={1}>
                   <td colSpan={flatColumns.length}>
-                    {renderDeviceSubcomponent({ row })}
+                    <div className={classNames.subrow}>
+                      {renderDeviceSubcomponent({ row })}
+                    </div>
                   </td>
                 </tr>
               ) : null}

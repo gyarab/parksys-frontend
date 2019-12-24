@@ -18,6 +18,7 @@ import { Navigation } from "../components/Navigation";
 import { BlankPage } from "../pages/BlankPage";
 import { LoginPage } from "../pages/LoginPage";
 import { DevicesPage } from "../pages/DevicesPage";
+import { RulePage } from "../pages/RulePage";
 
 setupCss();
 
@@ -51,7 +52,7 @@ class App extends React.Component<IStateToProps> {
       page: BlankPage
     },
     rulesPage: {
-      page: BlankPage
+      page: RulePage
     },
     revenuePage: {
       page: BlankPage

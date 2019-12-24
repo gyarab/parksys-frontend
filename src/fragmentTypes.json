@@ -1,0 +1,1 @@
+{"__schema":{"types":[{"kind":"INTERFACE","name":"ParkingRule","possibleTypes":[{"name":"ParkingRulePermitAccess"},{"name":"ParkingRuleTimedFee"}]},{"kind":"UNION","name":"ParkingRuleSelector","possibleTypes":[{"name":"ParkingRulePermitAccess"},{"name":"ParkingRuleTimedFee"}]}]}}
