@@ -1,18 +1,26 @@
 import React from "react";
 import { stylesheet } from "typestyle";
 import moment from "moment";
+import { Color } from "../constants";
 
 const border = (width = "1px") => `${width} solid #c3c3c3`;
+const hourWidth = 100 / 24;
 
 const classNames = stylesheet({
   cal: {
     backgroundColor: "#f6f6f6",
-    padding: "0.5em 1em 0.5em 1em"
+    padding: "0.5em"
+  },
+  calCentered: {
+    width: "97%",
+    marginLeft: "auto",
+    marginRight: "auto"
   },
   row: {
     position: "relative",
-    height: "2em",
+    height: "2.4em",
     top: 0,
+    width: `${hourWidth * 24}%`,
     borderBottom: border("2px"),
     borderRight: border("2px"),
     borderLeft: border("2px"),
@@ -22,23 +30,45 @@ const classNames = stylesheet({
       }
     }
   },
+  calHeader: {
+    position: "relative",
+    height: "1.2em",
+    $nest: {
+      div: {
+        position: "absolute",
+        width: `${hourWidth}%`,
+        height: "100%"
+      }
+    }
+  },
   cell: {
     position: "absolute",
-    top: 0,
-    height: "100%",
-    backgroundColor: "blue"
+    top: "0.2em",
+    height: "2em",
+    backgroundColor: Color.AQUAMARINE,
+    borderRadius: "3px",
+    zIndex: 1
   },
   horizontalUnit: {
-    width: "4%",
+    width: `${hourWidth}%`,
     borderRight: border(),
     position: "absolute",
     top: 0,
-    height: "100%"
+    height: "100%",
+    $nest: {
+      "&:last-child": {
+        borderRight: 0
+      }
+    }
+  },
+  calBody: {
+    position: "relative"
   }
 });
 
+const toHours = millis => millis / (1000 * 3600);
+
 const ParkingRuleAssignmentRow = ({ assignments, priority, dayStart }) => {
-  const hourWidth = 4;
   const dayEnd = moment(dayStart)
     .endOf("day")
     .toDate();
@@ -51,7 +81,6 @@ const ParkingRuleAssignmentRow = ({ assignments, priority, dayStart }) => {
     const start = new Date(assignment.start);
     const end = new Date(assignment.end);
 
-    const toHours = millis => millis / (1000 * 3600);
     const diffStart = start.getTime() - dayStart.getTime();
     const diffEnd = dayEnd.getTime() - end.getTime();
     let left = hourWidth * Math.max(0, toHours(diffStart));
@@ -71,8 +100,8 @@ const ParkingRuleAssignmentRow = ({ assignments, priority, dayStart }) => {
   });
   return (
     <div className={classNames.row}>
-      {backgroundMarkers}
       {assignmentsElements}
+      {backgroundMarkers}
     </div>
   );
 };
@@ -94,19 +123,45 @@ export const ParkingRuleAssignmentDay = ({ data, day }) => {
     priorityAssignmentMap[key].push(assignment);
   }
   console.log(priorityAssignmentMap);
+
+  const timeMarkers = new Array(24).fill(0).map((_, i) => {
+    const left = `${i * hourWidth}%`;
+    return <div style={{ left }}>{i}h</div>;
+  });
+
+  const dayStart = moment(day)
+    .startOf("day")
+    .toDate();
+  const currentH = toHours(new Date().getTime() - dayStart.getTime());
+  console.log(currentH);
+
   return (
     <div className={classNames.cal}>
-      {priorityAssignmentMap.map((assignments, priority) => (
-        <React.Fragment key={priority}>
-          <ParkingRuleAssignmentRow
-            assignments={assignments}
-            priority={priority}
-            dayStart={moment(day)
-              .startOf("day")
-              .toDate()}
-          />
-        </React.Fragment>
-      ))}
+      <div className={classNames.calCentered}>
+        <div className={classNames.calHeader}>{timeMarkers}</div>
+        <div className={classNames.calBody}>
+          {priorityAssignmentMap.map((assignments, priority) => (
+            <React.Fragment key={priority}>
+              <ParkingRuleAssignmentRow
+                assignments={assignments}
+                priority={priority}
+                dayStart={dayStart}
+              />
+            </React.Fragment>
+          ))}
+          <div
+            style={{
+              left: `${hourWidth * currentH}%`,
+              position: "absolute",
+              borderRight: "2px solid red",
+              height: `${2.4 * (maxPriority + 1)}em`,
+              width: 0,
+              top: 0,
+              zIndex: 2
+            }}
+          ></div>
+        </div>
+      </div>
     </div>
   );
 };
