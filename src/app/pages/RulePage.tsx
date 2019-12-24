@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useLazyQuery } from "@apollo/react-hooks";
 import { RulePageFetchParkingRuleAssignmentsQuery } from "../constants/Queries";
 import {
   ParkingRuleAssignmentFilter,
@@ -9,6 +9,8 @@ import {
 } from "../components/ParkingRuleAssignmentFilter";
 import { ParkingRuleAssignmentDay } from "../components/ParkingRuleAssignmentDay";
 import moment from "moment";
+import { Button } from "../components/Button";
+import gql from "graphql-tag";
 
 export interface IStateToProps {}
 
@@ -31,6 +33,47 @@ const RulePage = (props: IProps) => {
     refetch();
   };
 
+  const [simulVars, setSimulVars] = useState({
+    vehicle: "5df4e4b7ec5214271d220b0a",
+    start: new Date().toISOString(),
+    end: new Date().toISOString()
+  });
+  const onChange = e => {
+    const newSimulVars = {
+      ...simulVars,
+      [e.target.name]: e.target.value
+    };
+    setSimulVars(newSimulVars);
+  };
+
+  const [loadSimulation, { data: dataSimul }] = useLazyQuery(gql`
+    query vehicleRuleSimulation(
+      $vehicle: ID!
+      $start: DateTime!
+      $end: DateTime!
+    ) {
+      simulateRuleAssignmentApplication(
+        vehicle: $vehicle
+        start: $start
+        end: $end
+      ) {
+        start
+        end
+        assignment {
+          id
+          priority
+        }
+      }
+    }
+  `);
+
+  const simulate = () => {
+    console.log("SIMULATE");
+    loadSimulation({
+      variables: simulVars
+    });
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   } else if (error) {
@@ -51,7 +94,20 @@ const RulePage = (props: IProps) => {
         <ParkingRuleAssignmentDay
           data={data.parkingRuleAssignments}
           day={queryVariables.day}
+          appliedData={
+            !!dataSimul ? dataSimul.simulateRuleAssignmentApplication : null
+          }
         />
+        <input
+          name="vehicle"
+          value={simulVars["vehicle"]}
+          onChange={onChange}
+        />
+        <input name="start" value={simulVars["start"]} onChange={onChange} />
+        <input name="end" value={simulVars["end"]} onChange={onChange} />
+        <Button onClick={simulate}>Simulate</Button>
+        <br />
+        <code>{JSON.stringify(dataSimul, null, 2)}</code>
       </div>
     );
   }

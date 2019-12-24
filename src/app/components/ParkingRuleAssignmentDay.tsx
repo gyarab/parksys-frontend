@@ -66,6 +66,10 @@ const classNames = stylesheet({
     borderRight: "2px solid red",
     width: 0,
     top: 0
+  },
+  appliedRuleAssignment: {
+    position: "absolute",
+    borderTop: "3px solid blue"
   }
 });
 
@@ -90,8 +94,8 @@ const ParkingRuleAssignmentRow = ({
 
     const diffStart = start.getTime() - dayStart.getTime();
     const diffEnd = dayEnd.getTime() - end.getTime();
-    let left = hourWidth * Math.max(0, toHours(diffStart));
-    let right = hourWidth * Math.max(0, toHours(diffEnd));
+    const left = hourWidth * Math.max(0, toHours(diffStart));
+    const right = hourWidth * Math.max(0, toHours(diffEnd));
 
     return (
       <div
@@ -119,10 +123,11 @@ const calcMaxPriority = data =>
     return Math.max(assignment.priority, prevMax);
   }, -1);
 
-export const ParkingRuleAssignmentDay = ({ data, day }) => {
-  const dayStart = moment(day)
-    .startOf("day")
-    .toDate();
+export const ParkingRuleAssignmentDay = ({ appliedData, data, day }) => {
+  const dayStartM = moment(day).startOf("day");
+  const dayStart = dayStartM.toDate();
+  const dayEnd = dayStartM.endOf("day").toDate();
+
   const maxPriority = calcMaxPriority(data);
   const rowCount = maxPriority + 2; // Extra at the top and bottom
   const priorityAssignmentMap = new Array(rowCount);
@@ -138,6 +143,30 @@ export const ParkingRuleAssignmentDay = ({ data, day }) => {
     const left = `${i * hourWidth}%`;
     return <div style={{ left }}>{i}h</div>;
   });
+
+  const appliedLines = !!appliedData
+    ? appliedData.map(appliedAssignment => {
+        const start = new Date(appliedAssignment.start);
+        const end = new Date(appliedAssignment.end);
+
+        const diffStart = start.getTime() - dayStart.getTime();
+        const diffEnd = dayEnd.getTime() - end.getTime();
+        const left = hourWidth * Math.max(0, toHours(diffStart));
+        const right = hourWidth * Math.max(0, toHours(diffEnd));
+
+        const height = (1 + appliedAssignment.assignment.priority) * 2.9;
+        return (
+          <div
+            className={classNames.appliedRuleAssignment}
+            style={{
+              left: `${left}%`,
+              right: `${right}%`,
+              bottom: `${height}em`
+            }}
+          ></div>
+        );
+      })
+    : [];
 
   const calculateTimeIndicatorPosition = () => {
     return hourWidth * toHours(new Date().getTime() - dayStart.getTime());
@@ -169,6 +198,7 @@ export const ParkingRuleAssignmentDay = ({ data, day }) => {
               />
             </React.Fragment>
           ))}
+          {appliedLines}
           <div
             className={classNames.timeIndicator}
             style={{
