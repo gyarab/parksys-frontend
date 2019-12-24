@@ -1,5 +1,5 @@
-import {createAsyncActions} from "./baseModule";
-import {ITranslations, TLanguage} from "./settingsModule";
+import { createAsyncActions } from "./baseModule";
+import { ITranslations, TLanguage } from "./settingsModule";
 
 // tslint:disable-next-line:export-name
 export const setLanguage = createAsyncActions(

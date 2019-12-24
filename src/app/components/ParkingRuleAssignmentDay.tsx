@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { stylesheet } from "typestyle";
 import moment from "moment";
-import { Color } from "../constants";
+import { ParkingRuleAssignment } from "./ParkingRuleAssignment";
 
 const border = (width = "1px") => `${width} solid #c3c3c3`;
 const hourWidth = 100 / 24;
@@ -18,7 +18,7 @@ const classNames = stylesheet({
   },
   row: {
     position: "relative",
-    height: "2.4em",
+    height: "2.9em",
     top: 0,
     width: `${hourWidth * 24}%`,
     borderBottom: border("2px"),
@@ -41,13 +41,10 @@ const classNames = stylesheet({
       }
     }
   },
-  cell: {
+  cellContainer: {
     position: "absolute",
     top: "0.2em",
-    height: "2em",
-    backgroundColor: Color.AQUAMARINE,
-    borderRadius: "3px",
-    zIndex: 1
+    height: "2.5em"
   },
   horizontalUnit: {
     width: `${hourWidth}%`,
@@ -63,12 +60,23 @@ const classNames = stylesheet({
   },
   calBody: {
     position: "relative"
+  },
+  timeIndicator: {
+    position: "absolute",
+    borderRight: "2px solid red",
+    width: 0,
+    top: 0
   }
 });
 
 const toHours = millis => millis / (1000 * 3600);
 
-const ParkingRuleAssignmentRow = ({ assignments, priority, dayStart }) => {
+const ParkingRuleAssignmentRow = ({
+  assignments,
+  maxPriority,
+  priority,
+  dayStart
+}) => {
   const dayEnd = moment(dayStart)
     .endOf("day")
     .toDate();
@@ -88,13 +96,14 @@ const ParkingRuleAssignmentRow = ({ assignments, priority, dayStart }) => {
 
     return (
       <div
-        className={classNames.cell}
+        className={classNames.cellContainer}
         style={{
           left: `${left}%`,
-          right: `${right}%`
+          right: `${right}%`,
+          zIndex: maxPriority - priority + 1
         }}
       >
-        <span style={{ fontFamily: "monospace" }}>{assignment.id}</span>
+        <ParkingRuleAssignment assignment={assignment} />
       </div>
     );
   });
@@ -112,28 +121,38 @@ const calcMaxPriority = data =>
   }, -1);
 
 export const ParkingRuleAssignmentDay = ({ data, day }) => {
+  const dayStart = moment(day)
+    .startOf("day")
+    .toDate();
   const maxPriority = calcMaxPriority(data);
   const priorityAssignmentMap = new Array(maxPriority + 1);
   for (let i = 0; i < maxPriority + 1; i++) {
     priorityAssignmentMap[i] = [];
   }
-  console.log(priorityAssignmentMap);
   for (const assignment of data) {
     const key = assignment.priority;
     priorityAssignmentMap[key].push(assignment);
   }
-  console.log(priorityAssignmentMap);
 
   const timeMarkers = new Array(24).fill(0).map((_, i) => {
     const left = `${i * hourWidth}%`;
     return <div style={{ left }}>{i}h</div>;
   });
 
-  const dayStart = moment(day)
-    .startOf("day")
-    .toDate();
-  const currentH = toHours(new Date().getTime() - dayStart.getTime());
-  console.log(currentH);
+  const calculateTimeIndicatorPosition = () => {
+    return hourWidth * toHours(new Date().getTime() - dayStart.getTime());
+  };
+  const [timeIndicatorPosition, setTimeIndicatorPosition] = useState(
+    calculateTimeIndicatorPosition()
+  );
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeIndicatorPosition(calculateTimeIndicatorPosition());
+    }, 30000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
 
   return (
     <div className={classNames.cal}>
@@ -144,20 +163,18 @@ export const ParkingRuleAssignmentDay = ({ data, day }) => {
             <React.Fragment key={priority}>
               <ParkingRuleAssignmentRow
                 assignments={assignments}
+                maxPriority={maxPriority}
                 priority={priority}
                 dayStart={dayStart}
               />
             </React.Fragment>
           ))}
           <div
+            className={classNames.timeIndicator}
             style={{
-              left: `${hourWidth * currentH}%`,
-              position: "absolute",
-              borderRight: "2px solid red",
-              height: `${2.4 * (maxPriority + 1)}em`,
-              width: 0,
-              top: 0,
-              zIndex: 2
+              left: `${timeIndicatorPosition}%`,
+              height: `${2.9 * (maxPriority + 1)}em`,
+              zIndex: maxPriority + 1
             }}
           ></div>
         </div>

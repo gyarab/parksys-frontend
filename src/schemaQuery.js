@@ -3,7 +3,7 @@ const fetch = require("node-fetch");
 const fs = require("fs");
 const { config } = require("../config");
 
-const uri = `${config.backendApi.root}${config.backendApi.graphql}`;
+const uri = `${config.backendApi.root}/graphql`;
 
 fetch(uri, {
   method: "POST",
