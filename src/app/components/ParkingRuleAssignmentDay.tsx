@@ -80,7 +80,6 @@ const ParkingRuleAssignmentRow = ({
   const dayEnd = moment(dayStart)
     .endOf("day")
     .toDate();
-  console.log(assignments, priority);
   const backgroundMarkers = new Array(24).fill(0).map((_, i) => {
     const left = `${i * hourWidth}%`;
     return <div className={classNames.horizontalUnit} style={{ left }}></div>;
@@ -125,8 +124,9 @@ export const ParkingRuleAssignmentDay = ({ data, day }) => {
     .startOf("day")
     .toDate();
   const maxPriority = calcMaxPriority(data);
-  const priorityAssignmentMap = new Array(maxPriority + 1);
-  for (let i = 0; i < maxPriority + 1; i++) {
+  const rowCount = maxPriority + 2; // Extra at the top and bottom
+  const priorityAssignmentMap = new Array(rowCount);
+  for (let i = 0; i < priorityAssignmentMap.length; i++) {
     priorityAssignmentMap[i] = [];
   }
   for (const assignment of data) {
@@ -159,7 +159,7 @@ export const ParkingRuleAssignmentDay = ({ data, day }) => {
       <div className={classNames.calCentered}>
         <div className={classNames.calHeader}>{timeMarkers}</div>
         <div className={classNames.calBody}>
-          {priorityAssignmentMap.map((assignments, priority) => (
+          {priorityAssignmentMap.reverse().map((assignments, priority) => (
             <React.Fragment key={priority}>
               <ParkingRuleAssignmentRow
                 assignments={assignments}
@@ -173,8 +173,8 @@ export const ParkingRuleAssignmentDay = ({ data, day }) => {
             className={classNames.timeIndicator}
             style={{
               left: `${timeIndicatorPosition}%`,
-              height: `${2.9 * (maxPriority + 1)}em`,
-              zIndex: maxPriority + 1
+              height: `${2.9 * rowCount}em`,
+              zIndex: rowCount
             }}
           ></div>
         </div>

@@ -14,17 +14,13 @@ export interface IProps {
 const undefinedStr = "```";
 
 export const ParkingRuleAssignmentFilter = (props: IProps) => {
-  console.log(props);
   const [values, setValues] = useState<IValues>(props.values || {});
-  console.log(values);
 
   const onSubmit = e => {
-    console.log("onSubmit");
     e.preventDefault();
     props.onSubmit(values);
   };
   const onChange = e => {
-    console.log("onChange");
     const newValues = {
       ...values,
       [e.target.name]: e.target.value

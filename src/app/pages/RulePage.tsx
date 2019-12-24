@@ -72,7 +72,6 @@ const mapDispatchToProps = (_: Dispatch): IDispatchToProps => {
           .endOf("day")
           .toString()
       };
-      console.log(filter2);
       return useQuery(RulePageFetchParkingRuleAssignmentsQuery, {
         variables: filter2 || {}
       });
