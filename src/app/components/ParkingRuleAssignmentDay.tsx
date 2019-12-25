@@ -143,7 +143,7 @@ export const ParkingRuleAssignmentDay = ({ appliedData, data, day }) => {
   const dayEnd = dayStartM.endOf("day").toDate();
 
   const maxPriority = calcMaxPriority(data);
-  const rowCount = maxPriority + 2; // Extra at the top and bottom
+  const rowCount = maxPriority + 2; // Extra row at the top and bottom
   const priorityAssignmentMap = new Array(rowCount);
   for (let i = 0; i < priorityAssignmentMap.length; i++) {
     priorityAssignmentMap[i] = [];
@@ -159,7 +159,7 @@ export const ParkingRuleAssignmentDay = ({ appliedData, data, day }) => {
   });
 
   const appliedLines = !!appliedData
-    ? appliedData.map(appliedAssignment => {
+    ? appliedData.map((appliedAssignment, i) => {
         const start = new Date(appliedAssignment.start);
         const end = new Date(appliedAssignment.end);
         const [left, right] = calculateLeftRightFromTime(
@@ -171,6 +171,7 @@ export const ParkingRuleAssignmentDay = ({ appliedData, data, day }) => {
         const height = (1 + appliedAssignment.assignment.priority) * 2.9;
         return (
           <div
+            key={i}
             className={classNames.appliedRuleAssignment}
             style={{
               left: `${left}%`,
@@ -192,10 +193,11 @@ export const ParkingRuleAssignmentDay = ({ appliedData, data, day }) => {
     const timer = setInterval(() => {
       setTimeIndicatorPosition(calculateTimeIndicatorPosition());
     }, 30000);
+    setTimeIndicatorPosition(calculateTimeIndicatorPosition());
     return () => {
       clearInterval(timer);
     };
-  }, []);
+  }, [day]);
 
   return (
     <div className={classNames.cal}>
@@ -216,9 +218,13 @@ export const ParkingRuleAssignmentDay = ({ appliedData, data, day }) => {
           <div
             className={classNames.timeIndicator}
             style={{
-              left: `${timeIndicatorPosition}%`,
+              left: `${Math.max(0, Math.min(100, timeIndicatorPosition))}%`,
               height: `${2.9 * rowCount}em`,
-              zIndex: rowCount
+              zIndex: rowCount,
+              visibility:
+                0 <= timeIndicatorPosition && timeIndicatorPosition <= 100
+                  ? "inherit"
+                  : "hidden"
             }}
           ></div>
         </div>
