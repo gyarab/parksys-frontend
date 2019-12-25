@@ -74,6 +74,20 @@ const classNames = stylesheet({
 });
 
 const toHours = millis => millis / (1000 * 3600);
+// Result's unit is percent
+const calculateLeftRightFromTime = (
+  boundLeft: Date,
+  boundRight: Date,
+  start: Date,
+  end: Date
+): [number, number] => {
+  const diffStart = start.getTime() - boundLeft.getTime();
+  const diffEnd = boundRight.getTime() - end.getTime();
+  return [
+    hourWidth * Math.max(0, toHours(diffStart)),
+    hourWidth * Math.max(0, toHours(diffEnd))
+  ];
+};
 
 const ParkingRuleAssignmentRow = ({
   assignments,
@@ -91,12 +105,12 @@ const ParkingRuleAssignmentRow = ({
   const assignmentsElements = assignments.map(assignment => {
     const start = new Date(assignment.start);
     const end = new Date(assignment.end);
-
-    const diffStart = start.getTime() - dayStart.getTime();
-    const diffEnd = dayEnd.getTime() - end.getTime();
-    const left = hourWidth * Math.max(0, toHours(diffStart));
-    const right = hourWidth * Math.max(0, toHours(diffEnd));
-
+    const [left, right] = calculateLeftRightFromTime(
+      dayStart,
+      dayEnd,
+      start,
+      end
+    );
     return (
       <div
         className={classNames.cellContainer}
@@ -148,12 +162,12 @@ export const ParkingRuleAssignmentDay = ({ appliedData, data, day }) => {
     ? appliedData.map(appliedAssignment => {
         const start = new Date(appliedAssignment.start);
         const end = new Date(appliedAssignment.end);
-
-        const diffStart = start.getTime() - dayStart.getTime();
-        const diffEnd = dayEnd.getTime() - end.getTime();
-        const left = hourWidth * Math.max(0, toHours(diffStart));
-        const right = hourWidth * Math.max(0, toHours(diffEnd));
-
+        const [left, right] = calculateLeftRightFromTime(
+          dayStart,
+          dayEnd,
+          start,
+          end
+        );
         const height = (1 + appliedAssignment.assignment.priority) * 2.9;
         return (
           <div
@@ -161,7 +175,7 @@ export const ParkingRuleAssignmentDay = ({ appliedData, data, day }) => {
             style={{
               left: `${left}%`,
               right: `${right}%`,
-              bottom: `${height}em`
+              bottom: `calc(${height}em - 3px)`
             }}
           ></div>
         );
