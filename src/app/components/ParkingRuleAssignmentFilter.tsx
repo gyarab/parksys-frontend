@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 export interface IValues {
   day?: string;
@@ -9,28 +9,25 @@ export interface IProps {
   onChange: (values: IValues) => void;
   onSubmit: (values: IValues) => void;
   values?: IValues;
+  initialValues?: (values: IValues) => void;
 }
 
 const undefinedStr = "```";
 
 export const ParkingRuleAssignmentFilter = (props: IProps) => {
-  const [values, setValues] = useState<IValues>(props.values || {});
-
   const onSubmit = e => {
     e.preventDefault();
-    props.onSubmit(values);
+    props.onSubmit({ ...props.values });
   };
   const onChange = e => {
     const newValues = {
-      ...values,
+      ...props.values,
       [e.target.name]: e.target.value
     };
     if (e.target.value === undefinedStr) {
       delete newValues[e.target.name];
     }
-    setValues(newValues);
     props.onChange(newValues);
-    props.onSubmit(newValues);
   };
 
   return (
@@ -41,7 +38,7 @@ export const ParkingRuleAssignmentFilter = (props: IProps) => {
           <select
             onChange={onChange}
             name="vehicleSelectorMode"
-            value={values.vehicleSelectorMode}
+            value={props.values.vehicleSelectorMode}
           >
             <option value={undefinedStr}>-</option>
             <option value="ALL">ALL</option>
@@ -53,7 +50,7 @@ export const ParkingRuleAssignmentFilter = (props: IProps) => {
           <input
             type="date"
             name="day"
-            value={values.day.slice(0, 10)}
+            value={props.values.day.slice(0, 10)}
             onChange={onChange}
           />
         </label>

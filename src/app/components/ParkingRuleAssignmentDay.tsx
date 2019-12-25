@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { stylesheet } from "typestyle";
 import moment from "moment";
-import { ParkingRuleAssignment } from "./ParkingRuleAssignment";
+import { ParkingRuleAssignmentRow } from "./ParkingRuleAssignmentRow";
 
 const border = (width = "1px") => `${width} solid #c3c3c3`;
 const hourWidth = 100 / 24;
@@ -73,9 +73,9 @@ const classNames = stylesheet({
   }
 });
 
-const toHours = millis => millis / (1000 * 3600);
+export const millisToHours = millis => millis / (1000 * 3600);
 // Result's unit is percent
-const calculateLeftRightFromTime = (
+export const calculateLeftRightFromTime = (
   boundLeft: Date,
   boundRight: Date,
   start: Date,
@@ -84,52 +84,9 @@ const calculateLeftRightFromTime = (
   const diffStart = start.getTime() - boundLeft.getTime();
   const diffEnd = boundRight.getTime() - end.getTime();
   return [
-    hourWidth * Math.max(0, toHours(diffStart)),
-    hourWidth * Math.max(0, toHours(diffEnd))
+    hourWidth * Math.max(0, millisToHours(diffStart)),
+    hourWidth * Math.max(0, millisToHours(diffEnd))
   ];
-};
-
-const ParkingRuleAssignmentRow = ({
-  assignments,
-  maxPriority,
-  priority,
-  dayStart
-}) => {
-  const dayEnd = moment(dayStart)
-    .endOf("day")
-    .toDate();
-  const backgroundMarkers = new Array(24).fill(0).map((_, i) => {
-    const left = `${i * hourWidth}%`;
-    return <div className={classNames.horizontalUnit} style={{ left }}></div>;
-  });
-  const assignmentsElements = assignments.map(assignment => {
-    const start = new Date(assignment.start);
-    const end = new Date(assignment.end);
-    const [left, right] = calculateLeftRightFromTime(
-      dayStart,
-      dayEnd,
-      start,
-      end
-    );
-    return (
-      <div
-        className={classNames.cellContainer}
-        style={{
-          left: `${left}%`,
-          right: `${right}%`,
-          zIndex: maxPriority - priority + 1
-        }}
-      >
-        <ParkingRuleAssignment assignment={assignment} />
-      </div>
-    );
-  });
-  return (
-    <div className={classNames.row}>
-      {assignmentsElements}
-      {backgroundMarkers}
-    </div>
-  );
 };
 
 const calcMaxPriority = data =>
@@ -184,7 +141,7 @@ export const ParkingRuleAssignmentDay = ({ appliedData, data, day }) => {
     : [];
 
   const calculateTimeIndicatorPosition = () => {
-    return hourWidth * toHours(new Date().getTime() - dayStart.getTime());
+    return hourWidth * millisToHours(new Date().getTime() - dayStart.getTime());
   };
   const [timeIndicatorPosition, setTimeIndicatorPosition] = useState(
     calculateTimeIndicatorPosition()
