@@ -80,45 +80,48 @@ const RulePage = (props: IProps) => {
     });
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  } else if (error) {
-    return <div>ERROR: {error}</div>;
-  } else {
-    return (
+  return (
+    <div>
+      <ParkingRuleAssignmentFilter
+        onChange={values => {
+          props.setSelectedDay(values.day);
+          onShouldRefetch(values);
+        }}
+        onSubmit={onShouldRefetch}
+        values={queryVariables}
+      />
+      <hr />
       <div>
-        <ParkingRuleAssignmentFilter
-          onChange={values => {
-            props.setSelectedDay(values.day);
-          }}
-          onSubmit={onShouldRefetch}
-          values={queryVariables}
-        />
-        <hr />
-        <div>
-          data=<b>{JSON.stringify(data, null, 2)}</b>
-        </div>
-        <hr />
-        <ParkingRuleAssignmentDay
-          data={data.parkingRuleAssignments}
-          day={queryVariables.day}
-          appliedData={
-            !!dataSimul ? dataSimul.simulateRuleAssignmentApplication : null
-          }
-        />
-        <input
-          name="vehicle"
-          value={simulVars["vehicle"]}
-          onChange={onChange}
-        />
-        <input name="start" value={simulVars["start"]} onChange={onChange} />
-        <input name="end" value={simulVars["end"]} onChange={onChange} />
-        <Button onClick={simulate}>Simulate</Button>
-        <br />
-        <code>{JSON.stringify(dataSimul, null, 2)}</code>
+        data=<b>{JSON.stringify(data, null, 2)}</b>
       </div>
-    );
-  }
+      <hr />
+      {loading ? (
+        <p>Loading</p>
+      ) : error ? (
+        <p>ERROR: {error}</p>
+      ) : (
+        <div>
+          <ParkingRuleAssignmentDay
+            data={data.parkingRuleAssignments}
+            day={queryVariables.day}
+            appliedData={
+              !!dataSimul ? dataSimul.simulateRuleAssignmentApplication : null
+            }
+          />
+          <input
+            name="vehicle"
+            value={simulVars["vehicle"]}
+            onChange={onChange}
+          />
+          <input name="start" value={simulVars["start"]} onChange={onChange} />
+          <input name="end" value={simulVars["end"]} onChange={onChange} />
+          <Button onClick={simulate}>Simulate</Button>
+          <br />
+          <code>{JSON.stringify(dataSimul, null, 2)}</code>
+        </div>
+      )}
+    </div>
+  );
 };
 
 const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
