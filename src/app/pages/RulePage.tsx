@@ -11,21 +11,28 @@ import { ParkingRuleAssignmentDay } from "../components/ParkingRuleAssignmentDay
 import moment from "moment";
 import { Button } from "../components/Button";
 import gql from "graphql-tag";
+import { IStore } from "../redux/IStore";
+import { SET_SELECTED_DAY } from "../redux/modules/rulePageActionCreators";
 
-export interface IStateToProps {}
+export interface IStateToProps {
+  selectedDay: string;
+}
 
 export interface IDispatchToProps {
   useFetchRules: (filter?: any) => any;
+  setSelectedDay: (newDay: string) => any;
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
 
 const RulePage = (props: IProps) => {
   const [queryVariables, setQueryVariables] = useState<any>({
-    day: moment()
-      .toDate()
-      .toISOString()
+    day: props.selectedDay
   });
+  // Always get .day from props
+  if (queryVariables.day !== props.selectedDay) {
+    setQueryVariables({ ...queryVariables, day: props.selectedDay });
+  }
   const { loading, error, data, refetch } = props.useFetchRules(queryVariables);
 
   const onShouldRefetch = (values: FilterValues) => {
@@ -68,7 +75,6 @@ const RulePage = (props: IProps) => {
   `);
 
   const simulate = () => {
-    console.log("SIMULATE");
     loadSimulation({
       variables: simulVars
     });
@@ -82,7 +88,9 @@ const RulePage = (props: IProps) => {
     return (
       <div>
         <ParkingRuleAssignmentFilter
-          onChange={() => {}}
+          onChange={values => {
+            props.setSelectedDay(values.day);
+          }}
           onSubmit={onShouldRefetch}
           values={queryVariables}
         />
@@ -113,7 +121,13 @@ const RulePage = (props: IProps) => {
   }
 };
 
-const mapDispatchToProps = (_: Dispatch): IDispatchToProps => {
+const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
+  return {
+    selectedDay: state.rulePage.selectedDay
+  };
+};
+
+const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
     useFetchRules: filter => {
       const filter2 = { ...filter };
@@ -131,9 +145,11 @@ const mapDispatchToProps = (_: Dispatch): IDispatchToProps => {
       return useQuery(RulePageFetchParkingRuleAssignmentsQuery, {
         variables: filter2 || {}
       });
-    }
+    },
+    setSelectedDay: newDay =>
+      dispatch({ type: SET_SELECTED_DAY, payload: { day: newDay } })
   };
 };
 
-const connected = connect(null, mapDispatchToProps)(RulePage);
+const connected = connect(mapStateToProps, mapDispatchToProps)(RulePage);
 export { connected as RulePage, RulePage as UnconnectedRulePage };

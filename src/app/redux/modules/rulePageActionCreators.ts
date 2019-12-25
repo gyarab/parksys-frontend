@@ -10,4 +10,13 @@ interface ChangeOpenedRuleAssignment {
   };
 }
 
-export type RulePageActionTypes = ChangeOpenedRuleAssignment;
+export const SET_SELECTED_DAY = "RULE_PAGE/SET_SELECTED_DAY";
+interface SetSelectedDay {
+  type: typeof SET_SELECTED_DAY;
+  payload: {
+    // If null, today is set
+    day: string | null;
+  };
+}
+
+export type RulePageActionTypes = ChangeOpenedRuleAssignment | SetSelectedDay;
