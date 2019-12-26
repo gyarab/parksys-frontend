@@ -4,19 +4,19 @@ export const RulePageFetchParkingRuleAssignmentsQuery = gql`
   query parkingRuleAssignments(
     $startFilter: DateFilter
     $endFilter: DateFilter
-    $vehicleSelectorMode: VehicleSelectorMode
+    $vehicleFilterMode: VehicleFilterMode
   ) {
     parkingRuleAssignments(
       filter: {
         startFilter: $startFilter
         endFilter: $endFilter
-        vehicleSelectorMode: $vehicleSelectorMode
+        vehicleFilterMode: $vehicleFilterMode
       }
     ) {
       id
       start
       end
-      vehicleSelectorMode
+      vehicleFilterMode
       priority
       vehicleFilters {
         id

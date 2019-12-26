@@ -98,7 +98,7 @@ const RulePage = (props: IProps) => {
       {loading ? (
         <p>Loading</p>
       ) : error ? (
-        <p>ERROR: {error}</p>
+        <p>ERROR: {error.toString()}</p>
       ) : (
         <div>
           <ParkingRuleAssignmentDay

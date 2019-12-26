@@ -5,6 +5,8 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { CHANGE_OPENED_RULE_ASSIGNMENT } from "../redux/modules/rulePageActionCreators";
 import { IStore } from "../redux/IStore";
+import { useTwoPicker } from "./TwoPicker";
+import { useDatePicker } from "./DatePicker";
 
 export interface IDispatchToProps {
   changeOpenedRuleAssignment(id: string | null): void;
@@ -35,7 +37,8 @@ const styles = stylesheet({
         top: "2.5em",
         borderRadius: "3px",
         padding: "0.5em",
-        minWidth: "12em",
+        paddingTop: "2em",
+        width: "23em",
         minHeight: "8em",
         backgroundColor: "white",
         boxShadow: "0px 0px 3px 1px #888",
@@ -65,8 +68,49 @@ const styles = stylesheet({
         position: "relative"
       }
     }
+  },
+  options: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, auto)",
+    gridGap: "0.3em 0.4em",
+    alignItems: "center",
+    $nest: {
+      ".twoPickerContainer": {
+        marginRight: "0.65em",
+        $nest: {
+          "> div": {
+            float: "right"
+          }
+        }
+      }
+    }
   }
 });
+
+const Details = ({ assignment, close }) => {
+  const [startPicker] = useDatePicker(new Date(assignment.start));
+  const [endPicker] = useDatePicker(new Date(assignment.end));
+  const [filterModePicker] = useTwoPicker(
+    "NONE",
+    "ALL",
+    assignment.vehicleFilterMode === "NONE"
+  );
+  return (
+    <div className="details">
+      <span className="close" onClick={close}>
+        x
+      </span>
+      <div className={styles.options}>
+        <span>Start</span>
+        {startPicker}
+        <span>End</span>
+        {endPicker}
+        <span>Filter Mode</span>
+        <div className="twoPickerContainer">{filterModePicker}</div>
+      </div>
+    </div>
+  );
+};
 
 const ParkingRuleAssignment = ({
   assignment,
@@ -82,14 +126,9 @@ const ParkingRuleAssignment = ({
       <div className={"cellBody"} onClick={toggleDetails}>
         <span style={{ fontFamily: "monospace" }}>{assignment.id}</span>
       </div>
-      {!toggled ? null : (
-        <div className="details">
-          <span className="close" onClick={toggleDetails}>
-            x
-          </span>
-          <code>{JSON.stringify(assignment, null, 2)}</code>
-        </div>
-      )}
+      {toggled ? (
+        <Details assignment={assignment} close={toggleDetails} />
+      ) : null}
     </div>
   );
 };
