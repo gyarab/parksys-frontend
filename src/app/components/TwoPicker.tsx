@@ -42,8 +42,8 @@ export const useTwoPicker = (
   optionLeft: string,
   optionRight: string,
   leftIsInitial: boolean = true
-) => {
-  const [selectedValue, setSelectedValue] = useState(
+): [JSX.Element, string, (v: string) => void] => {
+  const [selectedValue, setSelectedValue] = useState<string>(
     leftIsInitial ? optionLeft : optionRight
   );
   const leftIsSelected = selectedValue === optionLeft;

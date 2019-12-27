@@ -38,3 +38,24 @@ export const RulePageFetchParkingRuleAssignmentsQuery = gql`
     }
   }
 `;
+
+export const RULE_SIMULATION_QUERY = gql`
+  query vehicleRuleSimulation(
+    $vehicle: ID!
+    $start: DateTime!
+    $end: DateTime!
+  ) {
+    simulateRuleAssignmentApplication(
+      vehicle: $vehicle
+      start: $start
+      end: $end
+    ) {
+      start
+      end
+      assignment {
+        id
+        priority
+      }
+    }
+  }
+`;

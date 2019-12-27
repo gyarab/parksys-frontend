@@ -69,7 +69,13 @@ const classNames = stylesheet({
   },
   appliedRuleAssignment: {
     position: "absolute",
-    borderTop: "3px solid blue"
+    borderTop: "3px solid blue",
+    height: 0
+  },
+  appliedRuleAssignmentConnector: {
+    position: "absolute",
+    borderRight: "2px dashed blue",
+    width: 0
   }
 });
 
@@ -116,28 +122,58 @@ export const ParkingRuleAssignmentDay = ({ appliedData, data, day }) => {
   });
 
   const appliedLines = !!appliedData
-    ? appliedData.map((appliedAssignment, i) => {
-        const start = new Date(appliedAssignment.start);
-        const end = new Date(appliedAssignment.end);
-        const [left, right] = calculateLeftRightFromTime(
-          dayStart,
-          dayEnd,
-          start,
-          end
-        );
-        const height = (1 + appliedAssignment.assignment.priority) * 2.9;
-        return (
-          <div
-            key={i}
-            className={classNames.appliedRuleAssignment}
-            style={{
-              left: `${left}%`,
-              right: `${right}%`,
-              bottom: `calc(${height}em - 3px)`
-            }}
-          ></div>
-        );
-      })
+    ? appliedData
+        .map(appliedAssignment => {
+          const start = new Date(appliedAssignment.start);
+          const end = new Date(appliedAssignment.end);
+          const [left, right] = calculateLeftRightFromTime(
+            dayStart,
+            dayEnd,
+            start,
+            end
+          );
+          const distanceFromBottom =
+            (1 + appliedAssignment.assignment.priority) * 2.9;
+          const distanceFromTop = (2 + maxPriority) * 2.9 - distanceFromBottom;
+          return [left, right, distanceFromBottom, distanceFromTop];
+        })
+        .map(
+          (
+            [left, right, height],
+            i: number,
+            array: Array<[number, number, number, number]>
+          ) => {
+            const leftP = `${left}%`;
+            const rightP = `${right}%`;
+            const heightCalc = (h, p = 3) => `calc(${h}em - ${p}px)`;
+            const heightP = heightCalc(height);
+            return (
+              <>
+                <div
+                  key={i}
+                  className={classNames.appliedRuleAssignment}
+                  style={{
+                    left: leftP,
+                    right: rightP,
+                    bottom: heightP
+                  }}
+                ></div>
+                {i > 0 ? (
+                  <div
+                    key={-i}
+                    style={{
+                      left: leftP,
+                      right: rightP,
+                      top: heightCalc(array[i - 1][3], -6),
+                      bottom: heightP
+                    }}
+                    className={classNames.appliedRuleAssignmentConnector}
+                  ></div>
+                ) : null}
+              </>
+            );
+          }
+        )
     : [];
 
   const calculateTimeIndicatorPosition = () => {

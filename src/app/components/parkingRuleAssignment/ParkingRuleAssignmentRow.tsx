@@ -3,9 +3,9 @@ import { stylesheet } from "typestyle";
 import moment from "moment";
 import { ParkingRuleAssignment } from "./ParkingRuleAssignment";
 import { calculateLeftRightFromTime } from "./ParkingRuleAssignmentDay";
-import { Color } from "../constants";
+import { Color } from "../../constants";
 import { Dispatch } from "redux";
-import { SET_SELECTED_DAY } from "../redux/modules/rulePageActionCreators";
+import { SET_SELECTED_DAY } from "../../redux/modules/rulePageActionCreators";
 import { connect } from "react-redux";
 
 const border = (width = "1px") => `${width} solid #c3c3c3`;

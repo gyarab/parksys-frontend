@@ -1,18 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { useQuery, useLazyQuery } from "@apollo/react-hooks";
-import { RulePageFetchParkingRuleAssignmentsQuery } from "../constants/Queries";
+import {
+  RulePageFetchParkingRuleAssignmentsQuery,
+  RULE_SIMULATION_QUERY
+} from "../constants/Queries";
 import {
   ParkingRuleAssignmentFilter,
   IValues as FilterValues
-} from "../components/ParkingRuleAssignmentFilter";
-import { ParkingRuleAssignmentDay } from "../components/ParkingRuleAssignmentDay";
+} from "../components/parkingRuleAssignment/ParkingRuleAssignmentFilter";
+import { ParkingRuleAssignmentDay } from "../components/parkingRuleAssignment/ParkingRuleAssignmentDay";
 import moment from "moment";
-import { Button } from "../components/Button";
-import gql from "graphql-tag";
 import { IStore } from "../redux/IStore";
 import { SET_SELECTED_DAY } from "../redux/modules/rulePageActionCreators";
+import { useTwoPicker } from "../components/TwoPicker";
 
 export interface IStateToProps {
   selectedDay: string;
@@ -20,6 +22,7 @@ export interface IStateToProps {
 
 export interface IDispatchToProps {
   useFetchRules: (filter?: any) => any;
+  useRuleSimulation: () => any;
   setSelectedDay: (newDay: string) => any;
 }
 
@@ -33,51 +36,47 @@ const RulePage = (props: IProps) => {
   if (queryVariables.day !== props.selectedDay) {
     setQueryVariables({ ...queryVariables, day: props.selectedDay });
   }
-  const { loading, error, data, refetch } = props.useFetchRules(queryVariables);
 
-  const onShouldRefetch = (values: FilterValues) => {
-    setQueryVariables(values);
-    refetch();
-  };
+  const [
+    loadSimulation,
+    { data: dataSimul, refetch: refetchSimulation }
+  ] = props.useRuleSimulation();
+  const { loading, error, data, refetch } = props.useFetchRules(queryVariables);
+  const [shouldSimulateComp, shouldSimulate] = useTwoPicker(
+    "SIM OFF",
+    "SIM ON"
+  );
 
   const [simulVars, setSimulVars] = useState({
     vehicle: "5df4e4b7ec5214271d220b0a",
     start: new Date().toISOString(),
     end: new Date().toISOString()
   });
-  const onChange = e => {
+  const simulate = () => {
+    if (shouldSimulate === "SIM ON") {
+      console.log("RUN");
+      const args = { variables: simulVars };
+      if (!!refetchSimulation) refetchSimulation(args);
+      else loadSimulation(args);
+    }
+  };
+  useEffect(() => {
+    console.log("EFF SIM");
+    simulate();
+  }, [shouldSimulate, simulVars]);
+
+  const onShouldRefetch = (values: FilterValues) => {
+    setQueryVariables(values);
+    refetch();
+    simulate();
+  };
+
+  const onChangeSimulVars = e => {
     const newSimulVars = {
       ...simulVars,
       [e.target.name]: e.target.value
     };
     setSimulVars(newSimulVars);
-  };
-
-  const [loadSimulation, { data: dataSimul }] = useLazyQuery(gql`
-    query vehicleRuleSimulation(
-      $vehicle: ID!
-      $start: DateTime!
-      $end: DateTime!
-    ) {
-      simulateRuleAssignmentApplication(
-        vehicle: $vehicle
-        start: $start
-        end: $end
-      ) {
-        start
-        end
-        assignment {
-          id
-          priority
-        }
-      }
-    }
-  `);
-
-  const simulate = () => {
-    loadSimulation({
-      variables: simulVars
-    });
   };
 
   return (
@@ -105,17 +104,27 @@ const RulePage = (props: IProps) => {
             data={data.parkingRuleAssignments}
             day={queryVariables.day}
             appliedData={
-              !!dataSimul ? dataSimul.simulateRuleAssignmentApplication : null
+              !!dataSimul && shouldSimulate
+                ? dataSimul.simulateRuleAssignmentApplication
+                : null
             }
           />
           <input
             name="vehicle"
             value={simulVars["vehicle"]}
-            onChange={onChange}
+            onChange={onChangeSimulVars}
           />
-          <input name="start" value={simulVars["start"]} onChange={onChange} />
-          <input name="end" value={simulVars["end"]} onChange={onChange} />
-          <Button onClick={simulate}>Simulate</Button>
+          <input
+            name="start"
+            value={simulVars["start"]}
+            onChange={onChangeSimulVars}
+          />
+          <input
+            name="end"
+            value={simulVars["end"]}
+            onChange={onChangeSimulVars}
+          />
+          {shouldSimulateComp}
           <br />
           <code>{JSON.stringify(dataSimul, null, 2)}</code>
         </div>
@@ -150,7 +159,10 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
       });
     },
     setSelectedDay: newDay =>
-      dispatch({ type: SET_SELECTED_DAY, payload: { day: newDay } })
+      dispatch({ type: SET_SELECTED_DAY, payload: { day: newDay } }),
+    useRuleSimulation: () => {
+      return useLazyQuery(RULE_SIMULATION_QUERY, { fetchPolicy: "no-cache" });
+    }
   };
 };
 

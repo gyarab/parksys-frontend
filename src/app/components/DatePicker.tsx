@@ -15,8 +15,10 @@ const dpStyles = stylesheet({
   }
 });
 
-export const useDatePicker = (date: Date) => {
-  const [value, setValue] = useState(date);
+export const useDatePicker = (
+  date: Date
+): [JSX.Element, Date, (date: Date) => void] => {
+  const [value, setValue] = useState<Date>(date);
   const setDate = (dateValue: Date) => {
     if (dateValue === null) return;
     const newValue = new Date(value);

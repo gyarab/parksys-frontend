@@ -1,12 +1,11 @@
 import React from "react";
 import { stylesheet } from "typestyle";
-import { Color } from "../constants";
+import { Color } from "../../constants";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { CHANGE_OPENED_RULE_ASSIGNMENT } from "../redux/modules/rulePageActionCreators";
-import { IStore } from "../redux/IStore";
-import { useTwoPicker } from "./TwoPicker";
-import { useDatePicker } from "./DatePicker";
+import { CHANGE_OPENED_RULE_ASSIGNMENT } from "../../redux/modules/rulePageActionCreators";
+import { IStore } from "../../redux/IStore";
+import { ParkingRuleAssignmentDetails } from "./ParkingRuleAssignmentDetails";
 
 export interface IDispatchToProps {
   changeOpenedRuleAssignment(id: string | null): void;
@@ -37,29 +36,11 @@ const styles = stylesheet({
         top: "2.5em",
         borderRadius: "3px",
         padding: "0.5em",
-        paddingTop: "2em",
         width: "23em",
         minHeight: "8em",
         backgroundColor: "white",
         boxShadow: "0px 0px 3px 1px #888",
-        cursor: "default",
-        $nest: {
-          ".close": {
-            position: "absolute",
-            right: "3px",
-            top: "2px",
-            padding: "3px",
-            backgroundColor: "#000000bb",
-            borderRadius: "10px",
-            color: "white",
-            lineHeight: "0.8em",
-            textAlign: "center",
-            height: "1.4em",
-            width: "1.4em",
-            fontFamily: "monospace",
-            cursor: "pointer"
-          }
-        }
+        cursor: "default"
       },
       ".cellBody": {
         height: "100%",
@@ -68,49 +49,8 @@ const styles = stylesheet({
         position: "relative"
       }
     }
-  },
-  options: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, auto)",
-    gridGap: "0.3em 0.4em",
-    alignItems: "center",
-    $nest: {
-      ".twoPickerContainer": {
-        marginRight: "0.65em",
-        $nest: {
-          "> div": {
-            float: "right"
-          }
-        }
-      }
-    }
   }
 });
-
-const Details = ({ assignment, close }) => {
-  const [startPicker] = useDatePicker(new Date(assignment.start));
-  const [endPicker] = useDatePicker(new Date(assignment.end));
-  const [filterModePicker] = useTwoPicker(
-    "NONE",
-    "ALL",
-    assignment.vehicleFilterMode === "NONE"
-  );
-  return (
-    <div className="details">
-      <span className="close" onClick={close}>
-        x
-      </span>
-      <div className={styles.options}>
-        <span>Start</span>
-        {startPicker}
-        <span>End</span>
-        {endPicker}
-        <span>Filter Mode</span>
-        <div className="twoPickerContainer">{filterModePicker}</div>
-      </div>
-    </div>
-  );
-};
 
 const ParkingRuleAssignment = ({
   assignment,
@@ -127,7 +67,10 @@ const ParkingRuleAssignment = ({
         <span style={{ fontFamily: "monospace" }}>{assignment.id}</span>
       </div>
       {toggled ? (
-        <Details assignment={assignment} close={toggleDetails} />
+        <ParkingRuleAssignmentDetails
+          assignment={assignment}
+          close={toggleDetails}
+        />
       ) : null}
     </div>
   );
