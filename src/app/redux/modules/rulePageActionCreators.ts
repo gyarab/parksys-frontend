@@ -19,4 +19,16 @@ interface SetSelectedDay {
   };
 }
 
-export type RulePageActionTypes = ChangeOpenedRuleAssignment | SetSelectedDay;
+export const SET_COLLIDING_RULE_ASSIGNMENTS =
+  "RULE_PAGE/SET_COLLIDING_RULE_ASSIGNMENTS";
+interface SetCollidingRuleAssignments {
+  type: typeof SET_COLLIDING_RULE_ASSIGNMENTS;
+  payload: {
+    collidingRuleAssignments: Array<string>;
+  };
+}
+
+export type RulePageActionTypes =
+  | ChangeOpenedRuleAssignment
+  | SetSelectedDay
+  | SetCollidingRuleAssignments;

@@ -3,8 +3,8 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { useQuery, useLazyQuery } from "@apollo/react-hooks";
 import {
-  RulePageFetchParkingRuleAssignmentsQuery,
-  RULE_SIMULATION_QUERY
+  RULE_PAGE_FETCH_PARKING_RULE_ASSIGNMENT_QUERY,
+  RULE_PAGE_RULE_SIMULATION_QUERY
 } from "../constants/Queries";
 import {
   ParkingRuleAssignmentFilter,
@@ -54,14 +54,12 @@ const RulePage = (props: IProps) => {
   });
   const simulate = () => {
     if (shouldSimulate === "SIM ON") {
-      console.log("RUN");
       const args = { variables: simulVars };
       if (!!refetchSimulation) refetchSimulation(args);
       else loadSimulation(args);
     }
   };
   useEffect(() => {
-    console.log("EFF SIM");
     simulate();
   }, [shouldSimulate, simulVars]);
 
@@ -89,10 +87,6 @@ const RulePage = (props: IProps) => {
         onSubmit={onShouldRefetch}
         values={queryVariables}
       />
-      <hr />
-      <div>
-        data=<b>{JSON.stringify(data, null, 2)}</b>
-      </div>
       <hr />
       {loading ? (
         <p>Loading</p>
@@ -154,14 +148,16 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
           .endOf("day")
           .toString()
       };
-      return useQuery(RulePageFetchParkingRuleAssignmentsQuery, {
+      return useQuery(RULE_PAGE_FETCH_PARKING_RULE_ASSIGNMENT_QUERY, {
         variables: filter2 || {}
       });
     },
     setSelectedDay: newDay =>
       dispatch({ type: SET_SELECTED_DAY, payload: { day: newDay } }),
     useRuleSimulation: () => {
-      return useLazyQuery(RULE_SIMULATION_QUERY, { fetchPolicy: "no-cache" });
+      return useLazyQuery(RULE_PAGE_RULE_SIMULATION_QUERY, {
+        fetchPolicy: "no-cache"
+      });
     }
   };
 };

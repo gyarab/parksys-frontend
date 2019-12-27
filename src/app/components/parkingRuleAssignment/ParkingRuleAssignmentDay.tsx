@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { stylesheet } from "typestyle";
 import moment from "moment";
 import { ParkingRuleAssignmentRow } from "./ParkingRuleAssignmentRow";
+import { Color } from "../../constants/Color";
 
 const border = (width = "1px") => `${width} solid #c3c3c3`;
 const hourWidth = 100 / 24;
@@ -69,12 +70,12 @@ const classNames = stylesheet({
   },
   appliedRuleAssignment: {
     position: "absolute",
-    borderTop: "3px solid blue",
+    borderTop: `2px solid ${Color.LIGHT_RED}`,
     height: 0
   },
   appliedRuleAssignmentConnector: {
     position: "absolute",
-    borderRight: "2px dashed blue",
+    borderRight: `2px dashed ${Color.LIGHT_RED}`,
     width: 0
   }
 });

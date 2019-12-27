@@ -1,18 +1,21 @@
 import {
-  CHANGE_OPENED_RULE_ASSIGNMENT,
   RulePageActionTypes,
-  SET_SELECTED_DAY
+  CHANGE_OPENED_RULE_ASSIGNMENT,
+  SET_SELECTED_DAY,
+  SET_COLLIDING_RULE_ASSIGNMENTS
 } from "./rulePageActionCreators";
 
 export interface IRulePageState {
   selectedDay: string;
   openedRuleAssignmentId?: string | null;
+  collidingRuleAssignments: Set<string>;
 }
 
 const defaultSelectedDay = () => new Date().toISOString().slice(0, 10);
 export const initialState: IRulePageState = {
   selectedDay: defaultSelectedDay(),
-  openedRuleAssignmentId: null
+  openedRuleAssignmentId: null,
+  collidingRuleAssignments: new Set()
 };
 
 export function rulePageReducer(
@@ -24,13 +27,25 @@ export function rulePageReducer(
       const same = action.payload.id === state.openedRuleAssignmentId;
       return {
         ...state,
-        openedRuleAssignmentId: same ? null : action.payload.id
+        openedRuleAssignmentId: same ? null : action.payload.id,
+        // Reset collidingRuleAssignments when details are closed
+        collidingRuleAssignments: same
+          ? new Set()
+          : state.collidingRuleAssignments
       };
     case SET_SELECTED_DAY:
-      const empty = action.payload.day === null;
       return {
         ...state,
-        selectedDay: empty ? defaultSelectedDay() : action.payload.day
+        selectedDay: !action.payload.day
+          ? defaultSelectedDay()
+          : action.payload.day
+      };
+    case SET_COLLIDING_RULE_ASSIGNMENTS:
+      return {
+        ...state,
+        collidingRuleAssignments: !action.payload.collidingRuleAssignments
+          ? new Set()
+          : new Set(action.payload.collidingRuleAssignments)
       };
     default:
       return state;

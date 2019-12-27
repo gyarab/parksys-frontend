@@ -1,8 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTwoPicker } from "../TwoPicker";
 import { useDatePicker } from "../DatePicker";
 import { Button } from "../Button";
 import { stylesheet } from "typestyle";
+import { connect } from "react-redux";
+import { useMutation, MutationTuple } from "@apollo/react-hooks";
+import { Dispatch } from "redux";
+import { RULE_PAGE_UPDATE_RULE_ASSIGNMENT_MUTATION } from "../../constants/Mutations";
+import { SET_COLLIDING_RULE_ASSIGNMENTS } from "../../redux/modules/rulePageActionCreators";
 
 const styles = stylesheet({
   options: {
@@ -34,10 +39,49 @@ const styles = stylesheet({
   }
 });
 
-export const ParkingRuleAssignmentDetails = ({ assignment, close: _close }) => {
-  const [startPicker, , setStart] = useDatePicker(new Date(assignment.start));
-  const [endPicker, , setEnd] = useDatePicker(new Date(assignment.end));
-  const [filterModePicker, , setFilterMode] = useTwoPicker(
+enum SaveStatus {
+  NONE = "Save",
+  SAVING = "Saving...",
+  FAILED = "Failed, try again",
+  SUCCEEDED = "Saved"
+}
+
+export interface IDispatchToProps {
+  useUpdateRuleAssignment: () => MutationTuple<
+    { updateParkingRuleAssignment: any },
+    { id: string; input: any }
+  >;
+  setCollidingRuleAssignments: (ids: Array<string>) => void;
+}
+
+export interface IProps extends IDispatchToProps {
+  assignment: any;
+  close: Function;
+}
+
+const compare = <T extends unknown>(a: T, b: T) => {
+  return a === b;
+};
+
+const updatedFields = (original, update) => {
+  const updatedFields = {};
+  for (const key of Object.keys(update)) {
+    if (original[key] !== undefined && !compare(update[key], original[key])) {
+      updatedFields[key] = update[key];
+    }
+  }
+  return updatedFields;
+};
+
+const ParkingRuleAssignmentDetails = ({
+  assignment,
+  close: _close,
+  useUpdateRuleAssignment,
+  setCollidingRuleAssignments
+}: IProps) => {
+  const [startPicker, start, setStart] = useDatePicker(assignment.start);
+  const [endPicker, end, setEnd] = useDatePicker(assignment.end);
+  const [filterModePicker, filterMode, setFilterMode] = useTwoPicker(
     "NONE",
     "ALL",
     assignment.vehicleFilterMode === "NONE"
@@ -61,38 +105,70 @@ export const ParkingRuleAssignmentDetails = ({ assignment, close: _close }) => {
     setPriority(assignment.priority);
   };
 
-  enum SaveStatus {
-    NONE = "Save",
-    SAVING = "Saving...",
-    FAILED = "Failed, try again",
-    SUCCEEDED = "Saved"
-  }
+  const getUpdatedObject = () => {
+    return {
+      priority,
+      start,
+      end,
+      vehicleFilterMode: filterMode
+    };
+  };
+  const [newAssignment, setNewAssignment] = useState(
+    updatedFields(assignment, getUpdatedObject())
+  );
+  useEffect(() => {
+    setNewAssignment(updatedFields(assignment, getUpdatedObject()));
+  }, [priority, start, end, filterMode]);
+
+  const [saveEffect] = useUpdateRuleAssignment();
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(SaveStatus.NONE);
   const close = () => {
     if (saveStatus !== SaveStatus.SAVING) _close();
   };
   const save = () => {
-    setSaveStatus(SaveStatus.SAVING);
     // Do async work, then close
-    setTimeout(() => {
-      setSaveStatus(SaveStatus.SUCCEEDED);
-      close();
-    }, 1500);
+    if (Object.keys(newAssignment).length === 0) return;
+    setSaveStatus(SaveStatus.SAVING);
+    saveEffect({
+      variables: {
+        id: assignment.id,
+        input: newAssignment
+      }
+    })
+      .then(({ data }) => {
+        if (data.updateParkingRuleAssignment.collisions) {
+          setCollidingRuleAssignments(
+            data.updateParkingRuleAssignment.collisions.map(
+              collision => collision.id
+            )
+          );
+          setSaveStatus(SaveStatus.FAILED);
+        } else {
+          setCollidingRuleAssignments([]);
+          setSaveStatus(SaveStatus.SUCCEEDED);
+          close();
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        setSaveStatus(SaveStatus.FAILED);
+      });
   };
   return (
     <div className="details">
       <div className={styles.controls}>
         <Button
-          disabled={saveStatus === SaveStatus.SAVING}
-          className="close"
+          disabled={
+            saveStatus === SaveStatus.SAVING ||
+            Object.keys(newAssignment).length === 0
+          }
           onClick={save}
+          type="positive"
         >
           {saveStatus}
         </Button>
-        <Button className="close" onClick={setOriginalValues}>
-          Reset
-        </Button>
-        <Button className="close" onClick={close}>
+        <Button onClick={setOriginalValues}>Reset</Button>
+        <Button type="negative" onClick={close}>
           Close
         </Button>
       </div>
@@ -115,4 +191,26 @@ export const ParkingRuleAssignmentDetails = ({ assignment, close: _close }) => {
       </div>
     </div>
   );
+};
+
+const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
+  return {
+    useUpdateRuleAssignment: () =>
+      useMutation(RULE_PAGE_UPDATE_RULE_ASSIGNMENT_MUTATION),
+    setCollidingRuleAssignments: ids =>
+      dispatch({
+        type: SET_COLLIDING_RULE_ASSIGNMENTS,
+        payload: { collidingRuleAssignments: ids }
+      })
+  };
+};
+
+const connected = connect(
+  null,
+  mapDispatchToProps
+)(ParkingRuleAssignmentDetails);
+
+export {
+  ParkingRuleAssignmentDetails as UnconnectedParkingRuleAssignmentDetails,
+  connected as ParkingRuleAssignmentDetails
 };

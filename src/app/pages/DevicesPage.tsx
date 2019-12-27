@@ -20,6 +20,10 @@ import { Button } from "../components/Button";
 import { stylesheet } from "typestyle";
 import { Color } from "../constants";
 import DeviceRowSubcomponent from "../components/DeviceRowSubcomponent";
+import {
+  DEVICE_PAGE_CREATE_DEVICE_MUTATION,
+  DEVICE_PAGE_DELETE_DEVICE_MUTATION
+} from "../constants/Mutations";
 
 const coloredStatus = (backgroundColor, textColor = Color.BLACK): any => {
   return {
@@ -246,24 +250,8 @@ export const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
     fetchDevices: filter => dispatch(fetchDevices.invoke({ filter })),
     updateDevice: (id, update) => dispatch(updateDevice({ id, update })),
-    useCreateDevice: () =>
-      useMutation(gql`
-        mutation createDevice($name: String!) {
-          createDevice(input: { name: $name }) {
-            id
-            name
-            activationQrUrl
-          }
-        }
-      `),
-    useDeleteDevice: () =>
-      useMutation(gql`
-        mutation deleteDevice($id: ID!) {
-          deleteDevice(id: $id) {
-            id
-          }
-        }
-      `),
+    useCreateDevice: () => useMutation(DEVICE_PAGE_CREATE_DEVICE_MUTATION),
+    useDeleteDevice: () => useMutation(DEVICE_PAGE_DELETE_DEVICE_MUTATION),
     useRegenerateActivationPassword: () =>
       useMutation(gql`
         mutation regenerateActivationPassword($id: ID!) {

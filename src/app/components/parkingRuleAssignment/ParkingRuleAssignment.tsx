@@ -13,6 +13,7 @@ export interface IDispatchToProps {
 
 export interface IStateToProps {
   toggledId: string | null;
+  collidingIds: Set<string>;
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {
@@ -26,6 +27,8 @@ const styles = stylesheet({
     position: "relative",
     backgroundColor: Color.AQUAMARINE,
     borderRadius: "3px",
+    padding: "2px",
+    border: `2px solid ${Color.AQUAMARINE}`,
     $nest: {
       "&:hover": {
         boxShadow: "0px 0px 2px 1px #999",
@@ -45,24 +48,33 @@ const styles = stylesheet({
       ".cellBody": {
         height: "100%",
         width: "100%",
-        padding: "4px",
         position: "relative"
       }
     }
   }
 });
 
+const modifyAssignment = assignment => {
+  assignment.start = new Date(assignment.start);
+  assignment.end = new Date(assignment.end);
+};
+
 const ParkingRuleAssignment = ({
   assignment,
   toggledId,
-  changeOpenedRuleAssignment
+  changeOpenedRuleAssignment,
+  collidingIds
 }: IProps) => {
+  modifyAssignment(assignment);
   const toggled = toggledId === assignment.id;
   const toggleDetails = () => {
     changeOpenedRuleAssignment(assignment.id);
   };
+  const extraStyle = collidingIds.has(assignment.id)
+    ? { border: `2px solid ${Color.LIGHT_RED}` }
+    : {};
   return (
-    <div className={styles.cell}>
+    <div className={styles.cell} style={extraStyle}>
       <div className={"cellBody"} onClick={toggleDetails}>
         <span style={{ fontFamily: "monospace" }}>{assignment.id}</span>
       </div>
@@ -85,7 +97,8 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
 
 const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
   return {
-    toggledId: state.rulePage.openedRuleAssignmentId
+    toggledId: state.rulePage.openedRuleAssignmentId,
+    collidingIds: state.rulePage.collidingRuleAssignments
   };
 };
 

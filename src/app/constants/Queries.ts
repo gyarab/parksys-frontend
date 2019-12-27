@@ -1,6 +1,7 @@
 import gql from "graphql-tag";
+import { PARKING_RULE_ASSIGNMENT_FRAGMENT } from "./Fragments";
 
-export const RulePageFetchParkingRuleAssignmentsQuery = gql`
+export const RULE_PAGE_FETCH_PARKING_RULE_ASSIGNMENT_QUERY = gql`
   query parkingRuleAssignments(
     $startFilter: DateFilter
     $endFilter: DateFilter
@@ -13,33 +14,13 @@ export const RulePageFetchParkingRuleAssignmentsQuery = gql`
         vehicleFilterMode: $vehicleFilterMode
       }
     ) {
-      id
-      start
-      end
-      vehicleFilterMode
-      priority
-      vehicleFilters {
-        id
-        name
-        action
-      }
-      rules {
-        id
-        name
-        __typename
-        ... on ParkingRulePermitAccess {
-          permit
-        }
-        ... on ParkingRuleTimedFee {
-          centsPerUnitTime
-          unitTime
-        }
-      }
+      ...ParkingRuleAssignmentArgs
     }
   }
+  ${PARKING_RULE_ASSIGNMENT_FRAGMENT}
 `;
 
-export const RULE_SIMULATION_QUERY = gql`
+export const RULE_PAGE_RULE_SIMULATION_QUERY = gql`
   query vehicleRuleSimulation(
     $vehicle: ID!
     $start: DateTime!

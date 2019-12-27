@@ -6,29 +6,33 @@ const classNames = stylesheet({
   button: {
     outline: "none",
     padding: "10px 25px",
-    border: "none"
+    border: "none",
+    cursor: "pointer"
   },
   disabled: {
-    backgroundColor: Color.GREY,
-    border: "none",
-    color: Color.WHITE,
+    backgroundColor: Color.LIGHT_GREY,
+    color: Color.BLACK,
     cursor: "not-allowed"
   },
   primary: {
     backgroundColor: Color.BLUE,
-    border: `1px solid ${Color.BLUE}`,
-    color: Color.WHITE,
-    cursor: "pointer"
+    color: Color.BLACK
   },
   secondary: {
     backgroundColor: Color.WHITE,
-    border: `1px solid ${Color.GREY}`,
-    color: Color.GREY,
-    cursor: "pointer"
+    color: Color.BLACK
+  },
+  negative: {
+    backgroundColor: Color.LIGHT_RED,
+    color: Color.BLACK
+  },
+  positive: {
+    backgroundColor: Color.AQUAMARINE,
+    color: Color.BLACK
   }
 });
 
-export type TButtonType = "primary" | "secondary";
+export type TButtonType = "primary" | "secondary" | "negative" | "positive";
 
 interface IProps extends React.HTMLProps<HTMLButtonElement> {
   /**
