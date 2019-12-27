@@ -99,8 +99,8 @@ const ParkingRuleAssignmentDetails = ({
   };
 
   const setOriginalValues = () => {
-    setStart(new Date(assignment.start));
-    setEnd(new Date(assignment.end));
+    setStart(assignment.start);
+    setEnd(assignment.end);
     setFilterMode(assignment.vehicleFilterMode);
     setPriority(assignment.priority);
   };
