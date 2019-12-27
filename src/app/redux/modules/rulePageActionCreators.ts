@@ -28,7 +28,20 @@ interface SetCollidingRuleAssignments {
   };
 }
 
+export const CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS =
+  "RULE_PAGE/TOGGLE_SIMULATE_RULES_ASSIGNMENTS";
+interface ChangeSimulateRuleAssignmentsOptions {
+  type: typeof CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS;
+  payload: {
+    on: boolean;
+    start: Date;
+    end: Date;
+    vehicle: string; // id
+  };
+}
+
 export type RulePageActionTypes =
   | ChangeOpenedRuleAssignment
   | SetSelectedDay
-  | SetCollidingRuleAssignments;
+  | SetCollidingRuleAssignments
+  | ChangeSimulateRuleAssignmentsOptions;

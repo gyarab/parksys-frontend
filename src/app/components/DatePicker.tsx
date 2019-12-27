@@ -5,38 +5,42 @@ const dpStyles = stylesheet({
   datePicker: {
     $nest: {
       "input[type=date]": {
-        float: "left",
+        // float: "left",
         marginRight: "5px"
       },
       "input[type=time]": {
-        float: "right"
+        // float: "right"
       }
     }
   }
 });
 
-export const useDatePicker = (
-  date: Date
-): [JSX.Element, Date, (date: Date) => void] => {
-  const [value, setValue] = useState<Date>(date);
+const tPad = (t: number) => t.toString().padStart(2, "0");
+
+export const DatePicker = ({
+  value,
+  onChange
+}: {
+  value: Date;
+  onChange: (d: Date) => any;
+}) => {
   const setDate = (dateValue: Date) => {
     if (dateValue === null) return;
-    const newValue = new Date(value);
+    const newValue = new Date(value); // copy
     newValue.setFullYear(dateValue.getUTCFullYear());
     newValue.setMonth(dateValue.getUTCMonth());
     newValue.setDate(dateValue.getUTCDate());
-    setValue(newValue);
+    onChange(newValue);
   };
   const setTime = (timeValue: Date) => {
     if (timeValue === null) return;
-    const newValue = new Date(value);
+    const newValue = new Date(value); // copy
     newValue.setHours(timeValue.getUTCHours());
     newValue.setMinutes(timeValue.getUTCMinutes());
     newValue.setSeconds(timeValue.getUTCSeconds());
-    setValue(newValue);
+    onChange(newValue);
   };
-  const tPad = (t: number) => t.toString().padStart(2, "0");
-  const render = (
+  return (
     <div className={dpStyles.datePicker}>
       <input
         type="date"
@@ -52,5 +56,12 @@ export const useDatePicker = (
       />
     </div>
   );
+};
+
+export const useDatePicker = (
+  date: Date
+): [JSX.Element, Date, (date: Date) => void] => {
+  const [value, setValue] = useState<Date>(date);
+  const render = <DatePicker value={value} onChange={setValue} />;
   return [render, value, setValue];
 };

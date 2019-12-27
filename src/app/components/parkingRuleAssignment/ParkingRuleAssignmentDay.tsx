@@ -74,9 +74,7 @@ const classNames = stylesheet({
     height: 0
   },
   appliedRuleAssignmentConnector: {
-    position: "absolute",
-    borderRight: `2px dashed ${Color.LIGHT_RED}`,
-    width: 0
+    position: "absolute"
   }
 });
 
@@ -123,58 +121,32 @@ export const ParkingRuleAssignmentDay = ({ appliedData, data, day }) => {
   });
 
   const appliedLines = !!appliedData
-    ? appliedData
-        .map(appliedAssignment => {
-          const start = new Date(appliedAssignment.start);
-          const end = new Date(appliedAssignment.end);
-          const [left, right] = calculateLeftRightFromTime(
-            dayStart,
-            dayEnd,
-            start,
-            end
-          );
-          const distanceFromBottom =
-            (1 + appliedAssignment.assignment.priority) * 2.9;
-          const distanceFromTop = (2 + maxPriority) * 2.9 - distanceFromBottom;
-          return [left, right, distanceFromBottom, distanceFromTop];
-        })
-        .map(
-          (
-            [left, right, height],
-            i: number,
-            array: Array<[number, number, number, number]>
-          ) => {
-            const leftP = `${left}%`;
-            const rightP = `${right}%`;
-            const heightCalc = (h, p = 3) => `calc(${h}em - ${p}px)`;
-            const heightP = heightCalc(height);
-            return (
-              <>
-                <div
-                  key={i}
-                  className={classNames.appliedRuleAssignment}
-                  style={{
-                    left: leftP,
-                    right: rightP,
-                    bottom: heightP
-                  }}
-                ></div>
-                {i > 0 ? (
-                  <div
-                    key={-i}
-                    style={{
-                      left: leftP,
-                      right: rightP,
-                      top: heightCalc(array[i - 1][3], -6),
-                      bottom: heightP
-                    }}
-                    className={classNames.appliedRuleAssignmentConnector}
-                  ></div>
-                ) : null}
-              </>
-            );
-          }
-        )
+    ? appliedData.map((appliedAssignment, i) => {
+        const start = new Date(appliedAssignment.start);
+        const end = new Date(appliedAssignment.end);
+        const [left, right] = calculateLeftRightFromTime(
+          dayStart,
+          dayEnd,
+          start,
+          end
+        );
+
+        const leftP = `${left}%`;
+        const rightP = `${right}%`;
+        const height = (appliedAssignment.assignment.priority + 1) * 2.9;
+        const heightP = `calc(${height}em - 3px)`;
+        return (
+          <div
+            key={i}
+            className={classNames.appliedRuleAssignment}
+            style={{
+              left: leftP,
+              right: rightP,
+              bottom: heightP
+            }}
+          ></div>
+        );
+      })
     : [];
 
   const calculateTimeIndicatorPosition = () => {

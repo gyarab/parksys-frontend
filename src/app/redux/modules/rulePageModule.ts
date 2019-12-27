@@ -2,20 +2,33 @@ import {
   RulePageActionTypes,
   CHANGE_OPENED_RULE_ASSIGNMENT,
   SET_SELECTED_DAY,
-  SET_COLLIDING_RULE_ASSIGNMENTS
+  SET_COLLIDING_RULE_ASSIGNMENTS,
+  CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS
 } from "./rulePageActionCreators";
 
 export interface IRulePageState {
   selectedDay: string;
   openedRuleAssignmentId?: string | null;
   collidingRuleAssignments: Set<string>;
+  ruleAssignmentSimulation: {
+    on: boolean;
+    start: Date;
+    end: Date;
+    vehicle: string; // id
+  };
 }
 
 const defaultSelectedDay = () => new Date().toISOString().slice(0, 10);
 export const initialState: IRulePageState = {
   selectedDay: defaultSelectedDay(),
   openedRuleAssignmentId: null,
-  collidingRuleAssignments: new Set()
+  collidingRuleAssignments: new Set(),
+  ruleAssignmentSimulation: {
+    on: false,
+    start: new Date(),
+    end: new Date(),
+    vehicle: "5df4e4b7ec5214271d220b0a"
+  }
 };
 
 export function rulePageReducer(
@@ -24,14 +37,13 @@ export function rulePageReducer(
 ): IRulePageState {
   switch (action.type) {
     case CHANGE_OPENED_RULE_ASSIGNMENT:
-      const same = action.payload.id === state.openedRuleAssignmentId;
       return {
         ...state,
-        openedRuleAssignmentId: same ? null : action.payload.id,
-        // Reset collidingRuleAssignments when details are closed
-        collidingRuleAssignments: same
-          ? new Set()
-          : state.collidingRuleAssignments
+        openedRuleAssignmentId:
+          action.payload.id === state.openedRuleAssignmentId
+            ? null
+            : action.payload.id,
+        collidingRuleAssignments: new Set()
       };
     case SET_SELECTED_DAY:
       return {
@@ -46,6 +58,14 @@ export function rulePageReducer(
         collidingRuleAssignments: !action.payload.collidingRuleAssignments
           ? new Set()
           : new Set(action.payload.collidingRuleAssignments)
+      };
+    case CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS:
+      return {
+        ...state,
+        ruleAssignmentSimulation: {
+          ...state.ruleAssignmentSimulation,
+          ...action.payload
+        }
       };
     default:
       return state;

@@ -38,6 +38,30 @@ const tpStyles = stylesheet({
   }
 });
 
+export const TwoPicker = ({
+  optionLeft,
+  optionRight,
+  leftIsSelected,
+  onChange
+}) => {
+  return (
+    <div className={tpStyles.twoPicker}>
+      <div
+        className={leftIsSelected ? "left selected" : "left"}
+        onClick={() => onChange(optionLeft)}
+      >
+        {optionLeft}
+      </div>
+      <div
+        className={!leftIsSelected ? "right selected" : "right"}
+        onClick={() => onChange(optionRight)}
+      >
+        {optionRight}
+      </div>
+    </div>
+  );
+};
+
 export const useTwoPicker = (
   optionLeft: string,
   optionRight: string,
@@ -48,20 +72,12 @@ export const useTwoPicker = (
   );
   const leftIsSelected = selectedValue === optionLeft;
   const render = (
-    <div className={tpStyles.twoPicker}>
-      <div
-        className={leftIsSelected ? "left selected" : "left"}
-        onClick={() => setSelectedValue(optionLeft)}
-      >
-        {optionLeft}
-      </div>
-      <div
-        className={!leftIsSelected ? "right selected" : "right"}
-        onClick={() => setSelectedValue(optionRight)}
-      >
-        {optionRight}
-      </div>
-    </div>
+    <TwoPicker
+      optionLeft={optionLeft}
+      optionRight={optionRight}
+      leftIsSelected={leftIsSelected}
+      onChange={setSelectedValue}
+    />
   );
   return [render, selectedValue, setSelectedValue];
 };

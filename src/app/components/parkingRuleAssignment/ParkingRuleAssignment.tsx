@@ -39,7 +39,7 @@ const styles = stylesheet({
         top: "2.5em",
         borderRadius: "3px",
         padding: "0.5em",
-        width: "23em",
+        minWidth: "23em",
         minHeight: "8em",
         backgroundColor: "white",
         boxShadow: "0px 0px 3px 1px #888",
