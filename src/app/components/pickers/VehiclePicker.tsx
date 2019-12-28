@@ -7,6 +7,7 @@ const styles = stylesheet({
   vehiclePicker: {
     position: "relative",
     display: "grid",
+    alignItems: "center",
     gridTemplateColumns: "repeat(2, auto)",
     $nest: {
       input: {
@@ -22,7 +23,7 @@ const styles = stylesheet({
   belowInput: {
     position: "absolute",
     top: "2.0em",
-    right: 0,
+    right: "3.2em",
     zIndex: 100,
     backgroundColor: "white",
     borderRadius: "3px",
@@ -112,6 +113,7 @@ export const VehiclePicker = (props: IProps) => {
         onFocus={onFocus}
         onBlur={onUnfocus}
       />
+      {belowInput}
       <button
         disabled={disabled}
         onClick={() => {
@@ -121,7 +123,6 @@ export const VehiclePicker = (props: IProps) => {
       >
         X
       </button>
-      {belowInput}
     </div>
   );
 };
