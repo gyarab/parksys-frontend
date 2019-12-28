@@ -150,7 +150,7 @@ const DevicesPage = (props: IProps): JSX.Element => {
               >
                 Details
               </Button>
-              <Button type={"secondary"} onClick={deleteClick}>
+              <Button type="negative" onClick={deleteClick}>
                 Delete
               </Button>
             </>

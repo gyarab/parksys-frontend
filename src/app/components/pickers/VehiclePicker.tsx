@@ -49,7 +49,6 @@ const styles = stylesheet({
 });
 
 interface IProps {
-  onInputChange: (licensePlate: string) => void;
   onSelect: (vehicle: { licensePlate: string; id: string }) => void;
   licensePlate: string;
   disabled?: boolean;
@@ -60,40 +59,48 @@ export const VehiclePicker = (props: IProps) => {
   const [loadVehicles, { data, loading, called, error }] = useLazyQuery(
     VEHICLE_PICKER_SEARCH_QUERY
   );
+  // This value differs from props.licensePlate when the input is focused
+  const [localLicensePlate, setLocalLicensePlate] = useState();
+  // Accept the value passed from parent
+  useEffect(() => setLocalLicensePlate(props.licensePlate), [
+    props.licensePlate
+  ]);
   const load = () => {
     loadVehicles({
       variables: { licensePlate: props.licensePlate }
     });
   };
+
   useEffect(() => {
-    load();
-  }, [props.licensePlate]);
+    if (called) load();
+  }, [localLicensePlate, called]);
   const [focused, setFocused] = useState<boolean>(false);
   // Input event handlers
-  const onFocus = () => {
+  const onEditing = () => {
     setFocused(true);
     if (!called) load();
   };
-  const onUnfocus = () => {
+  const onStopEditing = () => {
     setFocused(false);
+    setLocalLicensePlate(props.licensePlate);
   };
   // Below Input event handlers
-  const [belowInputMouse, setBelowInputMouse] = useState<boolean>(false);
-  const onBelowMouseOver = () => setBelowInputMouse(true);
-  const onBelowMouseLeave = () => setBelowInputMouse(false);
+  const [selecting, setSelecting] = useState<boolean>(false);
+  const onSelecting = () => setSelecting(true);
+  const onStopSelecting = () => setSelecting(false);
   const onSelect = (vehicle: any) => {
-    setBelowInputMouse(false);
+    setSelecting(false);
     props.onSelect(vehicle);
   };
   const belowInput =
-    focused || belowInputMouse ? (
+    focused || selecting ? (
       <div className={styles.belowInput}>
         {loading ? (
           <span>Loading</span>
         ) : error ? (
           <span>{error.toString()}</span>
         ) : (
-          <div onMouseOver={onBelowMouseOver} onMouseLeave={onBelowMouseLeave}>
+          <div onMouseOver={onSelecting} onMouseLeave={onStopSelecting}>
             {data.vehicleSearch.data.map(vehicle => (
               <span onClick={() => onSelect(vehicle)}>
                 {vehicle.licensePlate}
@@ -106,18 +113,18 @@ export const VehiclePicker = (props: IProps) => {
   return (
     <div className={styles.vehiclePicker}>
       <input
+        placeholder="Search"
         type="text"
         disabled={disabled}
-        value={props.licensePlate}
-        onChange={e => props.onInputChange(e.target.value)}
-        onFocus={onFocus}
-        onBlur={onUnfocus}
+        value={localLicensePlate}
+        onChange={e => setLocalLicensePlate(e.target.value)}
+        onFocus={onEditing}
+        onBlur={onStopEditing}
       />
       {belowInput}
       <button
         disabled={disabled}
         onClick={() => {
-          props.onInputChange("");
           props.onSelect(null);
         }}
       >

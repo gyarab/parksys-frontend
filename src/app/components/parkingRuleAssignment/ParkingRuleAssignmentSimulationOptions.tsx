@@ -67,7 +67,6 @@ const ParkingRuleAssignmentSimulationOptions = (props: IProps) => {
         <span>Vehicle</span>
         <VehiclePicker
           licensePlate={lp}
-          onInputChange={setLp}
           disabled={disabled}
           onSelect={v => {
             setLp(!!v ? v.licensePlate : "");
