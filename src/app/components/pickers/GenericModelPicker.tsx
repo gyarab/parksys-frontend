@@ -47,25 +47,29 @@ const styles = stylesheet({
   }
 });
 
-interface IGProps {
+interface IProps {
   onSelect: (obj: any) => void;
   identifier: string;
   disabled?: boolean;
 }
 
-export const GenericModelPicker = (
-  QUERY: any,
-  identifierToOptions: (identifier: string) => any,
-  renderModel: (model: any) => JSX.Element,
-  arrayGetter: (data) => Array<any>
-) => (props: IGProps) => {
+interface IGProps {
+  QUERY: any;
+  identifierToOptions: (identifier: string) => any;
+  renderModel: (model: any) => JSX.Element;
+  arrayGetter: (data) => Array<any>;
+}
+
+export const GenericModelPicker = (gProps: IGProps) => (props: IProps) => {
   const disabled = props.disabled || false;
-  const [loadGql, { data, loading, called, error }] = useLazyQuery(QUERY);
+  const [loadGql, { data, loading, called, error }] = useLazyQuery(
+    gProps.QUERY
+  );
   // This value differs from props.licensePlate when the input is focused
   const [identifier, setIdentifier] = useState();
   // Accept the value passed from parent
   useEffect(() => setIdentifier(props.identifier), [props.identifier]);
-  const load = () => loadGql(identifierToOptions(identifier));
+  const load = () => loadGql(gProps.identifierToOptions(identifier));
 
   useEffect(() => {
     if (called) load();
@@ -97,8 +101,10 @@ export const GenericModelPicker = (
           <span>{error.toString()}</span>
         ) : (
           <div onMouseOver={onSelecting} onMouseLeave={onStopSelecting}>
-            {arrayGetter(data).map(model => (
-              <div onClick={() => onSelect(model)}>{renderModel(model)}</div>
+            {gProps.arrayGetter(data).map(model => (
+              <div onClick={() => onSelect(model)}>
+                {gProps.renderModel(model)}
+              </div>
             ))}
           </div>
         )}
@@ -126,4 +132,31 @@ export const GenericModelPicker = (
       </button>
     </div>
   );
+};
+
+export const useGenericPickerFromPicker = (
+  PickerInstance: (props: IProps) => JSX.Element,
+  identifierFromModel: (model: any) => string
+) => {
+  return (disabled: boolean = false, defaultModel: any | null = null) => {
+    const [model, setModel] = useState<any | null>(defaultModel);
+    const render = (
+      <PickerInstance
+        identifier={!!model ? identifierFromModel(model) : ""}
+        onSelect={model => {
+          setModel(model);
+        }}
+        disabled={disabled}
+      />
+    );
+    return [render, model, setModel];
+  };
+};
+
+export const useGenericPicker = (
+  gProps: IGProps,
+  identifierFromModel: (model: any) => string
+) => {
+  const PickerInstance = GenericModelPicker(gProps);
+  return useGenericPickerFromPicker(PickerInstance, identifierFromModel);
 };
