@@ -6,10 +6,7 @@ import {
   RULE_PAGE_FETCH_PARKING_RULE_ASSIGNMENT_QUERY,
   RULE_PAGE_RULE_SIMULATION_QUERY
 } from "../constants/Queries";
-import {
-  ParkingRuleAssignmentFilter,
-  IValues as FilterValues
-} from "../components/parkingRuleAssignment/ParkingRuleAssignmentFilter";
+import { ParkingRuleAssignmentFilter } from "../components/parkingRuleAssignment/ParkingRuleAssignmentFilter";
 import { ParkingRuleAssignmentDay } from "../components/parkingRuleAssignment/ParkingRuleAssignmentDay";
 import moment from "moment";
 import { IStore } from "../redux/IStore";
@@ -51,31 +48,21 @@ const RulePage = (props: IProps) => {
   const [loadSimulation, { data: dataSimul }] = props.useRuleSimulation();
   const { loading, error, data, refetch } = props.useFetchRules(queryVariables);
 
-  const simulate = () => {
-    if (props.ruleAssignmentSimulation.on) {
+  useEffect(() => {
+    if (props.ruleAssignmentSimulation.on && !!data) {
       const args = { variables: props.ruleAssignmentSimulation };
       loadSimulation(args);
-      return;
     }
-  };
-  useEffect(() => {
-    simulate();
-  }, [props.ruleAssignmentSimulation]);
-
-  const onShouldRefetch = (values: FilterValues) => {
-    setQueryVariables(values);
-    refetch();
-    simulate();
-  };
+  }, [props.ruleAssignmentSimulation, data]);
 
   return (
     <div>
       <ParkingRuleAssignmentFilter
         onChange={values => {
           props.setSelectedDay(values.day);
-          onShouldRefetch(values);
+          setQueryVariables(values);
         }}
-        onSubmit={onShouldRefetch}
+        onSubmit={refetch}
         values={queryVariables}
       />
       <hr />
