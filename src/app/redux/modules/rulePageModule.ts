@@ -7,16 +7,21 @@ import {
 } from "./rulePageActionCreators";
 import moment = require("moment");
 
+export interface IRulePageStateSimulation {
+  on: boolean;
+  start: Date;
+  end: Date;
+  vehicle: {
+    id: string;
+    licensePlate?: string;
+  };
+}
+
 export interface IRulePageState {
   selectedDay: string;
   openedRuleAssignmentId?: string | null;
   collidingRuleAssignments: Set<string>;
-  ruleAssignmentSimulation: {
-    on: boolean;
-    start: Date;
-    end: Date;
-    vehicle: string; // id
-  };
+  ruleAssignmentSimulation: IRulePageStateSimulation;
 }
 
 const defaultSelectedDay = () => new Date().toISOString().slice(0, 10);

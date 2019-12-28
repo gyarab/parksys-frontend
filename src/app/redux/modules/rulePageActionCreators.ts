@@ -1,3 +1,5 @@
+import { IRulePageStateSimulation } from "./rulePageModule";
+
 export const SEND_MESSAGE = "SEND_MESSAGE";
 export const DELETE_MESSAGE = "DELETE_MESSAGE";
 
@@ -32,12 +34,7 @@ export const CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS =
   "RULE_PAGE/CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS";
 interface ChangeSimulateRuleAssignmentsOptions {
   type: typeof CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS;
-  payload: {
-    on: boolean;
-    start: Date;
-    end: Date;
-    vehicle: string; // id
-  };
+  payload: IRulePageStateSimulation;
 }
 
 export type RulePageActionTypes =

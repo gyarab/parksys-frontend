@@ -1,5 +1,5 @@
 import { DatePicker } from "../pickers/DatePicker";
-import React, { useState } from "react";
+import React from "react";
 import { TwoPicker } from "../pickers/TwoPicker";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
@@ -7,14 +7,11 @@ import { CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS } from "../../redux/modules/r
 import { IStore } from "../../redux/IStore";
 import { stylesheet } from "typestyle";
 import { VehiclePicker } from "../pickers/VehiclePicker";
+import { IRulePageStateSimulation } from "../../redux/modules/rulePageModule";
+import lodash from "lodash";
 
 export interface IStateToProps {
-  ruleAssignmentSimulation: {
-    on: boolean;
-    start: Date;
-    end: Date;
-    vehicle: string; // id
-  };
+  ruleAssignmentSimulation: IRulePageStateSimulation;
 }
 
 export interface IDispatchToProps {
@@ -48,7 +45,6 @@ const styles = stylesheet({
 });
 
 const ParkingRuleAssignmentSimulationOptions = (props: IProps) => {
-  const [lp, setLp] = useState("");
   const disabled = !props.ruleAssignmentSimulation.on;
   return (
     <div className={styles.simulationOptions}>
@@ -66,13 +62,14 @@ const ParkingRuleAssignmentSimulationOptions = (props: IProps) => {
       <div className={styles.pickers}>
         <span>Vehicle</span>
         <VehiclePicker
-          licensePlate={lp}
+          identifier={lodash.get(
+            props.ruleAssignmentSimulation.vehicle,
+            "licensePlate",
+            ""
+          )}
           disabled={disabled}
           onSelect={v => {
-            setLp(!!v ? v.licensePlate : "");
-            props.changeSimulateRuleAssignmentsOptions({
-              vehicle: !!v ? v.id : null
-            });
+            props.changeSimulateRuleAssignmentsOptions({ vehicle: v });
           }}
         />
         <span>Start</span>

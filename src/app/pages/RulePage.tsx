@@ -13,15 +13,11 @@ import { IStore } from "../redux/IStore";
 import { SET_SELECTED_DAY } from "../redux/modules/rulePageActionCreators";
 import { ParkingRuleAssignmentSimulationOptions } from "../components/parkingRuleAssignment/ParkingRuleAssignmentSimulationOptions";
 import { stylesheet } from "typestyle";
+import { IRulePageStateSimulation } from "../redux/modules/rulePageModule";
 
 export interface IStateToProps {
   selectedDay: string;
-  ruleAssignmentSimulation: {
-    on: boolean;
-    start: Date;
-    end: Date;
-    vehicle: string; // id
-  };
+  ruleAssignmentSimulation: IRulePageStateSimulation;
 }
 
 export interface IDispatchToProps {
@@ -57,8 +53,13 @@ const RulePage = (props: IProps) => {
     !!props.ruleAssignmentSimulation.vehicle;
   useEffect(() => {
     if (shouldShowSimulation && !!data) {
-      const args = { variables: props.ruleAssignmentSimulation };
-      loadSimulation(args);
+      loadSimulation({
+        variables: {
+          vehicle: props.ruleAssignmentSimulation.vehicle.id,
+          start: props.ruleAssignmentSimulation.start,
+          end: props.ruleAssignmentSimulation.end
+        }
+      });
     }
   }, [props.ruleAssignmentSimulation, data]);
 
