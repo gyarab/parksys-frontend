@@ -76,7 +76,10 @@ const ParkingRuleAssignment = ({
   return (
     <div className={styles.cell} style={extraStyle}>
       <div className={"cellBody"} onClick={toggleDetails}>
-        <span style={{ fontFamily: "monospace" }}>{assignment.id}</span>
+        <span>
+          {assignment.rules.map(rule => rule.name).join(", ")} -{" "}
+          {assignment.vehicleFilters.map(filter => filter.name).join(", ")}
+        </span>
       </div>
       {toggled ? (
         <ParkingRuleAssignmentDetails

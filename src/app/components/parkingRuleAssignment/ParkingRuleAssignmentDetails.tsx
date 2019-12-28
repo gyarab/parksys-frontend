@@ -9,6 +9,7 @@ import { Dispatch } from "redux";
 import { RULE_PAGE_UPDATE_RULE_ASSIGNMENT_MUTATION } from "../../constants/Mutations";
 import { SET_COLLIDING_RULE_ASSIGNMENTS } from "../../redux/modules/rulePageActionCreators";
 import { useRulePicker } from "../pickers/RulePicker";
+import { useVehicleFilterPicker } from "../pickers/VehicleFilterPicker";
 
 const styles = stylesheet({
   options: {
@@ -87,7 +88,8 @@ const ParkingRuleAssignmentDetails = ({
 }: IProps) => {
   const comparisonAssignment = {
     ...assignment,
-    rules: assignment.rules.map(rule => rule.id)
+    rules: assignment.rules.map(rule => rule.id),
+    vehicleFilters: assignment.vehicleFilters.map(filter => filter.id)
   };
   const [startPicker, start, setStart] = useDatePicker(assignment.start);
   const [endPicker, end, setEnd] = useDatePicker(assignment.end);
@@ -112,6 +114,10 @@ const ParkingRuleAssignmentDetails = ({
     false,
     assignment.rules.length > 0 ? assignment.rules[0] : null
   );
+  const [filterPicker, filter, setFilter] = useVehicleFilterPicker(
+    false,
+    assignment.vehicleFilters.length > 0 ? assignment.vehicleFilters[0] : null
+  );
 
   const setOriginalValues = () => {
     setStart(assignment.start);
@@ -119,6 +125,9 @@ const ParkingRuleAssignmentDetails = ({
     setFilterMode(assignment.vehicleFilterMode);
     setPriority(assignment.priority);
     setRule(assignment.rules.length > 0 ? assignment.rules[0] : null);
+    setFilter(
+      assignment.vehicleFilters.length > 0 ? assignment.vehicleFilters[0] : null
+    );
   };
 
   const getUpdatedObject = () => {
@@ -127,7 +136,8 @@ const ParkingRuleAssignmentDetails = ({
       start,
       end,
       vehicleFilterMode: filterMode,
-      rules: !!rule ? [rule.id] : []
+      rules: !!rule ? [rule.id] : [],
+      vehicleFilters: !!filter ? [filter.id] : []
     };
   };
   const [newAssignment, setNewAssignment] = useState(
@@ -135,7 +145,7 @@ const ParkingRuleAssignmentDetails = ({
   );
   useEffect(() => {
     setNewAssignment(updatedFields(comparisonAssignment, getUpdatedObject()));
-  }, [priority, start, end, filterMode, rule]); // ADD ANY NEW FIELDS HERE!
+  }, [priority, start, end, filterMode, rule, filter]); // ADD ANY NEW FIELDS HERE!
 
   const [saveEffect] = useUpdateRuleAssignment();
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(SaveStatus.NONE);
@@ -194,8 +204,6 @@ const ParkingRuleAssignmentDetails = ({
         {startPicker}
         <span>End</span>
         {endPicker}
-        <span>Filter Mode</span>
-        <div className="twoPickerContainer">{filterModePicker}</div>
         <span>Priority</span>
         <div>
           <input
@@ -205,6 +213,10 @@ const ParkingRuleAssignmentDetails = ({
             onChange={e => setPriority(e.target.value)}
           />
         </div>
+        <span>Filter Mode</span>
+        <div className="twoPickerContainer">{filterModePicker}</div>
+        <span>Filters</span>
+        {filterPicker}
         <span>Rules</span>
         {rulePicker}
       </div>

@@ -51,3 +51,33 @@ export const VEHICLE_PICKER_SEARCH_QUERY = gql`
     }
   }
 `;
+
+export const RULE_PICKER_SEARCH_QUERY = gql`
+  query searchParkingRules($name: String!) {
+    parkingRuleSearch(search: { name: $name }) {
+      data {
+        id
+        name
+        ... on ParkingRulePermitAccess {
+          permit
+        }
+        ... on ParkingRuleTimedFee {
+          centsPerUnitTime
+          unitTime
+        }
+      }
+    }
+  }
+`;
+
+export const VEHICLE_FILTER_PICKER_SEARCH_QUERY = gql`
+  query searchVehicleFilters($name: String!) {
+    vehicleFilterSearch(search: { name: $name }) {
+      data {
+        id
+        name
+        action
+      }
+    }
+  }
+`;

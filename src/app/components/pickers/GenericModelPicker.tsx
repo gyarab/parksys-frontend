@@ -66,7 +66,7 @@ export const GenericModelPicker = (gProps: IGProps) => (props: IProps) => {
     gProps.QUERY
   );
   // This value differs from props.licensePlate when the input is focused
-  const [identifier, setIdentifier] = useState();
+  const [identifier, setIdentifier] = useState("");
   // Accept the value passed from parent
   useEffect(() => setIdentifier(props.identifier), [props.identifier]);
   const load = () => loadGql(gProps.identifierToOptions(identifier));
@@ -75,22 +75,25 @@ export const GenericModelPicker = (gProps: IGProps) => (props: IProps) => {
     if (called) load();
   }, [identifier, called]);
   const [focused, setFocused] = useState<boolean>(false);
-  // Input event handlers
   const onEditing = () => {
     setFocused(true);
     if (!called) load();
   };
-  const onStopEditing = () => {
-    setFocused(false);
-    setIdentifier(props.identifier);
-  };
-  // Below Input event handlers
   const [selecting, setSelecting] = useState<boolean>(false);
   const onSelecting = () => setSelecting(true);
-  const onStopSelecting = () => setSelecting(false);
+  const onStopSelecting = () => {
+    setSelecting(false);
+    setIdentifier(props.identifier);
+  };
   const onSelect = (model: any) => {
     setSelecting(false);
     props.onSelect(model);
+  };
+  const onStopEditing = () => {
+    setFocused(false);
+    if (!selecting) {
+      setIdentifier(props.identifier);
+    }
   };
   const belowInput =
     focused || selecting ? (

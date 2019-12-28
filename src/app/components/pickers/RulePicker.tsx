@@ -1,27 +1,13 @@
-import gql from "graphql-tag";
 import {
   useGenericPickerFromPicker,
   GenericModelPicker
 } from "./GenericModelPicker";
 import React from "react";
+import { RULE_PICKER_SEARCH_QUERY } from "../../constants/Queries";
 
 export const RulePicker = GenericModelPicker({
-  QUERY: gql`
-    query {
-      parkingRules {
-        id
-        name
-        ... on ParkingRulePermitAccess {
-          permit
-        }
-        ... on ParkingRuleTimedFee {
-          centsPerUnitTime
-          unitTime
-        }
-      }
-    }
-  `,
-  arrayGetter: data => data.parkingRules,
+  QUERY: RULE_PICKER_SEARCH_QUERY,
+  arrayGetter: data => data.parkingRuleSearch.data,
   renderModel: model => <>{model.name}</>,
   identifierToOptions: name => ({ variables: { name } })
 });
