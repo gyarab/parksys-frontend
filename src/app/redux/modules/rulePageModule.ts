@@ -5,6 +5,7 @@ import {
   SET_COLLIDING_RULE_ASSIGNMENTS,
   CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS
 } from "./rulePageActionCreators";
+import moment = require("moment");
 
 export interface IRulePageState {
   selectedDay: string;
@@ -25,9 +26,15 @@ export const initialState: IRulePageState = {
   collidingRuleAssignments: new Set(),
   ruleAssignmentSimulation: {
     on: false,
-    start: new Date(),
-    end: new Date(),
-    vehicle: "5df4e4b7ec5214271d220b0a"
+    start: moment()
+      .subtract(3, "hour")
+      .startOf("hour")
+      .toDate(),
+    end: moment()
+      .add(1, "hour")
+      .startOf("hour")
+      .toDate(),
+    vehicle: null
   }
 };
 

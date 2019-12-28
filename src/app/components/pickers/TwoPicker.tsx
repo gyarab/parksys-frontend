@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Color } from "../constants";
+import { Color } from "../../constants";
 import { stylesheet } from "typestyle";
 
 const r = "5px";

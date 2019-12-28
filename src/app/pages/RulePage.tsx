@@ -52,8 +52,11 @@ const RulePage = (props: IProps) => {
   const [loadSimulation, { data: dataSimul }] = props.useRuleSimulation();
   const { loading, error, data, refetch } = props.useFetchRules(queryVariables);
 
+  const shouldShowSimulation =
+    props.ruleAssignmentSimulation.on &&
+    !!props.ruleAssignmentSimulation.vehicle;
   useEffect(() => {
-    if (props.ruleAssignmentSimulation.on && !!data) {
+    if (shouldShowSimulation && !!data) {
       const args = { variables: props.ruleAssignmentSimulation };
       loadSimulation(args);
     }
@@ -80,7 +83,7 @@ const RulePage = (props: IProps) => {
             data={data.parkingRuleAssignments}
             day={queryVariables.day}
             appliedData={
-              !!dataSimul && props.ruleAssignmentSimulation.on
+              !!dataSimul && shouldShowSimulation
                 ? dataSimul.simulateRuleAssignmentApplication
                 : null
             }

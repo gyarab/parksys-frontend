@@ -1,11 +1,12 @@
-import { DatePicker } from "../DatePicker";
-import React from "react";
-import { TwoPicker } from "../TwoPicker";
+import { DatePicker } from "../pickers/DatePicker";
+import React, { useState } from "react";
+import { TwoPicker } from "../pickers/TwoPicker";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS } from "../../redux/modules/rulePageActionCreators";
 import { IStore } from "../../redux/IStore";
 import { stylesheet } from "typestyle";
+import { VehiclePicker } from "../pickers/VehiclePicker";
 
 export interface IStateToProps {
   ruleAssignmentSimulation: {
@@ -47,6 +48,8 @@ const styles = stylesheet({
 });
 
 const ParkingRuleAssignmentSimulationOptions = (props: IProps) => {
+  const [lp, setLp] = useState("");
+  const disabled = !props.ruleAssignmentSimulation.on;
   return (
     <div className={styles.simulationOptions}>
       <div className={styles.header}>
@@ -54,7 +57,7 @@ const ParkingRuleAssignmentSimulationOptions = (props: IProps) => {
         <TwoPicker
           optionLeft="OFF"
           optionRight="ON"
-          leftIsSelected={!props.ruleAssignmentSimulation.on}
+          leftIsSelected={disabled}
           onChange={v =>
             props.changeSimulateRuleAssignmentsOptions({ on: v === "ON" })
           }
@@ -62,19 +65,20 @@ const ParkingRuleAssignmentSimulationOptions = (props: IProps) => {
       </div>
       <div className={styles.pickers}>
         <span>Vehicle</span>
-        <input
-          name="vehicle"
-          value={props.ruleAssignmentSimulation.vehicle}
-          disabled={!props.ruleAssignmentSimulation.on}
-          onChange={e =>
+        <VehiclePicker
+          licensePlate={lp}
+          onInputChange={setLp}
+          disabled={disabled}
+          onSelect={v => {
+            setLp(!!v ? v.licensePlate : "");
             props.changeSimulateRuleAssignmentsOptions({
-              vehicle: e.target.value
-            })
-          }
+              vehicle: !!v ? v.id : null
+            });
+          }}
         />
         <span>Start</span>
         <DatePicker
-          disabled={!props.ruleAssignmentSimulation.on}
+          disabled={disabled}
           value={props.ruleAssignmentSimulation.start}
           onChange={start =>
             props.changeSimulateRuleAssignmentsOptions({ start })
@@ -82,7 +86,7 @@ const ParkingRuleAssignmentSimulationOptions = (props: IProps) => {
         />
         <span>End</span>
         <DatePicker
-          disabled={!props.ruleAssignmentSimulation.on}
+          disabled={disabled}
           value={props.ruleAssignmentSimulation.end}
           onChange={end => props.changeSimulateRuleAssignmentsOptions({ end })}
         />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useTwoPicker } from "../TwoPicker";
-import { useDatePicker } from "../DatePicker";
+import { useTwoPicker } from "../pickers/TwoPicker";
+import { useDatePicker } from "../pickers/DatePicker";
 import { Button } from "../Button";
 import { stylesheet } from "typestyle";
 import { connect } from "react-redux";

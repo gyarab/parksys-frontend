@@ -12,7 +12,7 @@ import {
   toggleDeviceExpand
 } from "../redux/modules/devicesActionCreators";
 import { IDevicesState } from "../redux/modules/devicesModule";
-import { useTrueFalseUndefined } from "../components/TrueFalseUndefined";
+import { useTrueFalseUndefined } from "../components/pickers/TrueFalseUndefined";
 import { useMutation, MutationTuple } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { DeviceTable } from "../components/DeviceTable";

@@ -29,7 +29,7 @@ interface SetCollidingRuleAssignments {
 }
 
 export const CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS =
-  "RULE_PAGE/TOGGLE_SIMULATE_RULES_ASSIGNMENTS";
+  "RULE_PAGE/CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS";
 interface ChangeSimulateRuleAssignmentsOptions {
   type: typeof CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS;
   payload: {

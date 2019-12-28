@@ -40,3 +40,14 @@ export const RULE_PAGE_RULE_SIMULATION_QUERY = gql`
     }
   }
 `;
+
+export const VEHICLE_PICKER_SEARCH_QUERY = gql`
+  query vehicleSearch($licensePlate: String!) {
+    vehicleSearch(search: { licensePlate: $licensePlate, limit: 10 }) {
+      data {
+        id
+        licensePlate
+      }
+    }
+  }
+`;
