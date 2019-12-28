@@ -52,7 +52,7 @@ const RulePage = (props: IProps) => {
   const { loading, error, data, refetch } = props.useFetchRules(queryVariables);
 
   const simulate = () => {
-    if (props.ruleAssignmentSimulation) {
+    if (props.ruleAssignmentSimulation.on) {
       const args = { variables: props.ruleAssignmentSimulation };
       loadSimulation(args);
       return;
