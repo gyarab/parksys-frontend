@@ -19,10 +19,12 @@ const tPad = (t: number) => t.toString().padStart(2, "0");
 
 export const DatePicker = ({
   value,
-  onChange
+  onChange,
+  disabled = false
 }: {
   value: Date;
   onChange: (d: Date) => any;
+  disabled?: boolean;
 }) => {
   const setDate = (dateValue: Date) => {
     if (dateValue === null) return;
@@ -44,6 +46,7 @@ export const DatePicker = ({
     <div className={dpStyles.datePicker}>
       <input
         type="date"
+        disabled={disabled}
         value={`${value.getFullYear()}-${tPad(value.getMonth() + 1)}-${tPad(
           value.getDate()
         )}`}
@@ -51,6 +54,7 @@ export const DatePicker = ({
       />
       <input
         type="time"
+        disabled={disabled}
         value={`${tPad(value.getHours())}:${tPad(value.getMinutes())}`}
         onChange={e => setTime(e.target.valueAsDate)}
       />

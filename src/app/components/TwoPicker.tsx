@@ -42,18 +42,25 @@ export const TwoPicker = ({
   optionLeft,
   optionRight,
   leftIsSelected,
-  onChange
+  onChange,
+  disabled = false
+}: {
+  optionLeft: string;
+  optionRight: string;
+  leftIsSelected: boolean;
+  onChange: (value: string) => any;
+  disabled?: boolean;
 }) => {
   return (
     <div className={tpStyles.twoPicker}>
       <div
-        className={leftIsSelected ? "left selected" : "left"}
+        className={leftIsSelected && !disabled ? "left selected" : "left"}
         onClick={() => onChange(optionLeft)}
       >
         {optionLeft}
       </div>
       <div
-        className={!leftIsSelected ? "right selected" : "right"}
+        className={!leftIsSelected && !disabled ? "right selected" : "right"}
         onClick={() => onChange(optionRight)}
       >
         {optionRight}

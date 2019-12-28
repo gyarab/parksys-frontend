@@ -10,12 +10,9 @@ import { ParkingRuleAssignmentFilter } from "../components/parkingRuleAssignment
 import { ParkingRuleAssignmentDay } from "../components/parkingRuleAssignment/ParkingRuleAssignmentDay";
 import moment from "moment";
 import { IStore } from "../redux/IStore";
-import {
-  SET_SELECTED_DAY,
-  CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS
-} from "../redux/modules/rulePageActionCreators";
-import { TwoPicker } from "../components/TwoPicker";
-import { DatePicker } from "../components/DatePicker";
+import { SET_SELECTED_DAY } from "../redux/modules/rulePageActionCreators";
+import { ParkingRuleAssignmentSimulationOptions } from "../components/parkingRuleAssignment/ParkingRuleAssignmentSimulationOptions";
+import { stylesheet } from "typestyle";
 
 export interface IStateToProps {
   selectedDay: string;
@@ -31,10 +28,17 @@ export interface IDispatchToProps {
   useFetchRules: (filter?: any) => any;
   useRuleSimulation: () => any;
   setSelectedDay: (newDay: string) => any;
-  changeSimulateRuleAssignmentsOptions: (value: object) => any;
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
+
+const styles = stylesheet({
+  simulationOptionsContainer: {
+    maxWidth: "21.2em",
+    border: "1px solid #CCC",
+    marginTop: "1em"
+  }
+});
 
 const RulePage = (props: IProps) => {
   const [queryVariables, setQueryVariables] = useState<any>({
@@ -81,37 +85,9 @@ const RulePage = (props: IProps) => {
                 : null
             }
           />
-          <input
-            name="vehicle"
-            value={props.ruleAssignmentSimulation.vehicle}
-            onChange={e =>
-              props.changeSimulateRuleAssignmentsOptions({
-                vehicle: e.target.value
-              })
-            }
-          />
-          <DatePicker
-            value={props.ruleAssignmentSimulation.start}
-            onChange={start =>
-              props.changeSimulateRuleAssignmentsOptions({ start })
-            }
-          />
-          <DatePicker
-            value={props.ruleAssignmentSimulation.end}
-            onChange={end =>
-              props.changeSimulateRuleAssignmentsOptions({ end })
-            }
-          />
-          <TwoPicker
-            optionLeft="SIM OFF"
-            optionRight="SIM ON"
-            leftIsSelected={!props.ruleAssignmentSimulation.on}
-            onChange={v =>
-              props.changeSimulateRuleAssignmentsOptions({ on: v === "SIM ON" })
-            }
-          />
-          <br />
-          <code>{JSON.stringify(dataSimul, null, 2)}</code>
+          <div className={styles.simulationOptionsContainer}>
+            <ParkingRuleAssignmentSimulationOptions />
+          </div>
         </div>
       )}
     </div>
@@ -150,9 +126,7 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
       return useLazyQuery(RULE_PAGE_RULE_SIMULATION_QUERY, {
         fetchPolicy: "no-cache"
       });
-    },
-    changeSimulateRuleAssignmentsOptions: payload =>
-      dispatch({ type: CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS, payload })
+    }
   };
 };
 
