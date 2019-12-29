@@ -8,8 +8,8 @@ import { useMutation, MutationTuple } from "@apollo/react-hooks";
 import { Dispatch } from "redux";
 import { RULE_PAGE_UPDATE_RULE_ASSIGNMENT_MUTATION } from "../../constants/Mutations";
 import { SET_COLLIDING_RULE_ASSIGNMENTS } from "../../redux/modules/rulePageActionCreators";
-import { useRulePicker } from "../pickers/RulePicker";
-import { useVehicleFilterPicker } from "../pickers/VehicleFilterPicker";
+import { useRuleMultiPicker } from "../pickers/RulePicker";
+import { useVehicleFilterMultiPicker } from "../pickers/VehicleFilterPicker";
 
 const styles = stylesheet({
   options: {
@@ -110,24 +110,20 @@ const ParkingRuleAssignmentDetails = ({
     }
   };
 
-  const [rulePicker, rule, setRule] = useRulePicker(
-    false,
-    assignment.rules.length > 0 ? assignment.rules[0] : null
-  );
-  const [filterPicker, filter, setFilter] = useVehicleFilterPicker(
-    false,
-    assignment.vehicleFilters.length > 0 ? assignment.vehicleFilters[0] : null
-  );
+  const [rulesPicker, rules, setRules] = useRuleMultiPicker({
+    initialModels: new Array(...assignment.rules)
+  });
+  const [filtersPicker, filters, setFilters] = useVehicleFilterMultiPicker({
+    initialModels: new Array(...assignment.vehicleFilters)
+  });
 
   const setOriginalValues = () => {
     setStart(assignment.start);
     setEnd(assignment.end);
     setFilterMode(assignment.vehicleFilterMode);
     setPriority(assignment.priority);
-    setRule(assignment.rules.length > 0 ? assignment.rules[0] : null);
-    setFilter(
-      assignment.vehicleFilters.length > 0 ? assignment.vehicleFilters[0] : null
-    );
+    setRules(new Array(...assignment.rules));
+    setFilters(new Array(...assignment.vehicleFilters));
   };
 
   const getUpdatedObject = () => {
@@ -136,8 +132,8 @@ const ParkingRuleAssignmentDetails = ({
       start,
       end,
       vehicleFilterMode: filterMode,
-      rules: !!rule ? [rule.id] : [],
-      vehicleFilters: !!filter ? [filter.id] : []
+      rules: rules.map(rules => rules.id),
+      vehicleFilters: filters.map(filter => filter.id)
     };
   };
   const [newAssignment, setNewAssignment] = useState(
@@ -145,13 +141,14 @@ const ParkingRuleAssignmentDetails = ({
   );
   useEffect(() => {
     setNewAssignment(updatedFields(comparisonAssignment, getUpdatedObject()));
-  }, [priority, start, end, filterMode, rule, filter]); // ADD ANY NEW FIELDS HERE!
+  }, [priority, start, end, filterMode, rules, filters]); // ADD ANY NEW FIELDS HERE!
 
   const [saveEffect] = useUpdateRuleAssignment();
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(SaveStatus.NONE);
   const close = () => {
     if (saveStatus !== SaveStatus.SAVING) _close();
   };
+
   const save = () => {
     // Do async work, then close
     if (Object.keys(newAssignment).length === 0) return;
@@ -216,9 +213,9 @@ const ParkingRuleAssignmentDetails = ({
         <span>Filter Mode</span>
         <div className="twoPickerContainer">{filterModePicker}</div>
         <span>Filters</span>
-        {filterPicker}
+        {filtersPicker}
         <span>Rules</span>
-        {rulePicker}
+        {rulesPicker}
       </div>
     </div>
   );
