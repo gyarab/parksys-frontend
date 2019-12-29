@@ -66,6 +66,9 @@ const styles = stylesheet({
     width: "calc(100% - 2em)",
     marginLeft: "auto",
     marginRight: "auto"
+  },
+  empty: {
+    color: "#999"
   }
 });
 
@@ -176,29 +179,27 @@ export const GenericModelMultiPicker = <T extends unknown = any>(
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
         />
-        {loading ? (
-          <span>Loading</span>
-        ) : error ? (
-          <span>{error.toString()}</span>
-        ) : (
-          <div className={styles.notSelectedModels}>
-            {notSelectedSet.size === 0 ? (
-              <p>Empty</p>
-            ) : (
-              gProps
-                .arrayGetter(data)
-                .filter(model =>
-                  notSelectedSet.has(gProps.modelToIdentifier(model))
+        <div className={styles.notSelectedModels}>
+          {loading ? (
+            <p>Loading</p>
+          ) : error ? (
+            <span>{error.toString()}</span>
+          ) : notSelectedSet.size === 0 ? (
+            <p className={styles.empty}>Empty</p>
+          ) : (
+            gProps
+              .arrayGetter(data)
+              .filter(model =>
+                notSelectedSet.has(gProps.modelToIdentifier(model))
+              )
+              .map(model =>
+                itemRender(
+                  gProps.renderModel(model),
+                  <button onClick={() => onAdd(model)}>+</button>
                 )
-                .map(model =>
-                  itemRender(
-                    gProps.renderModel(model),
-                    <button onClick={() => onAdd(model)}>+</button>
-                  )
-                )
-            )}
-          </div>
-        )}
+              )
+          )}
+        </div>
       </div>
     </div>
   ) : null;
@@ -211,7 +212,9 @@ export const GenericModelMultiPicker = <T extends unknown = any>(
             <button onClick={() => onRemove(i, model)}>x</button>
           )
         )}
-        {props.models.length === 0 ? <span>Empty</span> : null}
+        {props.models.length === 0 ? (
+          <span className={styles.empty}>Empty</span>
+        ) : null}
       </div>
       <div className="controls">
         <Button onClick={() => toggle()}>{isOpened ? "<<" : ">>"}</Button>
