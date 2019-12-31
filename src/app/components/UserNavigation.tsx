@@ -6,6 +6,7 @@ import { logoutUser as logoutUserActionCreator } from "../redux/modules/userActi
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { Button } from "./Button";
+import { navigate } from "../routes/routes";
 
 interface IStateToProps {
   user?: {
@@ -16,6 +17,7 @@ interface IStateToProps {
 
 interface IDispatchToProps {
   logout: () => void;
+  navigateToProfile: () => void;
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
@@ -37,7 +39,8 @@ function mapStateToProps(state: Pick<IStore, "user">): IStateToProps {
 
 function mapDispatchToProps(dispatch: Dispatch): IDispatchToProps {
   return {
-    logout: () => dispatch(logoutUserActionCreator())
+    logout: () => dispatch(logoutUserActionCreator()),
+    navigateToProfile: () => dispatch(navigate.userPage())
   };
 }
 
@@ -52,27 +55,36 @@ const classNames = stylesheet({
         textAlign: "center"
       }
     }
+  },
+  controls: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gridColumnGap: "0.3em"
   }
 });
 
-class UserNavigation extends React.Component<IProps> {
-  render(): JSX.Element {
-    let body: JSX.Element;
-    if (this.props.user) {
-      body = (
-        <>
-          <p>{this.props.user.name}</p>
-          <Button name="logoutButton" onClick={this.props.logout}>
+const UserNavigation = (props: IProps) => {
+  let body: JSX.Element;
+  if (props.user) {
+    body = (
+      <>
+        <p>{props.user.name}</p>
+        <div className={classNames.controls}>
+          <Button name="logoutButton" onClick={props.logout}>
             Logout
           </Button>
-        </>
-      );
-    } else {
-      body = <p>Not Logged In</p>;
-    }
-    return <div className={classNames.userNavigation}>{body}</div>;
+
+          <Button type="secondary" onClick={props.navigateToProfile}>
+            Profile
+          </Button>
+        </div>
+      </>
+    );
+  } else {
+    body = <p>Not Logged In</p>;
   }
-}
+  return <div className={classNames.userNavigation}>{body}</div>;
+};
 
 const connected = connect(mapStateToProps, mapDispatchToProps)(UserNavigation);
 

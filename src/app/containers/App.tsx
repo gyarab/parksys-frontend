@@ -19,6 +19,7 @@ import { BlankPage } from "../pages/BlankPage";
 import { LoginPage } from "../pages/LoginPage";
 import { DevicesPage } from "../pages/DevicesPage";
 import { RulePage } from "../pages/RulePage";
+import { UserPage } from "../pages/UserPage";
 
 setupCss();
 
@@ -66,6 +67,9 @@ class App extends React.Component<IStateToProps> {
     },
     devicesPage: {
       page: DevicesPage
+    },
+    userPage: {
+      page: UserPage
     }
   };
   private defaultNavigation = Navigation;

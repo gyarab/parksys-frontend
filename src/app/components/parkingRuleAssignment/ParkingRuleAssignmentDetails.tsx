@@ -38,6 +38,17 @@ const styles = stylesheet({
         maxHeight: "3em"
       }
     }
+  },
+  details: {
+    position: "absolute",
+    top: "2.5em",
+    borderRadius: "3px",
+    padding: "0.5em",
+    minWidth: "23em",
+    minHeight: "8em",
+    backgroundColor: "white",
+    boxShadow: "0px 0px 3px 1px #888",
+    cursor: "default"
   }
 });
 
@@ -93,11 +104,11 @@ const ParkingRuleAssignmentDetails = ({
   };
   const [startPicker, start, setStart] = useDatePicker(assignment.start);
   const [endPicker, end, setEnd] = useDatePicker(assignment.end);
-  const [filterModePicker, filterMode, setFilterMode] = useTwoPicker(
-    "NONE",
-    "ALL",
-    assignment.vehicleFilterMode === "NONE"
-  );
+  const [
+    filterModePicker,
+    { textValue: filterMode },
+    { setTextValue: setFilterMode }
+  ] = useTwoPicker("NONE", "ALL", assignment.vehicleFilterMode === "ALL");
   const [priority, _setPriority] = useState<string | number>(
     assignment.priority
   );
@@ -116,6 +127,11 @@ const ParkingRuleAssignmentDetails = ({
   const [filtersPicker, filters, setFilters] = useVehicleFilterMultiPicker({
     initialModels: new Array(...assignment.vehicleFilters)
   });
+  const [
+    activePicker,
+    { value: active },
+    { setValue: setActive }
+  ] = useTwoPicker("NO", "YES", assignment.active);
 
   const setOriginalValues = () => {
     setStart(assignment.start);
@@ -124,6 +140,7 @@ const ParkingRuleAssignmentDetails = ({
     setPriority(assignment.priority);
     setRules(new Array(...assignment.rules));
     setFilters(new Array(...assignment.vehicleFilters));
+    setActive(assignment.active);
   };
 
   const getUpdatedObject = () => {
@@ -133,7 +150,8 @@ const ParkingRuleAssignmentDetails = ({
       end,
       vehicleFilterMode: filterMode,
       rules: rules.map(rules => rules.id),
-      vehicleFilters: filters.map(filter => filter.id)
+      vehicleFilters: filters.map(filter => filter.id),
+      active
     };
   };
   const [newAssignment, setNewAssignment] = useState(
@@ -141,7 +159,7 @@ const ParkingRuleAssignmentDetails = ({
   );
   useEffect(() => {
     setNewAssignment(updatedFields(comparisonAssignment, getUpdatedObject()));
-  }, [priority, start, end, filterMode, rules, filters]); // ADD ANY NEW FIELDS HERE!
+  }, [priority, start, end, filterMode, rules, filters, active]); // ADD ANY NEW FIELDS HERE!
 
   const [saveEffect] = useUpdateRuleAssignment();
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(SaveStatus.NONE);
@@ -179,7 +197,7 @@ const ParkingRuleAssignmentDetails = ({
       });
   };
   return (
-    <div className="details">
+    <div className={styles.details}>
       <div className={styles.controls}>
         <Button
           disabled={
@@ -197,6 +215,8 @@ const ParkingRuleAssignmentDetails = ({
         </Button>
       </div>
       <div className={styles.options}>
+        <span>Active</span>
+        {activePicker}
         <span>Start</span>
         {startPicker}
         <span>End</span>

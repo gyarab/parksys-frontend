@@ -92,6 +92,51 @@ interface IProps<T = any> {
   initialSearch?: string;
 }
 
+const PopUpBody = ({
+  loading,
+  error,
+  notSelectedSet,
+  gProps: { arrayGetter, modelToIdentifier, renderModel },
+  data,
+  itemRender,
+  onAdd
+}) => {
+  return loading ? (
+    <p>Loading</p>
+  ) : error ? (
+    <span>{error.toString()}</span>
+  ) : notSelectedSet.size === 0 ? (
+    <p className={styles.empty}>Empty</p>
+  ) : (
+    arrayGetter(data)
+      .filter(model => notSelectedSet.has(modelToIdentifier(model)))
+      .map(model =>
+        itemRender(
+          renderModel(model),
+          <button onClick={() => onAdd(model)}>+</button>
+        )
+      )
+  );
+};
+
+const PopUp = ({ children, disabled, searchQuery, setSearchQuery }) => {
+  return (
+    <div className={styles.belowInput}>
+      <div className={styles.modelDisplay}>
+        <input
+          className={styles.searchBox}
+          placeholder="Search"
+          type="text"
+          disabled={disabled}
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+        />
+        <div className={styles.notSelectedModels}>{children}</div>
+      </div>
+    </div>
+  );
+};
+
 export const GenericModelMultiPicker = <T extends unknown = any>(
   gProps: IGProps<T>
 ) => (props: IProps<T>) => {
@@ -168,41 +213,7 @@ export const GenericModelMultiPicker = <T extends unknown = any>(
       </div>
     );
   };
-  const belowInput = isOpened ? (
-    <div className={styles.belowInput}>
-      <div className={styles.modelDisplay}>
-        <input
-          className={styles.searchBox}
-          placeholder="Search"
-          type="text"
-          disabled={disabled}
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-        />
-        <div className={styles.notSelectedModels}>
-          {loading ? (
-            <p>Loading</p>
-          ) : error ? (
-            <span>{error.toString()}</span>
-          ) : notSelectedSet.size === 0 ? (
-            <p className={styles.empty}>Empty</p>
-          ) : (
-            gProps
-              .arrayGetter(data)
-              .filter(model =>
-                notSelectedSet.has(gProps.modelToIdentifier(model))
-              )
-              .map(model =>
-                itemRender(
-                  gProps.renderModel(model),
-                  <button onClick={() => onAdd(model)}>+</button>
-                )
-              )
-          )}
-        </div>
-      </div>
-    </div>
-  ) : null;
+
   return (
     <div className={styles.multiModelPicker}>
       <div className="selectedModels">
@@ -228,7 +239,23 @@ export const GenericModelMultiPicker = <T extends unknown = any>(
           X
         </Button>
       </div>
-      {belowInput}
+      {isOpened ? (
+        <PopUp
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          disabled={disabled}
+        >
+          <PopUpBody
+            data={data}
+            loading={loading}
+            error={error}
+            onAdd={onAdd}
+            notSelectedSet={notSelectedSet}
+            itemRender={itemRender}
+            gProps={gProps}
+          />
+        </PopUp>
+      ) : null}
     </div>
   );
 };

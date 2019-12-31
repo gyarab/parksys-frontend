@@ -42,29 +42,12 @@ const classNames = stylesheet({
       }
     }
   },
-  cellContainer: {
-    position: "absolute",
-    top: "0.2em",
-    height: "2.5em"
-  },
-  horizontalUnit: {
-    width: `${hourWidth}%`,
-    borderRight: border(),
-    position: "absolute",
-    top: 0,
-    height: "100%",
-    $nest: {
-      "&:last-child": {
-        borderRight: 0
-      }
-    }
-  },
   calBody: {
     position: "relative"
   },
   timeIndicator: {
     position: "absolute",
-    borderRight: "2px solid red",
+    borderRight: `2px solid ${Color.BLUE}`,
     width: 0,
     top: 0
   },
@@ -186,7 +169,6 @@ export const ParkingRuleAssignmentDay = ({ appliedData, data, day }) => {
             style={{
               left: `${Math.max(0, Math.min(100, timeIndicatorPosition))}%`,
               height: `${2.9 * rowCount}em`,
-              zIndex: rowCount,
               visibility:
                 0 <= timeIndicatorPosition && timeIndicatorPosition <= 100
                   ? "inherit"

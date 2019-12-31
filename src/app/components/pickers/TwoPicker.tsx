@@ -41,26 +41,26 @@ const tpStyles = stylesheet({
 export const TwoPicker = ({
   optionLeft,
   optionRight,
-  leftIsSelected,
+  rightIsSelected,
   onChange,
   disabled = false
 }: {
   optionLeft: string;
   optionRight: string;
-  leftIsSelected: boolean;
+  rightIsSelected: boolean;
   onChange: (value: string) => any;
   disabled?: boolean;
 }) => {
   return (
     <div className={tpStyles.twoPicker}>
       <div
-        className={leftIsSelected && !disabled ? "left selected" : "left"}
+        className={!rightIsSelected && !disabled ? "left selected" : "left"}
         onClick={() => onChange(optionLeft)}
       >
         {optionLeft}
       </div>
       <div
-        className={!leftIsSelected && !disabled ? "right selected" : "right"}
+        className={rightIsSelected && !disabled ? "right selected" : "right"}
         onClick={() => onChange(optionRight)}
       >
         {optionRight}
@@ -72,19 +72,34 @@ export const TwoPicker = ({
 export const useTwoPicker = (
   optionLeft: string,
   optionRight: string,
-  leftIsInitial: boolean = true
-): [JSX.Element, string, (v: string) => void] => {
-  const [selectedValue, setSelectedValue] = useState<string>(
-    leftIsInitial ? optionLeft : optionRight
+  rightIsInitial: boolean = true
+): [
+  JSX.Element,
+  { textValue: string; value: boolean },
+  { setTextValue: (text: string) => void; setValue: (value: boolean) => void }
+] => {
+  const [selectedValue, setTextValue] = useState<string>(
+    rightIsInitial ? optionRight : optionLeft
   );
-  const leftIsSelected = selectedValue === optionLeft;
+  const setValue = (value: boolean) => {
+    if (value) {
+      setTextValue(optionRight);
+    } else {
+      setTextValue(optionLeft);
+    }
+  };
+  const rightIsSelected = selectedValue === optionRight;
   const render = (
     <TwoPicker
       optionLeft={optionLeft}
       optionRight={optionRight}
-      leftIsSelected={leftIsSelected}
-      onChange={setSelectedValue}
+      rightIsSelected={rightIsSelected}
+      onChange={setTextValue}
     />
   );
-  return [render, selectedValue, setSelectedValue];
+  return [
+    render,
+    { textValue: selectedValue, value: selectedValue === optionRight },
+    { setTextValue, setValue }
+  ];
 };

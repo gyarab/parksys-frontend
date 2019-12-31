@@ -53,7 +53,7 @@ const ParkingRuleAssignmentSimulationOptions = (props: IProps) => {
         <TwoPicker
           optionLeft="OFF"
           optionRight="ON"
-          leftIsSelected={disabled}
+          rightIsSelected={!disabled}
           onChange={v =>
             props.changeSimulateRuleAssignmentsOptions({ on: v === "ON" })
           }

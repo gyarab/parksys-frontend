@@ -36,7 +36,8 @@ const classNames = stylesheet({
       "& > .spacer": {
         height: "10em"
       }
-    }
+    },
+    paddingTop: "1em"
   },
   wrapper: {
     height: "100%"

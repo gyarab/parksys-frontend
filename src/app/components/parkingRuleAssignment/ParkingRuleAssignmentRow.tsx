@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { stylesheet } from "typestyle";
 import moment from "moment";
 import { ParkingRuleAssignment } from "./ParkingRuleAssignment";
@@ -7,6 +7,7 @@ import { Color } from "../../constants";
 import { Dispatch } from "redux";
 import { SET_SELECTED_DAY } from "../../redux/modules/rulePageActionCreators";
 import { connect } from "react-redux";
+import { ParkingRuleAssignmentDetails } from "./ParkingRuleAssignmentDetails";
 
 const border = (width = "1px") => `${width} solid #c3c3c3`;
 const hourWidth = 100 / 24;
@@ -82,6 +83,42 @@ export interface IProps extends IDispatchToProps {
   dayStart: Date;
 }
 
+const addPRAStyles = stylesheet({
+  plus: {
+    position: "absolute",
+    top: "50%",
+    transform: "translate(-50%, -50%)",
+    left: "50%",
+    display: "none"
+  },
+  addPra: {
+    width: "100%",
+    height: "100%",
+    color: "#666",
+    textAlign: "center",
+    position: "relative",
+    fontWeight: "bold",
+    $nest: {
+      "&:hover > div": {
+        display: "block"
+      }
+    }
+  }
+});
+
+const AddPRA = (props): JSX.Element => {
+  return (
+    <div
+      style={{ zIndex: props.zIndex }}
+      className={addPRAStyles.addPra}
+      onClick={() => props.add(props.index)}
+    >
+      <div className={addPRAStyles.plus}>+</div>
+      {props.children}
+    </div>
+  );
+};
+
 const ParkingRuleAssignmentRow = ({
   assignments,
   maxPriority,
@@ -104,9 +141,27 @@ const ParkingRuleAssignmentRow = ({
     .toDate()
     .toISOString()
     .slice(0, 10);
+  const [addingAtIndex, setAddingAtIndex] = useState(-1);
+  const onAdd = index => {
+    setAddingAtIndex(index);
+    const date = new Date(dayStart.getTime() + index * 3600 * 1000);
+    console.log(`ADD @${date.toISOString()} priority=${priority}`);
+  };
+
   const backgroundMarkers = new Array(24).fill(0).map((_, i) => {
     const left = `${i * hourWidth}%`;
-    return <div className={classNames.horizontalUnit} style={{ left }}></div>;
+    return (
+      <div className={classNames.horizontalUnit} style={{ left }}>
+        <AddPRA add={onAdd} index={i} zIndex={maxPriority}>
+          {addingAtIndex === i ? (
+            <ParkingRuleAssignmentDetails
+              assignment={assignments[0]}
+              close={() => setAddingAtIndex(-1)}
+            />
+          ) : null}
+        </AddPRA>
+      </div>
+    );
   });
   const assignmentsElements = assignments.map((assignment, i) => {
     const start = new Date(assignment.start);

@@ -7,7 +7,8 @@ const classNames = stylesheet({
     outline: "none",
     padding: "10px 25px",
     border: "none",
-    cursor: "pointer"
+    cursor: "pointer",
+    borderRadius: "4px"
   },
   disabled: {
     backgroundColor: Color.LIGHT_GREY,

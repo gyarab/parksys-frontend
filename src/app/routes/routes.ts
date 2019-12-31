@@ -16,7 +16,8 @@ type RoutablePages =
   | "revenuePage"
   | "historyPage"
   | "loginPage"
-  | "devicesPage";
+  | "devicesPage"
+  | "userPage";
 interface PageRecord {
   page: ComponentClass;
   nav?: ComponentClass;
@@ -55,7 +56,8 @@ const config: RouteConfig = {
   revenuePage: { path: "/revenue" },
   historyPage: { path: "/history" },
   loginPage: { path: "/" },
-  devicesPage: { path: "/devices" }
+  devicesPage: { path: "/devices" },
+  userPage: { path: "/user" }
 };
 
 export const routes = getRoutes(config);
@@ -69,5 +71,6 @@ export const navigate: RouteNavigate = {
   revenuePage: () => getNavigateAction(routes.revenuePage.name),
   historyPage: () => getNavigateAction(routes.historyPage.name),
   loginPage: () => getNavigateAction(routes.loginPage.name),
-  devicesPage: () => getNavigateAction(routes.devicesPage.name)
+  devicesPage: () => getNavigateAction(routes.devicesPage.name),
+  userPage: () => getNavigateAction(routes.userPage.name)
 };

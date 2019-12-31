@@ -60,6 +60,28 @@ interface IGProps {
   arrayGetter: (data) => Array<any>;
 }
 
+const PopUp = ({
+  loading,
+  error,
+  onSelecting,
+  gProps: { arrayGetter, renderModel },
+  data,
+  onStopSelecting,
+  onSelect
+}) => {
+  return loading ? (
+    <span>Loading</span>
+  ) : error ? (
+    <span>{error.toString()}</span>
+  ) : (
+    <div onMouseOver={onSelecting} onMouseLeave={onStopSelecting}>
+      {arrayGetter(data).map(model => (
+        <div onClick={() => onSelect(model)}>{renderModel(model)}</div>
+      ))}
+    </div>
+  );
+};
+
 export const GenericModelPicker = (gProps: IGProps) => (props: IProps) => {
   const disabled = props.disabled || false;
   const [loadGql, { data, loading, called, error }] = useLazyQuery(
@@ -95,24 +117,7 @@ export const GenericModelPicker = (gProps: IGProps) => (props: IProps) => {
       setIdentifier(props.identifier);
     }
   };
-  const belowInput =
-    focused || selecting ? (
-      <div className={styles.belowInput}>
-        {loading ? (
-          <span>Loading</span>
-        ) : error ? (
-          <span>{error.toString()}</span>
-        ) : (
-          <div onMouseOver={onSelecting} onMouseLeave={onStopSelecting}>
-            {gProps.arrayGetter(data).map(model => (
-              <div onClick={() => onSelect(model)}>
-                {gProps.renderModel(model)}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    ) : null;
+
   return (
     <div className={styles.modelPicker}>
       <input
@@ -124,7 +129,6 @@ export const GenericModelPicker = (gProps: IGProps) => (props: IProps) => {
         onFocus={onEditing}
         onBlur={onStopEditing}
       />
-      {belowInput}
       <button
         disabled={disabled}
         onClick={() => {
@@ -133,6 +137,19 @@ export const GenericModelPicker = (gProps: IGProps) => (props: IProps) => {
       >
         X
       </button>
+      {focused || selecting ? (
+        <div className={styles.belowInput}>
+          <PopUp
+            loading={loading}
+            onSelect={onSelect}
+            data={data}
+            gProps={gProps}
+            onStopSelecting={onStopSelecting}
+            error={error}
+            onSelecting={onSelecting}
+          />
+        </div>
+      ) : null}
     </div>
   );
 };

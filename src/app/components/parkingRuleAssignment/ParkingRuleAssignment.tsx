@@ -34,17 +34,6 @@ const styles = stylesheet({
         boxShadow: "0px 0px 2px 1px #999",
         cursor: "pointer"
       },
-      ".details": {
-        position: "absolute",
-        top: "2.5em",
-        borderRadius: "3px",
-        padding: "0.5em",
-        minWidth: "23em",
-        minHeight: "8em",
-        backgroundColor: "white",
-        boxShadow: "0px 0px 3px 1px #888",
-        cursor: "default"
-      },
       ".cellBody": {
         height: "100%",
         width: "100%",

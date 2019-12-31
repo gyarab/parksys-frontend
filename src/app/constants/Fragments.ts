@@ -7,6 +7,7 @@ export const PARKING_RULE_ASSIGNMENT_FRAGMENT = gql`
     end
     vehicleFilterMode
     priority
+    active
     vehicleFilters {
       id
       name

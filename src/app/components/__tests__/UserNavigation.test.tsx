@@ -39,7 +39,11 @@ describe("<UserNavigation />", () => {
   it("calls logout() when logout button is clicked", () => {
     const spied = jest.fn();
     const wrapper = shallow(
-      <UnconnectedUserNavigation user={userProps} logout={spied} />
+      <UnconnectedUserNavigation
+        user={userProps}
+        logout={spied}
+        navigateToProfile={() => null}
+      />
     );
     const buttonSelector = { name: "logoutButton" };
     expect(wrapper.find(buttonSelector)).toBeDefined();
@@ -53,7 +57,11 @@ describe("<UserNavigation />", () => {
     const spied = jest.fn();
     const buttonSelector = { name: "logoutButton" };
     const wrapper = shallow(
-      <UnconnectedUserNavigation user={null} logout={spied} />
+      <UnconnectedUserNavigation
+        user={null}
+        logout={spied}
+        navigateToProfile={() => null}
+      />
     );
     expect(wrapper.find(buttonSelector)).toEqual({});
   });

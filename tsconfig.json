@@ -8,8 +8,6 @@
     "inlineSourceMap": false,
     "inlineSources": false,
     "experimentalDecorators": true,
-    "noUnusedParameters": true,
-    "noUnusedLocals": true,
     "jsx": "react",
     "moduleResolution": "node",
     "esModuleInterop": true,
