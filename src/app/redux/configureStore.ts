@@ -12,6 +12,7 @@ import { Router } from "router5";
 import { config as appConfig } from "../../../config";
 import { IStore } from "./IStore";
 import rootReducer from "./rootReducer";
+import { persistStore } from "redux-persist";
 
 export interface IExtendedStore extends Store<Partial<IStore>> {
   runSaga: (rootSaga: any) => Task;
@@ -21,7 +22,7 @@ export interface IExtendedStore extends Store<Partial<IStore>> {
 export function configureStore(
   router: Router,
   initialState?: Partial<IStore>
-): IExtendedStore {
+): { store: IExtendedStore; persistor: any } {
   const sagaMiddleware = createSagaMiddleware();
   const middlewares: Middleware[] = [router5Middleware(router), sagaMiddleware];
 
@@ -45,6 +46,9 @@ export function configureStore(
     initialState,
     composeEnhancers(applyMiddleware(...middlewares))
   );
+  const persistor = persistStore(store, null, () => {
+    console.log("restoredState", store.getState());
+  });
 
   if (appConfig.env === "development" && (module as any).hot) {
     (module as any).hot.accept("./rootReducer", () => {
@@ -53,8 +57,11 @@ export function configureStore(
   }
 
   return {
-    ...store,
-    close: () => store.dispatch(END),
-    runSaga: sagaMiddleware.run
+    store: {
+      ...store,
+      close: () => store.dispatch(END),
+      runSaga: sagaMiddleware.run
+    },
+    persistor
   };
 }

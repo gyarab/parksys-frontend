@@ -14,6 +14,7 @@ import { configureRouter } from "./app/routes/configureRouter";
 import rootSaga from "./app/sagas/rootSaga";
 import { createApolloClient } from "./app/apis/gql";
 import { ApolloProvider } from "@apollo/react-hooks";
+import { PersistGate } from "redux-persist/integration/react";
 
 const ReactHotLoader =
   appConfig.env !== "production"
@@ -23,7 +24,7 @@ const ReactHotLoader =
 const renderOrHydrate = appConfig.ssr ? ReactDOM.hydrate : ReactDOM.render;
 
 const router = configureRouter();
-const store = configureStore(router, window.__INITIAL_STATE__);
+const { store, persistor } = configureStore(router, window.__INITIAL_STATE__);
 const apolloClient = createApolloClient(store);
 const rootSagaGenerator = rootSaga(apolloClient);
 let sagaTask = store.runSaga(rootSagaGenerator);
@@ -36,9 +37,11 @@ renderOrHydrate(
   <ReactHotLoader>
     <ApolloProvider client={apolloClient}>
       <Provider store={store} key="provider">
-        <RouterProvider router={router}>
-          <App />
-        </RouterProvider>
+        <PersistGate persistor={persistor}>
+          <RouterProvider router={router}>
+            <App />
+          </RouterProvider>
+        </PersistGate>
       </Provider>
     </ApolloProvider>
   </ReactHotLoader>,
@@ -54,9 +57,11 @@ if ((module as any).hot) {
       <ReactHotLoader>
         <ApolloProvider client={apolloClient}>
           <Provider store={store}>
-            <RouterProvider router={router}>
-              <NewApp />
-            </RouterProvider>
+            <PersistGate persistor={persistor}>
+              <RouterProvider router={router}>
+                <NewApp />
+              </RouterProvider>
+            </PersistGate>
           </Provider>
         </ApolloProvider>
       </ReactHotLoader>,

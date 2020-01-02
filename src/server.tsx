@@ -20,6 +20,7 @@ import rootSaga from "./app/sagas/rootSaga";
 import { createApolloClient } from "./app/apis/gql";
 import { ApolloProvider } from "@apollo/react-hooks";
 import compression from "compression";
+import { PersistGate } from "redux-persist/integration/react";
 
 const app = express();
 
@@ -73,7 +74,7 @@ app.get("*", (req: express.Request, res: express.Response) => {
     const languageHelper = new LanguageHelper(
       req.headers["accept-language"] as string
     );
-    const store = configureStore(router, {
+    const { store, persistor } = configureStore(router, {
       router: {
         previousRoute: null,
         route: routeState,
@@ -104,9 +105,11 @@ app.get("*", (req: express.Request, res: express.Response) => {
         const markup = renderToString(
           <ApolloProvider client={apolloClient}>
             <Provider store={store} key="provider">
-              <RouterProvider router={router}>
-                <App />
-              </RouterProvider>
+              <PersistGate persistor={persistor}>
+                <RouterProvider router={router}>
+                  <App />
+                </RouterProvider>
+              </PersistGate>
             </Provider>
           </ApolloProvider>
         );
@@ -128,9 +131,11 @@ app.get("*", (req: express.Request, res: express.Response) => {
     renderToString(
       <ApolloProvider client={apolloClient}>
         <Provider store={store} key="provider">
-          <RouterProvider router={router}>
-            <App />
-          </RouterProvider>
+          <PersistGate persistor={persistor}>
+            <RouterProvider router={router}>
+              <App />
+            </RouterProvider>
+          </PersistGate>
         </Provider>
       </ApolloProvider>
     );
