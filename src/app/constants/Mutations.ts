@@ -24,12 +24,29 @@ export const RULE_PAGE_UPDATE_RULE_ASSIGNMENT_MUTATION = gql`
     $id: ID!
     $input: ParkingRuleAssignmentUpdateInput!
   ) {
-    updateParkingRuleAssignment(id: $id, input: $input) {
+    result: updateParkingRuleAssignment(id: $id, input: $input) {
       __typename
       ... on ParkingRuleAssignment {
         ...ParkingRuleAssignmentArgs
       }
-      ... on ParkingRuleAssignmentResultUpdateError {
+      ... on ParkingRuleAssignmentResultError {
+        collisions {
+          id
+        }
+      }
+    }
+  }
+  ${PARKING_RULE_ASSIGNMENT_FRAGMENT}
+`;
+
+export const RULE_PAGE_CREATE_RULE_ASSIGNMENT_MUTATION = gql`
+  mutation createRuleAssignment($input: ParkingRuleAssignmentCreateInput!) {
+    result: createParkingRuleAssignment(input: $input) {
+      __typename
+      ... on ParkingRuleAssignment {
+        ...ParkingRuleAssignmentArgs
+      }
+      ... on ParkingRuleAssignmentResultError {
         collisions {
           id
         }

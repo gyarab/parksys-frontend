@@ -158,7 +158,7 @@ export const ParkingRuleAssignmentDay = ({ appliedData, data, day }) => {
               <ParkingRuleAssignmentRow
                 assignments={assignments}
                 maxPriority={maxPriority}
-                priority={priority}
+                priority={maxPriority - priority + 1}
                 dayStart={dayStart}
               />
             </React.Fragment>

@@ -6,7 +6,10 @@ import { stylesheet } from "typestyle";
 import { connect } from "react-redux";
 import { useMutation, MutationTuple } from "@apollo/react-hooks";
 import { Dispatch } from "redux";
-import { RULE_PAGE_UPDATE_RULE_ASSIGNMENT_MUTATION } from "../../constants/Mutations";
+import {
+  RULE_PAGE_UPDATE_RULE_ASSIGNMENT_MUTATION,
+  RULE_PAGE_CREATE_RULE_ASSIGNMENT_MUTATION
+} from "../../constants/Mutations";
 import { SET_COLLIDING_RULE_ASSIGNMENTS } from "../../redux/modules/rulePageActionCreators";
 import { useRuleMultiPicker } from "../pickers/RulePicker";
 import { useVehicleFilterMultiPicker } from "../pickers/VehicleFilterPicker";
@@ -64,12 +67,18 @@ export interface IDispatchToProps {
     { updateParkingRuleAssignment: any },
     { id: string; input: any }
   >;
+  useCreateRuleAssignment: () => MutationTuple<
+    { createParkingRuleAssignment },
+    { input: any }
+  >;
   setCollidingRuleAssignments: (ids: Array<string>) => void;
 }
 
 export interface IProps extends IDispatchToProps {
   assignment: any;
   close: Function;
+  onChange?: (assignment: any) => void;
+  isNew?: boolean;
 }
 
 const compare = <T extends unknown>(a: T, b: T): boolean => {
@@ -91,26 +100,22 @@ const updatedFields = (original, update) => {
   return updatedFields;
 };
 
-const ParkingRuleAssignmentDetails = ({
-  assignment,
-  close: _close,
-  useUpdateRuleAssignment,
-  setCollidingRuleAssignments
-}: IProps) => {
+const ParkingRuleAssignmentDetails = (props: IProps) => {
   const comparisonAssignment = {
-    ...assignment,
-    rules: assignment.rules.map(rule => rule.id),
-    vehicleFilters: assignment.vehicleFilters.map(filter => filter.id)
+    ...props.assignment,
+    rules: props.assignment.rules.map(rule => rule.id),
+    vehicleFilters: props.assignment.vehicleFilters.map(filter => filter.id)
   };
-  const [startPicker, start, setStart] = useDatePicker(assignment.start);
-  const [endPicker, end, setEnd] = useDatePicker(assignment.end);
+  const [isNew] = useState(props.isNew || false);
+  const [startPicker, start, setStart] = useDatePicker(props.assignment.start);
+  const [endPicker, end, setEnd] = useDatePicker(props.assignment.end);
   const [
     filterModePicker,
     { textValue: filterMode },
     { setTextValue: setFilterMode }
-  ] = useTwoPicker("NONE", "ALL", assignment.vehicleFilterMode === "ALL");
+  ] = useTwoPicker("NONE", "ALL", props.assignment.vehicleFilterMode === "ALL");
   const [priority, _setPriority] = useState<string | number>(
-    assignment.priority
+    props.assignment.priority
   );
   const setPriority = (value: string) => {
     const numberValue = Number(value);
@@ -122,29 +127,29 @@ const ParkingRuleAssignmentDetails = ({
   };
 
   const [rulesPicker, rules, setRules] = useRuleMultiPicker({
-    initialModels: new Array(...assignment.rules)
+    initialModels: new Array(...props.assignment.rules)
   });
   const [filtersPicker, filters, setFilters] = useVehicleFilterMultiPicker({
-    initialModels: new Array(...assignment.vehicleFilters)
+    initialModels: new Array(...props.assignment.vehicleFilters)
   });
   const [
     activePicker,
     { value: active },
     { setValue: setActive }
-  ] = useTwoPicker("NO", "YES", assignment.active);
+  ] = useTwoPicker("NO", "YES", props.assignment.active);
 
   const setOriginalValues = () => {
-    setStart(assignment.start);
-    setEnd(assignment.end);
-    setFilterMode(assignment.vehicleFilterMode);
-    setPriority(assignment.priority);
-    setRules(new Array(...assignment.rules));
-    setFilters(new Array(...assignment.vehicleFilters));
-    setActive(assignment.active);
+    setStart(props.assignment.start);
+    setEnd(props.assignment.end);
+    setFilterMode(props.assignment.vehicleFilterMode);
+    setPriority(props.assignment.priority);
+    setRules(new Array(...props.assignment.rules));
+    setFilters(new Array(...props.assignment.vehicleFilters));
+    setActive(props.assignment.active);
   };
 
   const getUpdatedObject = () => {
-    return {
+    const updated = {
       priority,
       start,
       end,
@@ -153,40 +158,49 @@ const ParkingRuleAssignmentDetails = ({
       vehicleFilters: filters.map(filter => filter.id),
       active
     };
+    return isNew ? updated : updatedFields(comparisonAssignment, updated);
   };
-  const [newAssignment, setNewAssignment] = useState(
-    updatedFields(comparisonAssignment, getUpdatedObject())
-  );
+  const [newAssignment, setNewAssignment] = useState(getUpdatedObject());
   useEffect(() => {
-    setNewAssignment(updatedFields(comparisonAssignment, getUpdatedObject()));
+    const updatedObj = getUpdatedObject();
+    setNewAssignment(updatedObj);
+    console.log(updatedObj);
+    if (!!props.onChange && Object.keys(updatedObj).length > 0) {
+      props.onChange(updatedObj);
+    }
   }, [priority, start, end, filterMode, rules, filters, active]); // ADD ANY NEW FIELDS HERE!
 
-  const [saveEffect] = useUpdateRuleAssignment();
+  const [updateEffect] = props.useUpdateRuleAssignment();
+  const [createEffect] = props.useCreateRuleAssignment();
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(SaveStatus.NONE);
   const close = () => {
-    if (saveStatus !== SaveStatus.SAVING) _close();
+    if (saveStatus !== SaveStatus.SAVING) props.close();
   };
 
   const save = () => {
     // Do async work, then close
     if (Object.keys(newAssignment).length === 0) return;
     setSaveStatus(SaveStatus.SAVING);
-    saveEffect({
-      variables: {
-        id: assignment.id,
-        input: newAssignment
-      }
-    })
+    console.log(isNew, newAssignment);
+    const promise: Promise<any> = isNew
+      ? createEffect({
+          variables: { input: newAssignment }
+        })
+      : updateEffect({
+          variables: {
+            id: props.assignment.id,
+            input: newAssignment
+          }
+        });
+    promise
       .then(({ data }) => {
-        if (data.updateParkingRuleAssignment.collisions) {
-          setCollidingRuleAssignments(
-            data.updateParkingRuleAssignment.collisions.map(
-              collision => collision.id
-            )
+        if (data.result.collisions) {
+          props.setCollidingRuleAssignments(
+            data.result.collisions.map(collision => collision.id)
           );
           setSaveStatus(SaveStatus.FAILED);
         } else {
-          setCollidingRuleAssignments([]);
+          props.setCollidingRuleAssignments([]);
           setSaveStatus(SaveStatus.SUCCEEDED);
           close();
         }
@@ -245,6 +259,8 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
     useUpdateRuleAssignment: () =>
       useMutation(RULE_PAGE_UPDATE_RULE_ASSIGNMENT_MUTATION),
+    useCreateRuleAssignment: () =>
+      useMutation(RULE_PAGE_CREATE_RULE_ASSIGNMENT_MUTATION),
     setCollidingRuleAssignments: ids =>
       dispatch({
         type: SET_COLLIDING_RULE_ASSIGNMENTS,

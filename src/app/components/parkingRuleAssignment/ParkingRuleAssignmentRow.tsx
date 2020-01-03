@@ -5,9 +5,15 @@ import { ParkingRuleAssignment } from "./ParkingRuleAssignment";
 import { calculateLeftRightFromTime } from "./ParkingRuleAssignmentDay";
 import { Color } from "../../constants";
 import { Dispatch } from "redux";
-import { SET_SELECTED_DAY } from "../../redux/modules/rulePageActionCreators";
+import {
+  SET_SELECTED_DAY,
+  ChangeOpenedNewRuleAssignment,
+  CHANGE_OPENED_NEW_RULE_ASSIGNMENT
+} from "../../redux/modules/rulePageActionCreators";
 import { connect } from "react-redux";
 import { ParkingRuleAssignmentDetails } from "./ParkingRuleAssignmentDetails";
+import { IRulePageState } from "../../redux/modules/rulePageModule";
+import { IStore } from "../../redux/IStore";
 
 const border = (width = "1px") => `${width} solid #c3c3c3`;
 const hourWidth = 100 / 24;
@@ -72,11 +78,18 @@ const classNames = stylesheet({
   }
 });
 
-export interface IDispatchToProps {
-  setSelectedDay: (newDay: string) => any;
+export interface IStateToProps {
+  openedNewRuleAssignment?: IRulePageState["openedRuleAssignment"]["new"];
 }
 
-export interface IProps extends IDispatchToProps {
+export interface IDispatchToProps {
+  setSelectedDay: (newDay: string) => void;
+  setOpenedNewRuleAssignment: (
+    payload: ChangeOpenedNewRuleAssignment["payload"]
+  ) => void;
+}
+
+export interface IProps extends IStateToProps, IDispatchToProps {
   assignments: any[];
   maxPriority: number;
   priority: number;
@@ -89,32 +102,41 @@ const addPRAStyles = stylesheet({
     top: "50%",
     transform: "translate(-50%, -50%)",
     left: "50%",
-    display: "none"
+    display: "none",
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#666"
   },
   addPra: {
     width: "100%",
     height: "100%",
-    color: "#666",
-    textAlign: "center",
-    position: "relative",
-    fontWeight: "bold",
+    position: "relative"
+  },
+  plusContainer: {
+    width: "100%",
+    height: "100%",
     $nest: {
       "&:hover > div": {
         display: "block"
       }
     }
+  },
+  children: {
+    position: "relative",
+    top: "-100%"
   }
 });
 
 const AddPRA = (props): JSX.Element => {
   return (
-    <div
-      style={{ zIndex: props.zIndex }}
-      className={addPRAStyles.addPra}
-      onClick={() => props.add(props.index)}
-    >
-      <div className={addPRAStyles.plus}>+</div>
-      {props.children}
+    <div className={addPRAStyles.addPra}>
+      <div
+        className={addPRAStyles.plusContainer}
+        onClick={() => props.add(props.index)}
+      >
+        <div className={addPRAStyles.plus}>+</div>
+      </div>
+      <div className={addPRAStyles.children}>{props.children}</div>
     </div>
   );
 };
@@ -124,7 +146,9 @@ const ParkingRuleAssignmentRow = ({
   maxPriority,
   priority,
   dayStart,
-  setSelectedDay
+  setSelectedDay,
+  setOpenedNewRuleAssignment,
+  openedNewRuleAssignment
 }: IProps) => {
   const dayEnd = moment(dayStart)
     .endOf("day")
@@ -141,24 +165,51 @@ const ParkingRuleAssignmentRow = ({
     .toDate()
     .toISOString()
     .slice(0, 10);
-  const [addingAtIndex, setAddingAtIndex] = useState(-1);
-  const onAdd = index => {
-    setAddingAtIndex(index);
-    const date = new Date(dayStart.getTime() + index * 3600 * 1000);
-    console.log(`ADD @${date.toISOString()} priority=${priority}`);
+  const onAdd = (index: number) => {
+    setOpenedNewRuleAssignment({
+      priority,
+      index
+    });
   };
 
+  const mightBeOpened =
+    !!openedNewRuleAssignment && priority === openedNewRuleAssignment.priority;
   const backgroundMarkers = new Array(24).fill(0).map((_, i) => {
     const left = `${i * hourWidth}%`;
+    let details = null;
+    if (mightBeOpened && openedNewRuleAssignment.index === i) {
+      const start = new Date(dayStart.getTime() + i * 3600 * 1000);
+      const end = new Date(start.getTime() + 3600 * 1000); // +1 hour
+      details = (
+        <div
+          style={{
+            position: "relative",
+            zIndex: maxPriority + 3
+          }}
+        >
+          <ParkingRuleAssignmentDetails
+            isNew={true}
+            assignment={{
+              start,
+              end,
+              priority,
+              vehicleFilterMode: "ALL",
+              vehicleFilters: [],
+              rules: [],
+              active: false
+            }}
+            close={() => {
+              console.log("CLOSE!");
+              setOpenedNewRuleAssignment(null);
+            }}
+          />
+        </div>
+      );
+    }
     return (
       <div className={classNames.horizontalUnit} style={{ left }}>
-        <AddPRA add={onAdd} index={i} zIndex={maxPriority}>
-          {addingAtIndex === i ? (
-            <ParkingRuleAssignmentDetails
-              assignment={assignments[0]}
-              close={() => setAddingAtIndex(-1)}
-            />
-          ) : null}
+        <AddPRA add={onAdd} index={i}>
+          {details}
         </AddPRA>
       </div>
     );
@@ -213,7 +264,7 @@ const ParkingRuleAssignmentRow = ({
           style={{
             left: `${left}%`,
             right: `${right}%`,
-            zIndex: maxPriority - priority + 1
+            zIndex: priority + 1
           }}
         >
           <ParkingRuleAssignment assignment={assignment} />
@@ -229,14 +280,25 @@ const ParkingRuleAssignmentRow = ({
   );
 };
 
-const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
+const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
   return {
-    setSelectedDay: newDay =>
-      dispatch({ type: SET_SELECTED_DAY, payload: { day: newDay } })
+    openedNewRuleAssignment: state.rulePage.openedRuleAssignment.new
   };
 };
 
-const connected = connect(null, mapDispatchToProps)(ParkingRuleAssignmentRow);
+const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
+  return {
+    setSelectedDay: newDay =>
+      dispatch({ type: SET_SELECTED_DAY, payload: { day: newDay } }),
+    setOpenedNewRuleAssignment: payload =>
+      dispatch({ type: CHANGE_OPENED_NEW_RULE_ASSIGNMENT, payload })
+  };
+};
+
+const connected = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ParkingRuleAssignmentRow);
 
 export {
   connected as ParkingRuleAssignmentRow,

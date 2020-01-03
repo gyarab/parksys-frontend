@@ -3,7 +3,8 @@ import {
   CHANGE_OPENED_RULE_ASSIGNMENT,
   SET_SELECTED_DAY,
   SET_COLLIDING_RULE_ASSIGNMENTS,
-  CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS
+  CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS,
+  CHANGE_OPENED_NEW_RULE_ASSIGNMENT
 } from "./rulePageActionCreators";
 import moment = require("moment");
 
@@ -19,7 +20,13 @@ export interface IRulePageStateSimulation {
 
 export interface IRulePageState {
   selectedDay: string;
-  openedRuleAssignmentId?: string | null;
+  openedRuleAssignment: {
+    id: string | null;
+    new?: {
+      priority: number;
+      index: number;
+    } | null;
+  };
   collidingRuleAssignments: Set<string>;
   ruleAssignmentSimulation: IRulePageStateSimulation;
 }
@@ -27,7 +34,10 @@ export interface IRulePageState {
 const defaultSelectedDay = () => new Date().toISOString().slice(0, 10);
 export const initialState: IRulePageState = {
   selectedDay: defaultSelectedDay(),
-  openedRuleAssignmentId: null,
+  openedRuleAssignment: {
+    id: null,
+    new: null
+  },
   collidingRuleAssignments: new Set(),
   ruleAssignmentSimulation: {
     on: false,
@@ -51,11 +61,21 @@ export function rulePageReducer(
     case CHANGE_OPENED_RULE_ASSIGNMENT:
       return {
         ...state,
-        openedRuleAssignmentId:
-          action.payload.id === state.openedRuleAssignmentId
-            ? null
-            : action.payload.id,
+        openedRuleAssignment: {
+          id:
+            action.payload.id === state.openedRuleAssignment.id
+              ? null
+              : action.payload.id
+        },
         collidingRuleAssignments: new Set()
+      };
+    case CHANGE_OPENED_NEW_RULE_ASSIGNMENT:
+      return {
+        ...state,
+        openedRuleAssignment: {
+          id: null,
+          new: action.payload
+        }
       };
     case SET_SELECTED_DAY:
       return {

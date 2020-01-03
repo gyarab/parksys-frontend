@@ -1,6 +1,5 @@
 import { config } from "../../../config";
 
-// TODO: Get hostname from config
 export default async (path: string) => {
   const url = `${config.backendApi.root}${path}`;
   return fetch(url, {

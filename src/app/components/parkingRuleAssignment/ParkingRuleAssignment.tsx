@@ -89,7 +89,7 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
 
 const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
   return {
-    toggledId: state.rulePage.openedRuleAssignmentId,
+    toggledId: state.rulePage.openedRuleAssignment.id,
     collidingIds: state.rulePage.collidingRuleAssignments
   };
 };
