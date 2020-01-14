@@ -164,7 +164,6 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
   useEffect(() => {
     const updatedObj = getUpdatedObject();
     setNewAssignment(updatedObj);
-    console.log(updatedObj);
     if (!!props.onChange && Object.keys(updatedObj).length > 0) {
       props.onChange(updatedObj);
     }

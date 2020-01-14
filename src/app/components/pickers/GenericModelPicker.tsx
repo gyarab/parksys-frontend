@@ -105,7 +105,9 @@ export const GenericModelPicker = (gProps: IGProps) => (props: IProps) => {
   const onSelecting = () => setSelecting(true);
   const onStopSelecting = () => {
     setSelecting(false);
-    setIdentifier(props.identifier);
+    if (!focused) {
+      setIdentifier(props.identifier);
+    }
   };
   const onSelect = (model: any) => {
     setSelecting(false);
