@@ -1,5 +1,8 @@
 import gql from "graphql-tag";
-import { PARKING_RULE_ASSIGNMENT_FRAGMENT } from "./Fragments";
+import {
+  PARKING_RULE_ASSIGNMENT_FRAGMENT,
+  VEHICLE_FILTER_FRAGMENT
+} from "./Fragments";
 
 export const RULE_PAGE_FETCH_PARKING_RULE_ASSIGNMENT_QUERY = gql`
   query parkingRuleAssignments(
@@ -74,14 +77,9 @@ export const VEHICLE_FILTER_PICKER_SEARCH_QUERY = gql`
   query searchVehicleFilters($name: String!) {
     vehicleFilterSearch(search: { name: $name }) {
       data {
-        id
-        name
-        action
-        vehicles {
-          id
-          licensePlate
-        }
+        ...VehicleFilterArgs
       }
     }
   }
+  ${VEHICLE_FILTER_FRAGMENT}
 `;

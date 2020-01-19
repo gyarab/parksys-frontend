@@ -27,3 +27,15 @@ export const PARKING_RULE_ASSIGNMENT_FRAGMENT = gql`
     }
   }
 `;
+
+export const VEHICLE_FILTER_FRAGMENT = gql`
+  fragment VehicleFilterArgs on VehicleFilter {
+    id
+    name
+    action
+    vehicles {
+      id
+      licensePlate
+    }
+  }
+`;

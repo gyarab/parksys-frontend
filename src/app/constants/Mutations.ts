@@ -1,5 +1,8 @@
 import gql from "graphql-tag";
-import { PARKING_RULE_ASSIGNMENT_FRAGMENT } from "./Fragments";
+import {
+  PARKING_RULE_ASSIGNMENT_FRAGMENT,
+  VEHICLE_FILTER_FRAGMENT
+} from "./Fragments";
 
 export const DEVICE_PAGE_CREATE_DEVICE_MUTATION = gql`
   mutation createDevice($name: String!) {
@@ -59,6 +62,23 @@ export const RULE_PAGE_CREATE_RULE_ASSIGNMENT_MUTATION = gql`
 export const RULE_PAGE_DELETE_RULE_ASSIGNMENT_MUTATION = gql`
   mutation deleteRuleAssignment($id: ID!) {
     deleteParkingRuleAssignment(id: $id) {
+      id
+    }
+  }
+`;
+
+export const RULE_PAGE_UPDATE_VEHICLE_FILTER = gql`
+  mutation updateVehicleFilter($id: ID!, $input: VehicleFilterUpdateInput!) {
+    updateVehicleFilter(id: $id, input: $input) {
+      ...VehicleFilterArgs
+    }
+  }
+  ${VEHICLE_FILTER_FRAGMENT}
+`;
+
+export const RULE_PAGE_DELETE_VEHICLE_FILTER = gql`
+  mutation deleteVehicleFilter($id: ID!) {
+    deleteVehicleFilter(id: $id) {
       id
     }
   }

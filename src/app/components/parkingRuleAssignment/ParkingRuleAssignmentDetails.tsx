@@ -14,6 +14,7 @@ import {
 import { SET_COLLIDING_RULE_ASSIGNMENTS } from "../../redux/modules/rulePageActionCreators";
 import { useRuleMultiPicker } from "../pickers/RulePicker";
 import { useVehicleFilterMultiPicker } from "../pickers/VehicleFilterPicker";
+import SaveStatus from "../../constants/SaveStatus";
 
 const styles = stylesheet({
   options: {
@@ -55,13 +56,6 @@ const styles = stylesheet({
     cursor: "default"
   }
 });
-
-enum SaveStatus {
-  NONE = "Save",
-  SAVING = "Saving...",
-  FAILED = "Failed, try again",
-  SUCCEEDED = "Saved"
-}
 
 export interface IDispatchToProps {
   useUpdateRuleAssignment: () => MutationTuple<

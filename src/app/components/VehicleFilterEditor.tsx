@@ -15,6 +15,13 @@ import {
 } from "../redux/modules/rulePageActionCreators";
 import { IRulePageState } from "../redux/modules/rulePageModule";
 import { IStore } from "../redux/IStore";
+import { Button } from "./Button";
+import SaveStatus from "../constants/SaveStatus";
+import { useMutation, MutationTuple } from "@apollo/react-hooks";
+import {
+  RULE_PAGE_UPDATE_VEHICLE_FILTER,
+  RULE_PAGE_DELETE_VEHICLE_FILTER
+} from "../constants/Mutations";
 
 export interface IStateToProps {
   vehicleFilter: IRulePageState["selectedVehicleFilter"];
@@ -22,6 +29,8 @@ export interface IStateToProps {
 
 export interface IDispatchToProps {
   setSelectedVehicleFilter: (payload: SetVehicleFilter["payload"]) => void;
+  useUpdateVehicleFilter: () => MutationTuple<any, { id: string; input: any }>;
+  useDeleteVehicleFilter: () => MutationTuple<any, { id: string }>;
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
@@ -44,45 +53,124 @@ const styles = stylesheet({
         maxHeight: "2em"
       }
     }
+  },
+  controls: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4, 1fr)",
+    gridColumnGap: "0.3em",
+    marginBottom: "0.5em",
+    $nest: {
+      button: {
+        maxHeight: "3em"
+      }
+    }
   }
 });
 
-export const VehicleFilterEditor = ({ filter }) => {
-  const [actionPicker, , { setTextValue: setAction }] = useTwoPicker(
+export const VehicleFilterEditor = ({ filter, del, save, saveStatus }) => {
+  const [actionPicker, { textValue: action }] = useTwoPicker(
     "EXCLUDE",
     "INCLUDE",
     filter.action === "INCLUDE"
   );
   const [name, setName] = useState(filter.name);
-  const [vehicleMultiPicker, , setVehicles] = useVehicleMultiPicker({
+  const [vehicleMultiPicker, vehicles] = useVehicleMultiPicker({
     initialModels: filter.vehicles
   });
   return (
-    <div className={styles.pickers}>
-      <span>Action</span>
-      {actionPicker}
-      <span>Name</span>
-      <Input
-        type="text"
-        value={name}
-        onChange={e => setName(e.target["value"])}
-      />
-      <span>Vehicles</span>
-      {vehicleMultiPicker}
+    <div>
+      <div className={styles.pickers}>
+        <span>Action</span>
+        {actionPicker}
+        <span>Name</span>
+        <Input
+          type="text"
+          value={name}
+          onChange={e => setName(e.target["value"])}
+        />
+        <span>Vehicles</span>
+        {vehicleMultiPicker}
+      </div>
+
+      <div className={styles.controls}>
+        <Button onClick={() => del()} type="negative">
+          Delete
+        </Button>
+        <Button
+          onClick={() =>
+            save({ name, action, vehicles: vehicles.map(v => v.id) })
+          }
+          type="positive"
+        >
+          {saveStatus}
+        </Button>
+      </div>
     </div>
   );
 };
 
 const VehicleFilterWidget = (props: IProps) => {
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>(SaveStatus.NONE);
+  const [updateEffect] = props.useUpdateVehicleFilter();
+  const [deleteEffect] = props.useDeleteVehicleFilter();
+
+  const onSuccess = ({ data, errors }) => {
+    console.log(data, errors);
+    setSaveStatus(SaveStatus.NONE);
+    props.setSelectedVehicleFilter(null);
+  };
+  const onFailed = err => {
+    console.log(err);
+    setSaveStatus(SaveStatus.FAILED);
+  };
+
+  const save = obj => {
+    setSaveStatus(SaveStatus.SAVING);
+    updateEffect({
+      variables: {
+        id: props.vehicleFilter.id,
+        input: obj
+      }
+    })
+      .then(onSuccess)
+      .catch(onFailed);
+  };
+  const del = () => {
+    setSaveStatus(SaveStatus.SAVING);
+    deleteEffect({
+      variables: { id: props.vehicleFilter.id }
+    })
+      .then(onSuccess)
+      .catch(onFailed);
+  };
+  const newFilter = () => {
+    props.setSelectedVehicleFilter({
+      id: "",
+      name: "",
+      action: "INCLUDE",
+      vehicles: []
+    });
+    setSaveStatus(SaveStatus.NONE);
+  };
   return (
     <div>
-      <h3>Vehicle Filters</h3>
+      <div className={styles.header}>
+        <h3>Vehicle Filters</h3>
+        <Button type="primary" onClick={newFilter}>
+          New
+        </Button>
+      </div>
       <VehicleFilterPicker
         identifier={props.vehicleFilter ? props.vehicleFilter.name : ""}
         onSelect={filter => props.setSelectedVehicleFilter(filter)}
       />
       {!!props.vehicleFilter ? (
-        <VehicleFilterEditor filter={props.vehicleFilter} />
+        <VehicleFilterEditor
+          del={del}
+          save={save}
+          saveStatus={saveStatus}
+          filter={props.vehicleFilter}
+        />
       ) : null}
     </div>
   );
@@ -100,7 +188,9 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
       dispatch({
         type: SET_VEHICLE_FILTER,
         payload
-      })
+      }),
+    useUpdateVehicleFilter: () => useMutation(RULE_PAGE_UPDATE_VEHICLE_FILTER),
+    useDeleteVehicleFilter: () => useMutation(RULE_PAGE_DELETE_VEHICLE_FILTER)
   };
 };
 
@@ -113,3 +203,4 @@ export {
   connected as VehicleFilterWidget,
   VehicleFilterWidget as UnconnectedVehicleFilterWdiget
 };
+9;
