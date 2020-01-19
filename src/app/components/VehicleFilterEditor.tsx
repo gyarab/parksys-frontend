@@ -20,7 +20,8 @@ import SaveStatus from "../constants/SaveStatus";
 import { useMutation, MutationTuple } from "@apollo/react-hooks";
 import {
   RULE_PAGE_UPDATE_VEHICLE_FILTER,
-  RULE_PAGE_DELETE_VEHICLE_FILTER
+  RULE_PAGE_DELETE_VEHICLE_FILTER,
+  RULE_PAGE_CREATE_VEHICLE_FILTER
 } from "../constants/Mutations";
 
 export interface IStateToProps {
@@ -31,6 +32,7 @@ export interface IDispatchToProps {
   setSelectedVehicleFilter: (payload: SetVehicleFilter["payload"]) => void;
   useUpdateVehicleFilter: () => MutationTuple<any, { id: string; input: any }>;
   useDeleteVehicleFilter: () => MutationTuple<any, { id: string }>;
+  useCreateVehicleFilter: () => MutationTuple<any, { input: any }>;
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
@@ -111,29 +113,31 @@ export const VehicleFilterEditor = ({ filter, del, save, saveStatus }) => {
 
 const VehicleFilterWidget = (props: IProps) => {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(SaveStatus.NONE);
+  const [isNew, setIsNew] = useState<boolean>(false);
   const [updateEffect] = props.useUpdateVehicleFilter();
   const [deleteEffect] = props.useDeleteVehicleFilter();
+  const [createEffect] = props.useCreateVehicleFilter();
 
   const onSuccess = ({ data, errors }) => {
-    console.log(data, errors);
     setSaveStatus(SaveStatus.NONE);
     props.setSelectedVehicleFilter(null);
+    setIsNew(false);
   };
   const onFailed = err => {
-    console.log(err);
     setSaveStatus(SaveStatus.FAILED);
   };
 
   const save = obj => {
     setSaveStatus(SaveStatus.SAVING);
-    updateEffect({
-      variables: {
-        id: props.vehicleFilter.id,
-        input: obj
-      }
-    })
-      .then(onSuccess)
-      .catch(onFailed);
+    const promise = isNew
+      ? createEffect({ variables: { input: obj } })
+      : updateEffect({
+          variables: {
+            id: props.vehicleFilter.id,
+            input: obj
+          }
+        });
+    promise.then(onSuccess).catch(onFailed);
   };
   const del = () => {
     setSaveStatus(SaveStatus.SAVING);
@@ -143,27 +147,41 @@ const VehicleFilterWidget = (props: IProps) => {
       .then(onSuccess)
       .catch(onFailed);
   };
-  const newFilter = () => {
-    props.setSelectedVehicleFilter({
-      id: "",
-      name: "",
-      action: "INCLUDE",
-      vehicles: []
-    });
+  const toggleNew = () => {
+    if (isNew) {
+      props.setSelectedVehicleFilter(null);
+    } else {
+      props.setSelectedVehicleFilter({
+        id: null,
+        name: "",
+        action: "INCLUDE",
+        vehicles: []
+      });
+    }
     setSaveStatus(SaveStatus.NONE);
+    setIsNew(!isNew);
   };
+
+  useEffect(() => {
+    if (!!props.vehicleFilter && !!props.vehicleFilter.id) {
+      setIsNew(false);
+    }
+  }, [props.vehicleFilter]);
+
   return (
     <div>
       <div className={styles.header}>
         <h3>Vehicle Filters</h3>
-        <Button type="primary" onClick={newFilter}>
-          New
+        <Button type="primary" onClick={toggleNew}>
+          {isNew ? "Abort New" : "New"}
         </Button>
       </div>
-      <VehicleFilterPicker
-        identifier={props.vehicleFilter ? props.vehicleFilter.name : ""}
-        onSelect={filter => props.setSelectedVehicleFilter(filter)}
-      />
+      {isNew ? null : (
+        <VehicleFilterPicker
+          identifier={props.vehicleFilter ? props.vehicleFilter.name : ""}
+          onSelect={filter => props.setSelectedVehicleFilter(filter)}
+        />
+      )}
       {!!props.vehicleFilter ? (
         <VehicleFilterEditor
           del={del}
@@ -190,7 +208,8 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
         payload
       }),
     useUpdateVehicleFilter: () => useMutation(RULE_PAGE_UPDATE_VEHICLE_FILTER),
-    useDeleteVehicleFilter: () => useMutation(RULE_PAGE_DELETE_VEHICLE_FILTER)
+    useDeleteVehicleFilter: () => useMutation(RULE_PAGE_DELETE_VEHICLE_FILTER),
+    useCreateVehicleFilter: () => useMutation(RULE_PAGE_CREATE_VEHICLE_FILTER)
   };
 };
 

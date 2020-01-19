@@ -83,3 +83,12 @@ export const RULE_PAGE_DELETE_VEHICLE_FILTER = gql`
     }
   }
 `;
+
+export const RULE_PAGE_CREATE_VEHICLE_FILTER = gql`
+  mutation createVehicleFilter($input: VehicleFilterCreateInput!) {
+    createVehicleFilter(input: $input) {
+      ...VehicleFilterArgs
+    }
+  }
+  ${VEHICLE_FILTER_FRAGMENT}
+`;

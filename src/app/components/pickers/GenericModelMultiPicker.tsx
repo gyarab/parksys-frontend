@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { stylesheet } from "typestyle";
 import { useLazyQuery } from "@apollo/react-hooks";
 import { Button } from "../Button";
+import { FetchPolicy } from "apollo-client";
 
 const styles = stylesheet({
   multiModelPicker: {
@@ -90,6 +91,7 @@ interface IProps<T = any> {
   models: Array<T>;
   disabled?: boolean;
   initialSearch?: string;
+  fetchPolicy?: FetchPolicy;
 }
 
 const PopUpBody = ({
@@ -142,7 +144,10 @@ export const GenericModelMultiPicker = <T extends unknown = any>(
 ) => (props: IProps<T>) => {
   const disabled = props.disabled || false;
   const [loadGql, { data, loading, called, error }] = useLazyQuery(
-    gProps.QUERY
+    gProps.QUERY,
+    {
+      fetchPolicy: props.fetchPolicy
+    }
   );
   // This value differs from props.licensePlate when the input is focused
   const [searchQuery, setSearchQuery] = useState(props.initialSearch || "");
@@ -266,11 +271,13 @@ export const useGenericMultiPickerFromMultiPicker = <T extends unknown = any>(
   return ({
     initialModels,
     initialSearch,
-    disabled
+    disabled,
+    fetchPolicy
   }: {
     initialModels?: Array<T>;
     initialSearch?: string;
     disabled?: boolean;
+    fetchPolicy?: FetchPolicy;
   }) => {
     // If initialModels is provided it must be copied so that the original
     // is not edited accidentally which can cause bugs
@@ -288,6 +295,7 @@ export const useGenericMultiPickerFromMultiPicker = <T extends unknown = any>(
         }}
         onClear={() => setModels([])}
         disabled={disabled || false}
+        fetchPolicy={fetchPolicy}
       />
     );
     return [render, models, setModels];
