@@ -21,9 +21,6 @@ export interface IDispatchToProps {
 export interface IProps extends IStateToProps, IDispatchToProps {}
 
 const styles = stylesheet({
-  simulationOptions: {
-    padding: "0.5em"
-  },
   pickers: {
     display: "grid",
     gridTemplateColumns: "repeat(2, auto)",
@@ -47,7 +44,7 @@ const styles = stylesheet({
 const ParkingRuleAssignmentSimulationOptions = (props: IProps) => {
   const disabled = !props.ruleAssignmentSimulation.on;
   return (
-    <div className={styles.simulationOptions}>
+    <div>
       <div className={styles.header}>
         <h3>Simulation</h3>
         <TwoPicker

@@ -14,6 +14,7 @@ import { SET_SELECTED_DAY } from "../redux/modules/rulePageActionCreators";
 import { ParkingRuleAssignmentSimulationOptions } from "../components/parkingRuleAssignment/ParkingRuleAssignmentSimulationOptions";
 import { stylesheet } from "typestyle";
 import { IRulePageStateSimulation } from "../redux/modules/rulePageModule";
+import { VehicleFilterWidget } from "../components/VehicleFilterEditor";
 
 export interface IStateToProps {
   selectedDay: string;
@@ -29,12 +30,25 @@ export interface IDispatchToProps {
 export interface IProps extends IStateToProps, IDispatchToProps {}
 
 const styles = stylesheet({
-  simulationOptionsContainer: {
+  optionsWidget: {
     maxWidth: "21.2em",
     border: "1px solid #CCC",
-    marginTop: "1em"
+    marginTop: "1em",
+    padding: "0.5em"
+  },
+  widgetContainer: {
+    display: "flex",
+    $nest: {
+      "> div": {
+        margin: "1em 0.6em 0.8em 0.6em"
+      }
+    }
   }
 });
+
+const OptionsWidget = (props: { children: any }) => {
+  return <div className={styles.optionsWidget}>{props.children}</div>;
+};
 
 const RulePage = (props: IProps) => {
   const [queryVariables, setQueryVariables] = useState<any>({
@@ -89,8 +103,13 @@ const RulePage = (props: IProps) => {
                 : null
             }
           />
-          <div className={styles.simulationOptionsContainer}>
-            <ParkingRuleAssignmentSimulationOptions />
+          <div className={styles.widgetContainer}>
+            <OptionsWidget>
+              <ParkingRuleAssignmentSimulationOptions />
+            </OptionsWidget>
+            <OptionsWidget>
+              <VehicleFilterWidget />
+            </OptionsWidget>
           </div>
         </div>
       )}

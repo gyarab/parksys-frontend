@@ -129,10 +129,10 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
   };
 
   const [rulesPicker, rules, setRules] = useRuleMultiPicker({
-    initialModels: new Array(...props.assignment.rules)
+    initialModels: props.assignment.rules
   });
   const [filtersPicker, filters, setFilters] = useVehicleFilterMultiPicker({
-    initialModels: new Array(...props.assignment.vehicleFilters)
+    initialModels: props.assignment.vehicleFilters
   });
   const [
     activePicker,

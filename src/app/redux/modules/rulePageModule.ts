@@ -4,7 +4,8 @@ import {
   SET_SELECTED_DAY,
   SET_COLLIDING_RULE_ASSIGNMENTS,
   CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS,
-  CHANGE_OPENED_NEW_RULE_ASSIGNMENT
+  CHANGE_OPENED_NEW_RULE_ASSIGNMENT,
+  SET_VEHICLE_FILTER
 } from "./rulePageActionCreators";
 import moment = require("moment");
 
@@ -29,6 +30,12 @@ export interface IRulePageState {
   };
   collidingRuleAssignments: Set<string>;
   ruleAssignmentSimulation: IRulePageStateSimulation;
+  selectedVehicleFilter?: {
+    id: string;
+    action: string;
+    name: string;
+    vehicles: string[];
+  };
 }
 
 const defaultSelectedDay = () => new Date().toISOString().slice(0, 10);
@@ -50,7 +57,8 @@ export const initialState: IRulePageState = {
       .startOf("hour")
       .toDate(),
     vehicle: null
-  }
+  },
+  selectedVehicleFilter: null
 };
 
 export function rulePageReducer(
@@ -98,6 +106,16 @@ export function rulePageReducer(
           ...state.ruleAssignmentSimulation,
           ...action.payload
         }
+      };
+    case SET_VEHICLE_FILTER:
+      return {
+        ...state,
+        selectedVehicleFilter: !!action.payload
+          ? {
+              ...state.selectedVehicleFilter,
+              ...action.payload // Partial
+            }
+          : null
       };
     default:
       return state;

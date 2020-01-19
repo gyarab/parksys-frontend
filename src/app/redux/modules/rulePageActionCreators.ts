@@ -44,9 +44,16 @@ export interface ChangeOpenedNewRuleAssignment {
   payload: IRulePageState["openedRuleAssignment"]["new"];
 }
 
+export const SET_VEHICLE_FILTER = "RULE_PAGE/SET_VEHICLE_FILTER";
+export interface SetVehicleFilter {
+  type: typeof SET_VEHICLE_FILTER;
+  payload: Partial<IRulePageState["selectedVehicleFilter"]> | null;
+}
+
 export type RulePageActionTypes =
   | ChangeOpenedRuleAssignment
   | SetSelectedDay
   | SetCollidingRuleAssignments
   | ChangeSimulateRuleAssignmentsOptions
-  | ChangeOpenedNewRuleAssignment;
+  | ChangeOpenedNewRuleAssignment
+  | SetVehicleFilter;

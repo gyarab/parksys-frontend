@@ -272,7 +272,11 @@ export const useGenericMultiPickerFromMultiPicker = <T extends unknown = any>(
     initialSearch?: string;
     disabled?: boolean;
   }) => {
-    const [models, setModels] = useState<any | null>(initialModels || []);
+    // If initialModels is provided it must be copied so that the original
+    // is not edited accidentally which can cause bugs
+    const [models, setModels] = useState<any | null>(
+      !!initialModels ? [...initialModels] : []
+    );
     const render = (
       <PickerInstance
         models={models}

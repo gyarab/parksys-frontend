@@ -77,6 +77,10 @@ export const VEHICLE_FILTER_PICKER_SEARCH_QUERY = gql`
         id
         name
         action
+        vehicles {
+          id
+          licensePlate
+        }
       }
     }
   }
