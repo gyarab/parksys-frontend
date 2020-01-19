@@ -8,7 +8,8 @@ import { useMutation, MutationTuple } from "@apollo/react-hooks";
 import { Dispatch } from "redux";
 import {
   RULE_PAGE_UPDATE_RULE_ASSIGNMENT_MUTATION,
-  RULE_PAGE_CREATE_RULE_ASSIGNMENT_MUTATION
+  RULE_PAGE_CREATE_RULE_ASSIGNMENT_MUTATION,
+  RULE_PAGE_DELETE_RULE_ASSIGNMENT_MUTATION
 } from "../../constants/Mutations";
 import { SET_COLLIDING_RULE_ASSIGNMENTS } from "../../redux/modules/rulePageActionCreators";
 import { useRuleMultiPicker } from "../pickers/RulePicker";
@@ -33,7 +34,7 @@ const styles = stylesheet({
   },
   controls: {
     display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
+    gridTemplateColumns: "repeat(4, 1fr)",
     gridColumnGap: "0.3em",
     marginBottom: "0.5em",
     $nest: {
@@ -72,6 +73,7 @@ export interface IDispatchToProps {
     { input: any }
   >;
   setCollidingRuleAssignments: (ids: Array<string>) => void;
+  useDeleteRuleAssignment: () => MutationTuple<{}, { id: string }>;
 }
 
 export interface IProps extends IDispatchToProps {
@@ -171,6 +173,7 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
 
   const [updateEffect] = props.useUpdateRuleAssignment();
   const [createEffect] = props.useCreateRuleAssignment();
+  const [deleteEffect] = props.useDeleteRuleAssignment();
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(SaveStatus.NONE);
   const close = () => {
     if (saveStatus !== SaveStatus.SAVING) props.close();
@@ -209,9 +212,26 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
         setSaveStatus(SaveStatus.FAILED);
       });
   };
+  const del = () => {
+    deleteEffect({
+      variables: {
+        id: props.assignment.id
+      }
+    }).then(({ data }) => {
+      props.setCollidingRuleAssignments([]);
+      close();
+    });
+  };
   return (
     <div className={styles.details}>
       <div className={styles.controls}>
+        <Button
+          disabled={isNew || saveStatus === SaveStatus.SAVING}
+          onClick={del}
+          type="negative"
+        >
+          Delete
+        </Button>
         <Button
           disabled={
             saveStatus === SaveStatus.SAVING ||
@@ -264,7 +284,9 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
       dispatch({
         type: SET_COLLIDING_RULE_ASSIGNMENTS,
         payload: { collidingRuleAssignments: ids }
-      })
+      }),
+    useDeleteRuleAssignment: () =>
+      useMutation(RULE_PAGE_DELETE_RULE_ASSIGNMENT_MUTATION)
   };
 };
 

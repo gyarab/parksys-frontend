@@ -192,7 +192,7 @@ const ParkingRuleAssignmentRow = ({
             assignment={{
               start,
               end,
-              priority,
+              priority: Math.max(1, priority),
               vehicleFilterMode: "ALL",
               vehicleFilters: [],
               rules: [],

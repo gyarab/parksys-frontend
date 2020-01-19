@@ -55,3 +55,11 @@ export const RULE_PAGE_CREATE_RULE_ASSIGNMENT_MUTATION = gql`
   }
   ${PARKING_RULE_ASSIGNMENT_FRAGMENT}
 `;
+
+export const RULE_PAGE_DELETE_RULE_ASSIGNMENT_MUTATION = gql`
+  mutation deleteRuleAssignment($id: ID!) {
+    deleteParkingRuleAssignment(id: $id) {
+      id
+    }
+  }
+`;
