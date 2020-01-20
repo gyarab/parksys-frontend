@@ -47,7 +47,7 @@ const styles = stylesheet({
   header: {
     marginBottom: "0.5em",
     display: "grid",
-    gridTemplateColumns: "1fr 3fr",
+    gridTemplateColumns: "2fr 3fr",
     alignItems: "center",
     justifyItems: "right",
     $nest: {
@@ -69,7 +69,13 @@ const styles = stylesheet({
   }
 });
 
-export const VehicleFilterEditor = ({ filter, del, save, saveStatus }) => {
+export const VehicleFilterEditor = ({
+  filter,
+  del,
+  save,
+  saveStatus,
+  isNew
+}) => {
   const [actionPicker, { textValue: action }] = useTwoPicker(
     "EXCLUDE",
     "INCLUDE",
@@ -95,7 +101,7 @@ export const VehicleFilterEditor = ({ filter, del, save, saveStatus }) => {
       </div>
 
       <div className={styles.controls}>
-        <Button onClick={() => del()} type="negative">
+        <Button onClick={() => del()} type="negative" disabled={isNew}>
           Delete
         </Button>
         <Button
@@ -188,6 +194,7 @@ const VehicleFilterWidget = (props: IProps) => {
           save={save}
           saveStatus={saveStatus}
           filter={props.vehicleFilter}
+          isNew={isNew}
         />
       ) : null}
     </div>
