@@ -12,7 +12,7 @@ import {
   RULE_PAGE_DELETE_RULE_ASSIGNMENT_MUTATION
 } from "../../constants/Mutations";
 import { SET_COLLIDING_RULE_ASSIGNMENTS } from "../../redux/modules/rulePageActionCreators";
-import { useRuleMultiPicker } from "../pickers/RulePicker";
+import { useParkingRuleMultiPicker } from "../pickers/ParkingRulePicker";
 import { useVehicleFilterMultiPicker } from "../pickers/VehicleFilterPicker";
 import SaveStatus from "../../constants/SaveStatus";
 
@@ -122,7 +122,7 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
     }
   };
 
-  const [rulesPicker, rules, setRules] = useRuleMultiPicker({
+  const [rulesPicker, rules, setRules] = useParkingRuleMultiPicker({
     initialModels: props.assignment.rules
   });
   const [filtersPicker, filters, setFilters] = useVehicleFilterMultiPicker({

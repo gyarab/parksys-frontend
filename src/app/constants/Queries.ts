@@ -1,7 +1,8 @@
 import gql from "graphql-tag";
 import {
   PARKING_RULE_ASSIGNMENT_FRAGMENT,
-  VEHICLE_FILTER_FRAGMENT
+  VEHICLE_FILTER_FRAGMENT,
+  PARKING_RULE_FRAGMENT
 } from "./Fragments";
 
 export const RULE_PAGE_FETCH_PARKING_RULE_ASSIGNMENT_QUERY = gql`
@@ -82,4 +83,15 @@ export const VEHICLE_FILTER_PICKER_SEARCH_QUERY = gql`
     }
   }
   ${VEHICLE_FILTER_FRAGMENT}
+`;
+
+export const PARKING_RULE_SEARCH_QUERY = gql`
+  query parkingRuleSearch($name: String!) {
+    parkingRuleSearch(search: { name: $name }) {
+      date {
+        ...ParkingRuleArgs
+      }
+    }
+  }
+  ${PARKING_RULE_FRAGMENT}
 `;

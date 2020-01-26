@@ -50,10 +50,17 @@ export interface SetVehicleFilter {
   payload: Partial<IRulePageState["selectedVehicleFilter"]> | null;
 }
 
+export const SET_PARKING_RULE = "RULE_PAGE/SET_PARKING_RULE";
+export interface SetParkingRule {
+  type: typeof SET_PARKING_RULE;
+  payload: Partial<IRulePageState["selectedParkingRule"]>;
+}
+
 export type RulePageActionTypes =
   | ChangeOpenedRuleAssignment
   | SetSelectedDay
   | SetCollidingRuleAssignments
   | ChangeSimulateRuleAssignmentsOptions
   | ChangeOpenedNewRuleAssignment
-  | SetVehicleFilter;
+  | SetVehicleFilter
+  | SetParkingRule;

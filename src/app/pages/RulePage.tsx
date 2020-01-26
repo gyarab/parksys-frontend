@@ -15,6 +15,7 @@ import { ParkingRuleAssignmentSimulationOptions } from "../components/parkingRul
 import { stylesheet } from "typestyle";
 import { IRulePageStateSimulation } from "../redux/modules/rulePageModule";
 import { VehicleFilterWidget } from "../components/VehicleFilterEditor";
+import { ParkingRuleWidget } from "../components/ParkingRuleEditor";
 
 export interface IStateToProps {
   selectedDay: string;
@@ -109,6 +110,9 @@ const RulePage = (props: IProps) => {
             </OptionsWidget>
             <OptionsWidget>
               <VehicleFilterWidget />
+            </OptionsWidget>
+            <OptionsWidget>
+              <ParkingRuleWidget />
             </OptionsWidget>
           </div>
         </div>

@@ -12,19 +12,19 @@ const renderModel = model => <>{model.name}</>;
 const identifierToOptions = name => ({ variables: { name } });
 const modelToIdentifier = model => model.name;
 
-export const RulePicker = GenericModelPicker({
+export const ParkingRulePicker = GenericModelPicker({
   QUERY,
   arrayGetter,
   renderModel,
   identifierToOptions
 });
 
-export const useRulePicker = useGenericPickerFromPicker(
-  RulePicker,
+export const useParkingRulePicker = useGenericPickerFromPicker(
+  ParkingRulePicker,
   modelToIdentifier
 );
 
-export const useRuleMultiPicker = useGenericMultiPicker({
+export const useParkingRuleMultiPicker = useGenericMultiPicker({
   QUERY,
   arrayGetter,
   renderModel,

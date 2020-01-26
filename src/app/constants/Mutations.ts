@@ -1,9 +1,11 @@
 import gql from "graphql-tag";
 import {
   PARKING_RULE_ASSIGNMENT_FRAGMENT,
-  VEHICLE_FILTER_FRAGMENT
+  VEHICLE_FILTER_FRAGMENT,
+  PARKING_RULE_FRAGMENT
 } from "./Fragments";
 
+// Device
 export const DEVICE_PAGE_CREATE_DEVICE_MUTATION = gql`
   mutation createDevice($name: String!) {
     createDevice(input: { name: $name }) {
@@ -22,6 +24,7 @@ export const DEVICE_PAGE_DELETE_DEVICE_MUTATION = gql`
   }
 `;
 
+// ParkingRuleAssignment
 export const RULE_PAGE_UPDATE_RULE_ASSIGNMENT_MUTATION = gql`
   mutation updateRuleAssignment(
     $id: ID!
@@ -67,9 +70,19 @@ export const RULE_PAGE_DELETE_RULE_ASSIGNMENT_MUTATION = gql`
   }
 `;
 
+// VehicleFilter
 export const RULE_PAGE_UPDATE_VEHICLE_FILTER = gql`
   mutation updateVehicleFilter($id: ID!, $input: VehicleFilterUpdateInput!) {
     updateVehicleFilter(id: $id, input: $input) {
+      ...VehicleFilterArgs
+    }
+  }
+  ${VEHICLE_FILTER_FRAGMENT}
+`;
+
+export const RULE_PAGE_CREATE_VEHICLE_FILTER = gql`
+  mutation createVehicleFilter($input: VehicleFilterCreateInput!) {
+    createVehicleFilter(input: $input) {
       ...VehicleFilterArgs
     }
   }
@@ -84,11 +97,29 @@ export const RULE_PAGE_DELETE_VEHICLE_FILTER = gql`
   }
 `;
 
-export const RULE_PAGE_CREATE_VEHICLE_FILTER = gql`
-  mutation createVehicleFilter($input: VehicleFilterCreateInput!) {
-    createVehicleFilter(input: $input) {
-      ...VehicleFilterArgs
+// ParkingRule
+export const RULE_PAGE_UPDATE_PARKING_RULE = gql`
+  mutation updateVehicleFilter($id: ID!, $input: ParkingRuleUpdateInput!) {
+    updateParkingRule(id: $id, input: $input) {
+      ...ParkingRuleArgs
     }
   }
-  ${VEHICLE_FILTER_FRAGMENT}
+  ${PARKING_RULE_FRAGMENT}
+`;
+
+export const RULE_PAGE_CREATE_PARKING_RULE = gql`
+  mutation createParkingRule($input: ParkingRuleCreateInput!) {
+    createParkingRule(input: $input) {
+      ...ParkingRuleArgs
+    }
+  }
+  ${PARKING_RULE_FRAGMENT}
+`;
+
+export const RULE_PAGE_DELETE_PARKING_RULE = gql`
+  mutation deleteParkingRule($id: ID!) {
+    deleteParkingRule(id: $id) {
+      id
+    }
+  }
 `;

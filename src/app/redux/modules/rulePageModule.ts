@@ -5,7 +5,8 @@ import {
   SET_COLLIDING_RULE_ASSIGNMENTS,
   CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS,
   CHANGE_OPENED_NEW_RULE_ASSIGNMENT,
-  SET_VEHICLE_FILTER
+  SET_VEHICLE_FILTER,
+  SET_PARKING_RULE
 } from "./rulePageActionCreators";
 import moment = require("moment");
 
@@ -36,6 +37,12 @@ export interface IRulePageState {
     name: string;
     vehicles: string[];
   };
+  selectedParkingRule?: {
+    id: string;
+    name: string;
+    __typename: string;
+    typeSpecific: object;
+  };
 }
 
 const defaultSelectedDay = () => new Date().toISOString().slice(0, 10);
@@ -58,7 +65,8 @@ export const initialState: IRulePageState = {
       .toDate(),
     vehicle: null
   },
-  selectedVehicleFilter: null
+  selectedVehicleFilter: null,
+  selectedParkingRule: null
 };
 
 export function rulePageReducer(
@@ -114,6 +122,16 @@ export function rulePageReducer(
           ? {
               ...state.selectedVehicleFilter,
               ...action.payload // Partial
+            }
+          : null
+      };
+    case SET_PARKING_RULE:
+      return {
+        ...state,
+        selectedParkingRule: !!action.payload
+          ? {
+              ...state.selectedParkingRule,
+              ...action.payload
             }
           : null
       };

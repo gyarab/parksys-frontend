@@ -1,5 +1,32 @@
 import gql from "graphql-tag";
 
+export const VEHICLE_FILTER_FRAGMENT = gql`
+  fragment VehicleFilterArgs on VehicleFilter {
+    id
+    name
+    action
+    vehicles {
+      id
+      licensePlate
+    }
+  }
+`;
+
+export const PARKING_RULE_FRAGMENT = gql`
+  fragment ParkingRuleArgs on ParkingRule {
+    id
+    name
+    __typename
+    ... on ParkingRulePermitAccess {
+      permit
+    }
+    ... on ParkingRuleTimedFee {
+      centsPerUnitTime
+      unitTime
+    }
+  }
+`;
+
 export const PARKING_RULE_ASSIGNMENT_FRAGMENT = gql`
   fragment ParkingRuleAssignmentArgs on ParkingRuleAssignment {
     id
@@ -14,28 +41,8 @@ export const PARKING_RULE_ASSIGNMENT_FRAGMENT = gql`
       action
     }
     rules {
-      id
-      name
-      __typename
-      ... on ParkingRulePermitAccess {
-        permit
-      }
-      ... on ParkingRuleTimedFee {
-        centsPerUnitTime
-        unitTime
-      }
+      ...ParkingRuleArgs
     }
   }
-`;
-
-export const VEHICLE_FILTER_FRAGMENT = gql`
-  fragment VehicleFilterArgs on VehicleFilter {
-    id
-    name
-    action
-    vehicles {
-      id
-      licensePlate
-    }
-  }
+  ${PARKING_RULE_FRAGMENT}
 `;
