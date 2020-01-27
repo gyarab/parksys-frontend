@@ -14,8 +14,8 @@ import { SET_SELECTED_DAY } from "../redux/modules/rulePageActionCreators";
 import { ParkingRuleAssignmentSimulationOptions } from "../components/parkingRuleAssignment/ParkingRuleAssignmentSimulationOptions";
 import { stylesheet } from "typestyle";
 import { IRulePageStateSimulation } from "../redux/modules/rulePageModule";
-import { VehicleFilterWidget } from "../components/VehicleFilterEditor";
-import { ParkingRuleWidget } from "../components/ParkingRuleEditor";
+import { VehicleFilterWidget } from "../components/editors/VehicleFilterEditor";
+import { ParkingRuleWidget } from "../components/editors/ParkingRuleEditor";
 
 export interface IStateToProps {
   selectedDay: string;
@@ -144,7 +144,8 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
           .toString()
       };
       return useQuery(RULE_PAGE_FETCH_PARKING_RULE_ASSIGNMENT_QUERY, {
-        variables: filter2 || {}
+        variables: filter2 || {},
+        fetchPolicy: "no-cache"
       });
     },
     setSelectedDay: newDay =>

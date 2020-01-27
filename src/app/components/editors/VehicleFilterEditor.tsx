@@ -1,36 +1,38 @@
 import React, { useState, useEffect } from "react";
-import { VehicleFilterPicker } from "./pickers/VehicleFilterPicker";
-import { useTwoPicker } from "./pickers/TwoPicker";
+import {
+  useVehicleFilterPicker,
+  VehicleFilterPicker
+} from "../pickers/VehicleFilterPicker";
+import { useTwoPicker } from "../pickers/TwoPicker";
 import { stylesheet } from "typestyle";
-import { Input } from "./Input";
-import { useVehicleMultiPicker } from "./pickers/VehiclePicker";
+import { Input } from "../Input";
+import { useVehicleMultiPicker } from "../pickers/VehiclePicker";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import {
-  SET_PARKING_RULE,
-  SetParkingRule
-} from "../redux/modules/rulePageActionCreators";
-import { IRulePageState } from "../redux/modules/rulePageModule";
-import { IStore } from "../redux/IStore";
-import { Button } from "./Button";
-import SaveStatus from "../constants/SaveStatus";
+  SET_VEHICLE_FILTER,
+  SetVehicleFilter
+} from "../../redux/modules/rulePageActionCreators";
+import { IRulePageState } from "../../redux/modules/rulePageModule";
+import { IStore } from "../../redux/IStore";
+import { Button } from "../Button";
+import SaveStatus from "../../constants/SaveStatus";
 import { useMutation, MutationTuple } from "@apollo/react-hooks";
-import { ParkingRulePicker } from "./pickers/ParkingRulePicker";
 import {
   RULE_PAGE_UPDATE_PARKING_RULE,
-  RULE_PAGE_CREATE_PARKING_RULE,
-  RULE_PAGE_DELETE_PARKING_RULE
-} from "../constants/Mutations";
+  RULE_PAGE_DELETE_VEHICLE_FILTER,
+  RULE_PAGE_CREATE_VEHICLE_FILTER
+} from "../../constants/Mutations";
 
 export interface IStateToProps {
-  parkingRule: IRulePageState["selectedParkingRule"];
+  vehicleFilter: IRulePageState["selectedVehicleFilter"];
 }
 
 export interface IDispatchToProps {
-  setSelectedParkingRule: (payload: SetParkingRule["payload"]) => void;
-  useUpdateParkingRule: () => MutationTuple<any, { id: string; input: any }>;
-  useDeleteParkingRule: () => MutationTuple<any, { id: string }>;
-  useCreateParkingRule: () => MutationTuple<any, { input: any }>;
+  setSelectedVehicleFilter: (payload: SetVehicleFilter["payload"]) => void;
+  useUpdateVehicleFilter: () => MutationTuple<any, { id: string; input: any }>;
+  useDeleteVehicleFilter: () => MutationTuple<any, { id: string }>;
+  useCreateVehicleFilter: () => MutationTuple<any, { input: any }>;
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
@@ -67,24 +69,47 @@ const styles = stylesheet({
   }
 });
 
-// TODO: Type specific fields
-export const ParkingRuleEditor = ({ filter, del, save, saveStatus, isNew }) => {
+export const VehicleFilterEditor = ({
+  filter,
+  del,
+  save,
+  saveStatus,
+  isNew
+}) => {
+  const [actionPicker, { textValue: action }] = useTwoPicker(
+    "EXCLUDE",
+    "INCLUDE",
+    filter.action === "INCLUDE"
+  );
   const [name, setName] = useState(filter.name);
+  const [vehicleMultiPicker, vehicles] = useVehicleMultiPicker({
+    initialModels: filter.vehicles
+  });
   return (
     <div>
       <div className={styles.pickers}>
+        <span>Action</span>
+        {actionPicker}
         <span>Name</span>
         <Input
           type="text"
           value={name}
           onChange={e => setName(e.target["value"])}
         />
+        <span>Vehicles</span>
+        {vehicleMultiPicker}
       </div>
+
       <div className={styles.controls}>
         <Button onClick={() => del()} type="negative" disabled={isNew}>
           Delete
         </Button>
-        <Button onClick={() => save({ name })} type="positive">
+        <Button
+          onClick={() =>
+            save({ name, action, vehicles: vehicles.map(v => v.id) })
+          }
+          type="positive"
+        >
           {saveStatus}
         </Button>
       </div>
@@ -92,16 +117,16 @@ export const ParkingRuleEditor = ({ filter, del, save, saveStatus, isNew }) => {
   );
 };
 
-const ParkingRuleWidget = (props: IProps) => {
+const VehicleFilterWidget = (props: IProps) => {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(SaveStatus.NONE);
   const [isNew, setIsNew] = useState<boolean>(false);
-  const [updateEffect] = props.useUpdateParkingRule();
-  const [deleteEffect] = props.useDeleteParkingRule();
-  const [createEffect] = props.useCreateParkingRule();
+  const [updateEffect] = props.useUpdateVehicleFilter();
+  const [deleteEffect] = props.useDeleteVehicleFilter();
+  const [createEffect] = props.useCreateVehicleFilter();
 
   const onSuccess = ({ data, errors }) => {
     setSaveStatus(SaveStatus.NONE);
-    props.setSelectedParkingRule(null);
+    props.setSelectedVehicleFilter(null);
     setIsNew(false);
   };
   const onFailed = err => {
@@ -114,7 +139,7 @@ const ParkingRuleWidget = (props: IProps) => {
       ? createEffect({ variables: { input: obj } })
       : updateEffect({
           variables: {
-            id: props.parkingRule.id,
+            id: props.vehicleFilter.id,
             input: obj
           }
         });
@@ -123,20 +148,20 @@ const ParkingRuleWidget = (props: IProps) => {
   const del = () => {
     setSaveStatus(SaveStatus.SAVING);
     deleteEffect({
-      variables: { id: props.parkingRule.id }
+      variables: { id: props.vehicleFilter.id }
     })
       .then(onSuccess)
       .catch(onFailed);
   };
   const toggleNew = () => {
     if (isNew) {
-      props.setSelectedParkingRule(null);
+      props.setSelectedVehicleFilter(null);
     } else {
-      props.setSelectedParkingRule({
+      props.setSelectedVehicleFilter({
         id: null,
         name: "",
-        __typename: null,
-        typeSpecific: {}
+        action: "INCLUDE",
+        vehicles: []
       });
     }
     setSaveStatus(SaveStatus.NONE);
@@ -144,31 +169,31 @@ const ParkingRuleWidget = (props: IProps) => {
   };
 
   useEffect(() => {
-    if (!!props.parkingRule && !!props.parkingRule.id) {
+    if (!!props.vehicleFilter && !!props.vehicleFilter.id) {
       setIsNew(false);
     }
-  }, [props.parkingRule]);
+  }, [props.vehicleFilter]);
 
   return (
     <div>
       <div className={styles.header}>
-        <h3>Parking Rules</h3>
+        <h3>Vehicle Filters</h3>
         <Button type="primary" onClick={toggleNew}>
           {isNew ? "Abort New" : "New"}
         </Button>
       </div>
       {isNew ? null : (
-        <ParkingRulePicker
-          identifier={props.parkingRule ? props.parkingRule.name : ""}
-          onSelect={filter => props.setSelectedParkingRule(filter)}
+        <VehicleFilterPicker
+          identifier={props.vehicleFilter ? props.vehicleFilter.name : ""}
+          onSelect={filter => props.setSelectedVehicleFilter(filter)}
         />
       )}
-      {!!props.parkingRule ? (
-        <ParkingRuleEditor
+      {!!props.vehicleFilter ? (
+        <VehicleFilterEditor
           del={del}
           save={save}
           saveStatus={saveStatus}
-          filter={props.parkingRule}
+          filter={props.vehicleFilter}
           isNew={isNew}
         />
       ) : null}
@@ -178,29 +203,29 @@ const ParkingRuleWidget = (props: IProps) => {
 
 const mapStateToProps = (store: Pick<IStore, "rulePage">): IStateToProps => {
   return {
-    parkingRule: store.rulePage.selectedParkingRule
+    vehicleFilter: store.rulePage.selectedVehicleFilter
   };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
-    setSelectedParkingRule: payload =>
+    setSelectedVehicleFilter: payload =>
       dispatch({
-        type: SET_PARKING_RULE,
+        type: SET_VEHICLE_FILTER,
         payload
       }),
-    useUpdateParkingRule: () => useMutation(RULE_PAGE_UPDATE_PARKING_RULE),
-    useDeleteParkingRule: () => useMutation(RULE_PAGE_DELETE_PARKING_RULE),
-    useCreateParkingRule: () => useMutation(RULE_PAGE_CREATE_PARKING_RULE)
+    useUpdateVehicleFilter: () => useMutation(RULE_PAGE_UPDATE_PARKING_RULE),
+    useDeleteVehicleFilter: () => useMutation(RULE_PAGE_DELETE_VEHICLE_FILTER),
+    useCreateVehicleFilter: () => useMutation(RULE_PAGE_CREATE_VEHICLE_FILTER)
   };
 };
 
 const connected = connect(
   mapStateToProps,
   mapDispatchToProps
-)(ParkingRuleWidget);
+)(VehicleFilterWidget);
 
 export {
-  connected as ParkingRuleWidget,
-  ParkingRuleWidget as UnconnectedParkingRuleWdiget
+  connected as VehicleFilterWidget,
+  VehicleFilterWidget as UnconnectedVehicleFilterWdiget
 };
