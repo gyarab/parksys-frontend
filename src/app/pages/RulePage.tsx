@@ -84,8 +84,8 @@ const RulePage = (props: IProps) => {
         onChange={values => {
           props.setSelectedDay(values.day);
           setQueryVariables(values);
+          refetch();
         }}
-        onSubmit={refetch}
         values={queryVariables}
       />
       <hr />
