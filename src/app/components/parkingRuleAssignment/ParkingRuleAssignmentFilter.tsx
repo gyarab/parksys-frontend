@@ -1,4 +1,5 @@
 import React from "react";
+import { OptionPicker, EMPTY } from "../pickers/OptionPicker";
 
 export interface IValues {
   day?: string;
@@ -12,8 +13,6 @@ export interface IProps {
   initialValues?: (values: IValues) => void;
 }
 
-const undefinedStr = "```";
-
 export const ParkingRuleAssignmentFilter = (props: IProps) => {
   const onSubmit = e => {
     e.preventDefault();
@@ -24,10 +23,13 @@ export const ParkingRuleAssignmentFilter = (props: IProps) => {
       ...props.values,
       [e.target.name]: e.target.value
     };
-    if (e.target.value === undefinedStr) {
+    if (e.target.value === EMPTY) {
       delete newValues[e.target.name];
     }
     props.onChange(newValues);
+  };
+  const onSelectorModeChange = ({ value, name }) => {
+    onChange({ target: { value, name } });
   };
 
   return (
@@ -35,15 +37,12 @@ export const ParkingRuleAssignmentFilter = (props: IProps) => {
       <form onSubmit={onSubmit}>
         <label>
           Vehicle Selector Mode
-          <select
-            onChange={onChange}
+          <OptionPicker
             name="vehicleSelectorMode"
-            value={props.values.vehicleSelectorMode}
-          >
-            <option value={undefinedStr}>-</option>
-            <option value="ALL">ALL</option>
-            <option value="NONE">NONE</option>
-          </select>
+            options={["ALL", "NONE", EMPTY]}
+            selectedOption={props.values.vehicleSelectorMode}
+            onChange={onSelectorModeChange}
+          />
         </label>
         <label>
           Day
