@@ -41,7 +41,11 @@ export interface IRulePageState {
     id: string;
     name: string;
     __typename: string;
-    typeSpecific: object;
+    // PermitAccess
+    permit?: boolean;
+    // TimedFee
+    centsPerUnitTime?: number;
+    unitTime?: string;
   };
 }
 

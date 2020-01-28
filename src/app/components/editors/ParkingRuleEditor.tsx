@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { VehicleFilterPicker } from "../pickers/VehicleFilterPicker";
-import { useTwoPicker } from "../pickers/TwoPicker";
-import { stylesheet } from "typestyle";
+import { TwoPicker } from "../pickers/TwoPicker";
+import { stylesheet, setStylesTarget } from "typestyle";
 import { Input } from "../Input";
-import { useVehicleMultiPicker } from "../pickers/VehiclePicker";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import {
@@ -22,6 +20,7 @@ import {
   RULE_PAGE_DELETE_PARKING_RULE
 } from "../../constants/Mutations";
 import { OptionPicker } from "../pickers/OptionPicker";
+import { NumberInput } from "../pickers/NumberInput";
 
 export interface IStateToProps {
   parkingRule: IRulePageState["selectedParkingRule"];
@@ -73,32 +72,77 @@ enum ParkingRuleTypes {
   ParkingRuleTimedFee = "ParkingRuleTimedFee"
 }
 
-const getTypeSpecificProps = (parkingRule: any): object => {
-  const clone = { ...parkingRule };
+const ParkingRulePermitAccessSpecific = ({ typeSpecific, setTypeSpecific }) => {
+  const { permit } = typeSpecific;
+  return (
+    <>
+      <span>Permit</span>
+      <TwoPicker
+        optionLeft="No"
+        optionRight="Yes"
+        rightIsSelected={permit}
+        onChange={value =>
+          setTypeSpecific({ ...typeSpecific, permit: value === "Yes" })
+        }
+      />
+    </>
+  );
+};
+
+const ParkingRuleTimedFeeSpecific = ({ typeSpecific, setTypeSpecific }) => {
+  const { unitTime, centsPerUnitTime } = typeSpecific;
+  const onChange = ({ name, value }) => {
+    setTypeSpecific({ ...typeSpecific, [name]: value });
+  };
+  return (
+    <>
+      <span>Time Unit</span>
+      <OptionPicker
+        options={["HOUR", "MINUTE"]}
+        selectedOption={unitTime}
+        name="unitTime"
+        onChange={onChange}
+      />
+      <span>Cents Per Unit Time</span>
+      <NumberInput
+        value={centsPerUnitTime}
+        onChange={value => onChange({ value, name: "centsPerUnitTime" })}
+      />
+    </>
+  );
+};
+
+const getTypeSpecific = rule => {
+  const clone = { ...rule };
+  delete clone.id;
   delete clone.name;
-  delete clone.type;
+  delete clone.__typename;
   return clone;
 };
 
 // TODO: Type specific fields
 export const ParkingRuleEditor = ({ rule, del, save, saveStatus, isNew }) => {
   const [name, setName] = useState(rule.name);
-  const [type, setType] = useState(rule.type);
-  const [typeSpecific, setTypeSpecific] = useState(getTypeSpecificProps(rule));
+  const [type, setType] = useState(rule.__typename);
+  const [typeSpecific, setTypeSpecific] = useState(getTypeSpecific(rule));
   return (
     <div>
       <div className={styles.pickers}>
-        <span>Type</span>
-        <OptionPicker
-          options={
-            type == null
-              ? ["select type", ...Object.values(ParkingRuleTypes)]
-              : Object.values(ParkingRuleTypes)
-          }
-          selectedOption={type || "select type"}
-          name={"_t"}
-          onChange={({ value }) => setType(value)}
-        />
+        {isNew ? (
+          <>
+            <span>Type</span>
+            <OptionPicker
+              options={
+                type == null
+                  ? ["select type", ...Object.values(ParkingRuleTypes)]
+                  : Object.values(ParkingRuleTypes)
+              }
+              selectedOption={type || "select type"}
+              name={"_t"}
+              onChange={({ value }) => setType(value)}
+            />
+          </>
+        ) : null}
         <span>Name</span>
         <Input
           type="text"
@@ -107,9 +151,15 @@ export const ParkingRuleEditor = ({ rule, del, save, saveStatus, isNew }) => {
         />
         {/* Other options are based on the specific type */}
         {type === ParkingRuleTypes.ParkingRulePermitAccess ? (
-          <div>HI</div>
+          <ParkingRulePermitAccessSpecific
+            typeSpecific={typeSpecific}
+            setTypeSpecific={setTypeSpecific}
+          />
         ) : type === ParkingRuleTypes.ParkingRuleTimedFee ? (
-          <div>BYE</div>
+          <ParkingRuleTimedFeeSpecific
+            typeSpecific={typeSpecific}
+            setTypeSpecific={setTypeSpecific}
+          />
         ) : null}
       </div>
       <div className={styles.controls}>
@@ -171,8 +221,7 @@ const ParkingRuleWidget = (props: IProps) => {
       props.setSelectedParkingRule({
         id: null,
         name: "",
-        __typename: null,
-        typeSpecific: {}
+        __typename: null
       });
     }
     setSaveStatus(SaveStatus.NONE);

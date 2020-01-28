@@ -15,6 +15,7 @@ import { SET_COLLIDING_RULE_ASSIGNMENTS } from "../../redux/modules/rulePageActi
 import { useParkingRuleMultiPicker } from "../pickers/ParkingRulePicker";
 import { useVehicleFilterMultiPicker } from "../pickers/VehicleFilterPicker";
 import SaveStatus from "../../constants/SaveStatus";
+import { useNumberInput } from "../pickers/NumberInput";
 
 const styles = stylesheet({
   options: {
@@ -110,17 +111,9 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
     { textValue: filterMode },
     { setTextValue: setFilterMode }
   ] = useTwoPicker("NONE", "ALL", props.assignment.vehicleFilterMode === "ALL");
-  const [priority, _setPriority] = useState<string | number>(
+  const [priorityInput, priority, setPriority] = useNumberInput(
     props.assignment.priority
   );
-  const setPriority = (value: string) => {
-    const numberValue = Number(value);
-    if (Number.isInteger(numberValue) && numberValue > 0) {
-      _setPriority(numberValue);
-    } else if (value.length === 0) {
-      _setPriority("");
-    }
-  };
 
   const [rulesPicker, rules, setRules] = useParkingRuleMultiPicker({
     initialModels: props.assignment.rules
@@ -249,14 +242,7 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
         <span>End</span>
         {endPicker}
         <span>Priority</span>
-        <div>
-          <input
-            style={{ width: "4em", float: "right" }}
-            type="text"
-            value={`${priority}`}
-            onChange={e => setPriority(e.target.value)}
-          />
-        </div>
+        <div>{priorityInput}</div>
         <span>Filter Mode</span>
         <div className="twoPickerContainer">{filterModePicker}</div>
         <span>Filters</span>
