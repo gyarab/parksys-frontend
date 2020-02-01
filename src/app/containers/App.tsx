@@ -20,6 +20,7 @@ import { LoginPage } from "../pages/LoginPage";
 import { DevicesPage } from "../pages/DevicesPage";
 import { RulePage } from "../pages/RulePage";
 import { UserPage } from "../pages/UserPage";
+import { StatisticsPage } from "../pages/StatisticsPage";
 
 setupCss();
 
@@ -50,7 +51,7 @@ class App extends React.Component<IStateToProps> {
       page: BlankPage
     },
     statisticsPage: {
-      page: BlankPage
+      page: StatisticsPage
     },
     rulesPage: {
       page: RulePage

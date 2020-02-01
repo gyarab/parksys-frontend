@@ -95,3 +95,13 @@ export const PARKING_RULE_SEARCH_QUERY = gql`
   }
   ${PARKING_RULE_FRAGMENT}
 `;
+
+export const STATS_PAGE_DAY_STATS_QUERY = gql`
+  query dayStats {
+    dayStats {
+      day
+      revenueCents
+      numParkingSessions
+    }
+  }
+`;
