@@ -43,7 +43,10 @@ function DayStatsChart({ inputData }) {
       numParkingSessions: 0
     });
     for (const { hour, data } of inputData) {
-      hourly[hour] = data;
+      hourly[hour] = {
+        numParkingSessions: data.numParkingSessions,
+        revenueCents: data.revenueCents / 100
+      };
     }
     return hourly;
   }, [inputData]);
@@ -90,8 +93,8 @@ function DayStatsChart({ inputData }) {
   return (
     <div
       style={{
-        width: "400px",
-        height: "300px"
+        width: "500px",
+        height: "400px"
       }}
     >
       <Chart data={data} axes={axes} options={options} tooltip />
