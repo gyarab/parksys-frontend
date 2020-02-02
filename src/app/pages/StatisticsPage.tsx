@@ -45,6 +45,16 @@ const styles = stylesheet({
 });
 
 const StatisticsPage = (props: IProps): JSX.Element => {
+  const { loading, error, data } = props.useFetchStats();
+  const [loadDetailed, { detailedData }] = props.useFetchDetailedStats();
+  const selectDay = day => {
+    props.setSelectedDay(day);
+    loadDetailed({
+      variables: {
+        day
+      }
+    });
+  };
   const columns = useMemo(
     () => [
       {
@@ -69,10 +79,7 @@ const StatisticsPage = (props: IProps): JSX.Element => {
             <>
               <Button
                 type="primary"
-                onClick={() =>
-                  props.selectedDay !== row.original.day &&
-                  props.setSelectedDay(row.original.day)
-                }
+                onClick={() => selectDay(row.original.day)}
               >
                 Show
               </Button>
@@ -83,8 +90,6 @@ const StatisticsPage = (props: IProps): JSX.Element => {
     ],
     []
   );
-  const { loading, error, data } = props.useFetchStats();
-  const [loadDetailed, { detailedData }] = props.useFetchDetailedStats();
   console.log(data);
   console.log(loadDetailed);
 

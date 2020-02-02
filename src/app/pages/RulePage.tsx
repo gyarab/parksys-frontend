@@ -16,6 +16,7 @@ import { stylesheet } from "typestyle";
 import { IRulePageStateSimulation } from "../redux/modules/rulePageModule";
 import { VehicleFilterWidget } from "../components/editors/VehicleFilterEditor";
 import { ParkingRuleWidget } from "../components/editors/ParkingRuleEditor";
+import { Color } from "../constants";
 
 export interface IStateToProps {
   selectedDay: string;
@@ -33,9 +34,10 @@ export interface IProps extends IStateToProps, IDispatchToProps {}
 const styles = stylesheet({
   optionsWidget: {
     maxWidth: "21.2em",
-    border: "1px solid #CCC",
+    border: `1px solid ${Color.LIGHT_GREY}`,
     marginTop: "1em",
-    padding: "0.5em"
+    padding: "0.5em",
+    borderRadius: "3px"
   },
   widgetContainer: {
     display: "flex",
