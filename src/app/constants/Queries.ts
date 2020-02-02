@@ -100,8 +100,25 @@ export const STATS_PAGE_DAY_STATS_QUERY = gql`
   query dayStats {
     dayStats {
       day
-      revenueCents
-      numParkingSessions
+      data {
+        revenueCents
+        numParkingSessions
+      }
+    }
+  }
+`;
+
+export const STATS_PAGE_DAY_HOURLY_QUERY = gql`
+  query dayHourlyStats($day: String!) {
+    dayStatsPerHour(day: $day) {
+      day
+      data {
+        hour
+        data {
+          revenueCents
+          numParkingSessions
+        }
+      }
     }
   }
 `;

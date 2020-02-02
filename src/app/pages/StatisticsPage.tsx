@@ -1,10 +1,13 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { stylesheet, classes } from "typestyle";
 import { IStore } from "../redux/IStore";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { useQuery, useLazyQuery } from "@apollo/react-hooks";
-import { STATS_PAGE_DAY_STATS_QUERY } from "../constants/Queries";
+import {
+  STATS_PAGE_DAY_STATS_QUERY,
+  STATS_PAGE_DAY_HOURLY_QUERY
+} from "../constants/Queries";
 import { DayStatsTable } from "../components/DayStatsTable";
 import { IStatsPageState } from "../redux/modules/statsPageModule";
 import { Color } from "../constants/Color";
@@ -45,8 +48,13 @@ const styles = stylesheet({
 });
 
 const StatisticsPage = (props: IProps): JSX.Element => {
-  const { loading, error, data } = props.useFetchStats();
-  const [loadDetailed, { detailedData }] = props.useFetchDetailedStats();
+  const { loading, data } = props.useFetchStats();
+  const [loadDetailed, { data: detailedData }] = props.useFetchDetailedStats();
+  // Detailed data is not cached or stored so this fetches is if needed
+  useEffect(() => {
+    if (!!props.selectedDay && !detailedData)
+      loadDetailed({ variables: { day: props.selectedDay } });
+  }, [props.selectedDay]);
   const selectDay = day => {
     props.setSelectedDay(day);
     loadDetailed({
@@ -65,12 +73,12 @@ const StatisticsPage = (props: IProps): JSX.Element => {
         Header: "Revenue",
         accessor: "revenueCents",
         Cell({ row }) {
-          return row.original.revenueCents / 100;
+          return row.original.data.revenueCents / 100;
         }
       },
       {
         Header: "# of sessions",
-        accessor: "numParkingSessions"
+        accessor: "data.numParkingSessions"
       },
       {
         Header: "Actions",
@@ -90,8 +98,7 @@ const StatisticsPage = (props: IProps): JSX.Element => {
     ],
     []
   );
-  console.log(data);
-  console.log(loadDetailed);
+  console.log(detailedData);
 
   return (
     <div className={styles.split}>
@@ -103,7 +110,10 @@ const StatisticsPage = (props: IProps): JSX.Element => {
         />
       </div>
       <div className={classes(styles.pane, styles.rightPane)}>
-        <DayStatsDetails day={props.selectedDay} />
+        <DayStatsDetails
+          day={props.selectedDay}
+          data={!!detailedData ? detailedData.dayStatsPerHour.data : []}
+        />
       </div>
     </div>
   );
@@ -121,7 +131,7 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
       dispatch({ type: CHANGE_SELECTED_DAY, payload: day }),
     // TODO: Fetch interval
     useFetchStats: () => useQuery(STATS_PAGE_DAY_STATS_QUERY),
-    useFetchDetailedStats: () => useLazyQuery(STATS_PAGE_DAY_STATS_QUERY)
+    useFetchDetailedStats: () => useLazyQuery(STATS_PAGE_DAY_HOURLY_QUERY)
   };
 };
 

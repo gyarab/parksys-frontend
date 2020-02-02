@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { stylesheet } from "typestyle";
 import { Color } from "../constants";
+import { Chart } from "react-charts";
 
 interface IProps {
   day: string;
+  data: any[] | null;
 }
 
 const styles = stylesheet({
@@ -34,6 +36,69 @@ const Section = ({ title, children }) => {
   );
 };
 
+function DayStatsChart({ inputData }) {
+  const hourlyData = useMemo(() => {
+    const hourly = Array(24).fill({
+      revenueCents: 0,
+      numParkingSessions: 0
+    });
+    for (const { hour, data } of inputData) {
+      hourly[hour] = data;
+    }
+    return hourly;
+  }, [inputData]);
+
+  const data = useMemo(() => {
+    const revenueData = hourlyData.map((p, i) => [i, p.revenueCents]);
+    const sessionsData = hourlyData.map((p, i) => [i, p.numParkingSessions]);
+    return [
+      {
+        label: "Revenue",
+        secondaryAxisID: "Revenue",
+        data: revenueData
+      },
+      {
+        label: "# of Sessions",
+        secondaryAxisID: "# of Sessions",
+        data: sessionsData
+      }
+    ];
+  }, [hourlyData]);
+
+  const axes = useMemo(
+    () => [
+      { primary: true, type: "linear", position: "bottom" },
+      { type: "linear", position: "left", id: "Revenue" },
+      { type: "linear", position: "right", id: "# of Sessions" }
+    ],
+    []
+  );
+
+  const options = useMemo(
+    () => ({
+      title: {
+        text: "Hourly Stats"
+      },
+      axisX: {
+        title: "Hours",
+        reversed: true
+      }
+    }),
+    []
+  );
+
+  return (
+    <div
+      style={{
+        width: "400px",
+        height: "300px"
+      }}
+    >
+      <Chart data={data} axes={axes} options={options} tooltip />
+    </div>
+  );
+}
+
 export const DayStatsDetails = (props: IProps) => {
   return (
     <div>
@@ -41,7 +106,9 @@ export const DayStatsDetails = (props: IProps) => {
         Selected day: <b>{props.day}</b>
       </span>
       <div className={styles.sections}>
-        <Section title={"Per Hour"}>...graph</Section>
+        <Section title={"Per Hour"}>
+          {!props.data ? "Loading" : <DayStatsChart inputData={props.data} />}
+        </Section>
       </div>
     </div>
   );
