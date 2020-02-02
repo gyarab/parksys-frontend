@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { connect } from "react-redux";
 import { IStore } from "../redux/IStore";
 import { Dispatch } from "redux";
-import { stylesheet } from "typestyle";
+import { stylesheet, classes } from "typestyle";
 import { Color } from "../constants";
 import { Button } from "../components/Button";
+import { useMutation, MutationTuple } from "@apollo/react-hooks";
+import { PASSWORD_CHANGE_MUTATION } from "../constants/Mutations";
 
 export interface IStateToProps {
   user?: {
@@ -14,7 +16,11 @@ export interface IStateToProps {
     permissions: string[];
   };
 }
-export interface IDispatchToProps {}
+
+export interface IDispatchToProps {
+  usePasswordChange: () => MutationTuple<string, { input: any }>;
+}
+
 export interface IProps extends IStateToProps, IDispatchToProps {}
 
 const mapStateToProps = (state: IStore): IStateToProps => ({
@@ -22,7 +28,9 @@ const mapStateToProps = (state: IStore): IStateToProps => ({
 });
 
 const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
-  return {};
+  return {
+    usePasswordChange: () => useMutation(PASSWORD_CHANGE_MUTATION)
+  };
 };
 
 const styles = stylesheet({
@@ -57,21 +65,6 @@ const uID = stylesheet({
   }
 });
 
-const us = stylesheet({
-  userSection: {
-    padding: "0",
-    $nest: {
-      h2: {
-        marginTop: 0
-      }
-    }
-  },
-  alert: {
-    paddingLeft: "1em",
-    borderLeft: `5px solid ${Color.LIGHT_RED}`
-  }
-});
-
 const UserIdentifierDisplay = ({ name, email }) => {
   return (
     <section className={uID.userDisplay}>
@@ -81,16 +74,77 @@ const UserIdentifierDisplay = ({ name, email }) => {
   );
 };
 
+enum SectionMessageStatus {
+  SUCCESS,
+  FAILURE,
+  WARNING
+}
+
+interface SectionMessage {
+  status: SectionMessageStatus;
+  message: string;
+}
+
+const us = stylesheet({
+  userSection: {
+    padding: "0",
+    $nest: {
+      h2: {
+        marginTop: 0,
+        display: "inline-block"
+      }
+    }
+  },
+  alert: {
+    paddingLeft: "1em",
+    borderLeft: `5px solid ${Color.LIGHT_RED}`
+  },
+  status: {
+    padding: "5px",
+    margin: "0.2em",
+    borderRadius: "3px",
+    marginTop: "-0.2em",
+    marginLeft: "0.5em"
+  },
+  statusFailure: {
+    backgroundColor: Color.LIGHT_RED
+  },
+  statusSuccess: {
+    backgroundColor: Color.LIGHT_BLUE
+  }
+});
+
+const statusToClass = (status: SectionMessageStatus) => {
+  switch (status) {
+    case SectionMessageStatus.FAILURE:
+      return us.statusFailure;
+    case SectionMessageStatus.SUCCESS:
+      return us.statusSuccess;
+    default:
+      "";
+  }
+};
+
 const UserSection = (props: {
   title: string;
   children?: any;
   alert?: boolean;
+  message?: SectionMessage;
 }) => {
   const alert = props.alert || false;
   return (
-    <section className={[us.userSection, alert ? us.alert : ""].join(" ")}>
+    <section className={classes(us.userSection, alert && us.alert)}>
       <a href={`#${props.title.toLowerCase()}`} />
-      <h2>{props.title}</h2>
+      <div>
+        <h2>{props.title}</h2>
+        {!!props.message ? (
+          <span
+            className={classes(statusToClass(props.message.status), us.status)}
+          >
+            {props.message.message}
+          </span>
+        ) : null}
+      </div>
       {props.children}
     </section>
   );
@@ -123,7 +177,7 @@ const sec = stylesheet({
   }
 });
 
-const UserSecurity = () => {
+const UserSecurity = ({ changePassword }) => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordRepeat, setNewPasswordRepeat] = useState("");
@@ -138,6 +192,7 @@ const UserSecurity = () => {
       return;
     }
     // Use apollo client
+    changePassword(currentPassword, newPassword);
   };
   return (
     <div className={sec.sec}>
@@ -176,12 +231,48 @@ const UserSecurity = () => {
 };
 
 const UserPage = (props: IProps) => {
+  const [securityMessage, setSecurityMessage] = useState<null | SectionMessage>(
+    null
+  );
+  const [changePasswordEffect] = props.usePasswordChange();
+  const changePassword = (currentPassword: string, newPassword: string) => {
+    changePasswordEffect({
+      variables: {
+        input: {
+          currentPassword,
+          newPassword,
+          user: props.user.id
+        }
+      }
+    })
+      .then(result => {
+        console.log(result);
+        setSecurityMessage({
+          status: SectionMessageStatus.SUCCESS,
+          message: "Password changed"
+        });
+      })
+      .catch(error => {
+        console.log(error);
+        setSecurityMessage({
+          status: SectionMessageStatus.FAILURE,
+          message: "Error while changing password"
+        });
+      });
+  };
   return (
     <div className={styles.userPage}>
       <UserIdentifierDisplay {...props.user} />
       <div className="sections">
-        <UserSection title="Security">
-          <UserSecurity />
+        <UserSection
+          title="Security"
+          message={securityMessage}
+          alert={
+            !!securityMessage &&
+            securityMessage.status === SectionMessageStatus.FAILURE
+          }
+        >
+          <UserSecurity changePassword={changePassword} />
         </UserSection>
       </div>
     </div>

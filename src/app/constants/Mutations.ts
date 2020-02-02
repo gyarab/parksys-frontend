@@ -123,3 +123,10 @@ export const RULE_PAGE_DELETE_PARKING_RULE = gql`
     }
   }
 `;
+
+// User Page
+export const PASSWORD_CHANGE_MUTATION = gql`
+  mutation passwordChange($input: PasswordChangeInput!) {
+    passwordChange(input: $input)
+  }
+`;
