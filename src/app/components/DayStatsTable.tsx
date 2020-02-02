@@ -1,6 +1,7 @@
 import React from "react";
-import { stylesheet } from "typestyle";
+import { stylesheet, classes } from "typestyle";
 import { useTable, useExpanded } from "react-table";
+import { Color } from "../constants";
 
 const classNames = stylesheet({
   table: {
@@ -29,10 +30,18 @@ const classNames = stylesheet({
   },
   subrow: {
     transition: "height 0.15s ease-out"
+  },
+  highlighted: {
+    backgroundColor: Color.LIGHT_GREY
   }
 });
 
-export const DayStatsTable = ({ columns, data, renderSubcomponent = null }) => {
+export const DayStatsTable = ({
+  columns,
+  data,
+  renderSubcomponent = null,
+  shouldBeHighlighted
+}) => {
   // Use the state and functions returned from useTable to build your UI
   const {
     getTableProps,
@@ -68,7 +77,10 @@ export const DayStatsTable = ({ columns, data, renderSubcomponent = null }) => {
             <React.Fragment key={i}>
               <tr
                 {...row.getRowProps()}
-                className={row.isExpanded ? classNames.expandedRow : ""}
+                className={classes(
+                  row.isExpanded && classNames.expandedRow,
+                  shouldBeHighlighted(row) && classNames.highlighted
+                )}
                 key={0}
               >
                 {row.cells.map(cell => {
