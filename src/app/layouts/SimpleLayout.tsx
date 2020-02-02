@@ -61,10 +61,8 @@ class SimpleLayout extends LayoutComponent {
             {this.props.navigation}
           </div>
           <div className={classNames.mainContent}>
+            {!!this.props.title ? <h2>{this.props.title}</h2> : null}
             {this.props.children}
-            {/* <div className={classNames.userNavContainer}>
-              <UserNavigation />
-            </div> */}
             <div className="spacer"></div>
           </div>
         </div>

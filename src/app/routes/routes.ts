@@ -22,6 +22,7 @@ interface PageRecord {
   page: ComponentClass;
   nav?: ComponentClass;
   layout?: ComponentClass<ILayoutProps>;
+  props?: Partial<ILayoutProps>;
 }
 
 type RouteConfig = Record<RoutablePages, Omit<IRoute, "name">>;

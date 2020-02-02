@@ -2,6 +2,7 @@ import React from "react";
 
 interface ILayoutProps {
   navigation?: JSX.Element;
+  title?: JSX.Element | string;
   children: JSX.Element;
 }
 

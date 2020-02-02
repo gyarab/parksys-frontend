@@ -125,7 +125,7 @@ const componentTranslationsSelector = createSelector(
         dashboard: translator.translate("Dashboard"),
         account: translator.translate("Account"),
         statistics: translator.translate("Statistics"),
-        rules: translator.translate("Rules"),
+        rules: translator.translate("Rules & Filters"),
         revenue: translator.translate("Revenue"),
         history: translator.translate("History"),
         devices: translator.translate("Devices")

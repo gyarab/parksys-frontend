@@ -43,7 +43,6 @@ const StatisticsPage = (props: IProps): JSX.Element => {
 
   return (
     <div>
-      <h2>Stats</h2>
       <DayStatsTable columns={columns} data={loading ? [] : data.dayStats} />
     </div>
   );

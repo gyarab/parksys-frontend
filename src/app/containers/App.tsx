@@ -51,10 +51,16 @@ class App extends React.Component<IStateToProps> {
       page: BlankPage
     },
     statisticsPage: {
-      page: StatisticsPage
+      page: StatisticsPage,
+      props: {
+        title: "Statistics"
+      }
     },
     rulesPage: {
-      page: RulePage
+      page: RulePage,
+      props: {
+        title: "Rules & Filters"
+      }
     },
     revenuePage: {
       page: BlankPage
@@ -67,7 +73,10 @@ class App extends React.Component<IStateToProps> {
       layout: null
     },
     devicesPage: {
-      page: DevicesPage
+      page: DevicesPage,
+      props: {
+        title: "Devices"
+      }
     },
     userPage: {
       page: UserPage
@@ -109,7 +118,14 @@ class App extends React.Component<IStateToProps> {
           this.defaultNavigation
         );
         const navRendered = nav ? React.createElement(nav) : null;
-        return React.createElement(layout, { navigation: navRendered }, page);
+        return React.createElement(
+          layout,
+          {
+            ...this.optionalPageOption(segment, "props", {}),
+            navigation: navRendered
+          },
+          page
+        );
       }
     } else {
       // Not Found
