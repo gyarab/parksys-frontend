@@ -9,9 +9,9 @@ import { NotFoundPage } from "../pages/NotFoundPage";
 describe("<App />", () => {
   const route: IRouteState = {
     meta: { id: 1, params: {}, options: {}, redirected: false },
-    name: routes.homePage.name,
+    name: routes.dashboardPage.name,
     params: {},
-    path: "/"
+    path: "/dashboard"
   };
   const routeUnavailable: IRouteState = {
     name: "unavailable",

@@ -8,13 +8,10 @@ interface IRoute {
   path: string;
 }
 type RoutablePages =
-  | "homePage"
   | "accountPage"
   | "dashboardPage"
   | "statisticsPage"
   | "rulesPage"
-  | "revenuePage"
-  | "historyPage"
   | "loginPage"
   | "devicesPage"
   | "userPage";
@@ -49,13 +46,10 @@ function getNavigateAction<T extends { [key: string]: any }>(
 }
 
 const config: RouteConfig = {
-  homePage: { path: "/home" },
   accountPage: { path: "/account" },
   dashboardPage: { path: "/dashboard" },
   statisticsPage: { path: "/statistics" },
   rulesPage: { path: "/rules" },
-  revenuePage: { path: "/revenue" },
-  historyPage: { path: "/history" },
   loginPage: { path: "/" },
   devicesPage: { path: "/devices" },
   userPage: { path: "/user" }
@@ -64,13 +58,10 @@ const config: RouteConfig = {
 export const routes = getRoutes(config);
 
 export const navigate: RouteNavigate = {
-  homePage: () => getNavigateAction(routes.homePage.name),
   accountPage: () => getNavigateAction(routes.accountPage.name),
   dashboardPage: () => getNavigateAction(routes.dashboardPage.name),
   statisticsPage: () => getNavigateAction(routes.statisticsPage.name),
   rulesPage: () => getNavigateAction(routes.rulesPage.name),
-  revenuePage: () => getNavigateAction(routes.revenuePage.name),
-  historyPage: () => getNavigateAction(routes.historyPage.name),
   loginPage: () => getNavigateAction(routes.loginPage.name),
   devicesPage: () => getNavigateAction(routes.devicesPage.name),
   userPage: () => getNavigateAction(routes.userPage.name)

@@ -41,9 +41,6 @@ interface IStateToProps {
 
 class App extends React.Component<IStateToProps> {
   private components: RoutePageMap = {
-    homePage: {
-      page: BlankPage
-    },
     accountPage: {
       page: BlankPage
     },
@@ -61,12 +58,6 @@ class App extends React.Component<IStateToProps> {
       props: {
         title: "Rules & Filters"
       }
-    },
-    revenuePage: {
-      page: BlankPage
-    },
-    historyPage: {
-      page: BlankPage
     },
     loginPage: {
       page: LoginPage,

@@ -98,12 +98,9 @@ class Navigation extends React.Component<IStateToProps> {
     return (
       <nav className={classNames.nav}>
         <ul>
-          <NavLink linkText={pages.home} route={routes.homePage} />
           <NavLink linkText={pages.dashboard} route={routes.dashboardPage} />
           <NavLink linkText={pages.statistics} route={routes.statisticsPage} />
           <NavLink linkText={pages.rules} route={routes.rulesPage} />
-          <NavLink linkText={pages.revenue} route={routes.revenuePage} />
-          <NavLink linkText={pages.history} route={routes.historyPage} />
           <NavLink linkText={pages.devices} route={routes.devicesPage} />
         </ul>
         <div className={classNames.userNavContainer}>
