@@ -124,7 +124,12 @@ const getTypeSpecific = rule => {
 export const ParkingRuleEditor = ({ rule, del, save, saveStatus, isNew }) => {
   const [name, setName] = useState(rule.name);
   const [type, setType] = useState(rule.__typename);
-  const [typeSpecific, setTypeSpecific] = useState(getTypeSpecific(rule));
+  const [typeSpecific, setTypeSpecific] = useState({
+    // TODO: Ugly but it works
+    ...getTypeSpecific(rule),
+    unitTime: "HOUR",
+    permit: false
+  });
   return (
     <div>
       <div className={styles.pickers}>

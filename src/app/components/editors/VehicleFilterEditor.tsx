@@ -19,7 +19,7 @@ import { Button } from "../Button";
 import SaveStatus from "../../constants/SaveStatus";
 import { useMutation, MutationTuple } from "@apollo/react-hooks";
 import {
-  RULE_PAGE_UPDATE_PARKING_RULE,
+  RULE_PAGE_UPDATE_VEHICLE_FILTER,
   RULE_PAGE_DELETE_VEHICLE_FILTER,
   RULE_PAGE_CREATE_VEHICLE_FILTER
 } from "../../constants/Mutations";
@@ -214,7 +214,7 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
         type: SET_VEHICLE_FILTER,
         payload
       }),
-    useUpdateVehicleFilter: () => useMutation(RULE_PAGE_UPDATE_PARKING_RULE),
+    useUpdateVehicleFilter: () => useMutation(RULE_PAGE_UPDATE_VEHICLE_FILTER),
     useDeleteVehicleFilter: () => useMutation(RULE_PAGE_DELETE_VEHICLE_FILTER),
     useCreateVehicleFilter: () => useMutation(RULE_PAGE_CREATE_VEHICLE_FILTER)
   };

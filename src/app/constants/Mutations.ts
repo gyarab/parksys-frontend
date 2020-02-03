@@ -99,7 +99,7 @@ export const RULE_PAGE_DELETE_VEHICLE_FILTER = gql`
 
 // ParkingRule
 export const RULE_PAGE_UPDATE_PARKING_RULE = gql`
-  mutation updateVehicleFilter($id: ID!, $input: ParkingRuleUpdateInput!) {
+  mutation updateParkingRule($id: ID!, $input: ParkingRuleUpdateInput!) {
     updateParkingRule(id: $id, input: $input) {
       ...ParkingRuleArgs
     }
