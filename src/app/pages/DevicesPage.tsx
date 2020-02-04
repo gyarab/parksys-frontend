@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { createSelector } from "reselect";
@@ -87,6 +87,11 @@ const DevicesPage = (props: IProps): JSX.Element => {
   const fetchDevices = () => {
     props.fetchDevices({ activated: activateFilter });
   };
+  useEffect(() => {
+    if (!props.devices.loaded) {
+      fetchDevices();
+    }
+  }, [props.devices.loaded]);
 
   const createDevice = e => {
     e.preventDefault();
