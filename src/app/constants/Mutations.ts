@@ -5,6 +5,23 @@ import {
   PARKING_RULE_FRAGMENT
 } from "./Fragments";
 
+// Log in
+export const LOGIN_MUTATION = gql`
+  mutation login($user: String!, $password: String!) {
+    passwordLogin(user: $user, password: $password) {
+      refreshToken
+      accessToken
+      user {
+        id
+        name
+        email
+        permissions
+        isAdmin
+      }
+    }
+  }
+`;
+
 // Device
 export const DEVICE_PAGE_CREATE_DEVICE_MUTATION = gql`
   mutation createDevice($name: String!) {

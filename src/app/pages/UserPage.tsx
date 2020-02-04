@@ -65,7 +65,8 @@ const uID = stylesheet({
   }
 });
 
-const UserIdentifierDisplay = ({ name, email }) => {
+const UserIdentifierDisplay = props => {
+  const { name, email } = props;
   return (
     <section className={uID.userDisplay}>
       <h2>{name}</h2>

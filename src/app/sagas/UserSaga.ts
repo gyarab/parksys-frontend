@@ -12,8 +12,27 @@ import * as userActions from "../redux/modules/userActionCreators";
 import { BaseSaga } from "./BaseSaga";
 import { loginApi } from "../apis/loginApi";
 import { navigate } from "../routes/routes";
+import { LOGIN_MUTATION } from "../constants/Mutations";
 
 export class UserSaga extends BaseSaga {
+  private client: any;
+  constructor(client) {
+    super();
+    this.client = client;
+  }
+
+  private loginUserCall(user, password): () => Promise<{ data: any }> {
+    return () =>
+      this.client.query({
+        query: LOGIN_MUTATION,
+        variables: {
+          user,
+          password
+        },
+        fetchPolicy: "no-cache"
+      });
+  }
+
   @autobind
   public *loginUser(
     action: ReturnType<typeof userActions.loginUser.invoke>
@@ -21,7 +40,9 @@ export class UserSaga extends BaseSaga {
     try {
       yield put(userActions.loginUser.setPending(null));
       const { user, password } = action.payload;
-      const payload: any = yield call(loginApi.loginUser(user, password));
+      const {
+        data: { passwordLogin: payload }
+      }: any = yield call(this.loginUserCall(user, password));
       localStorage.setItem("accessToken", payload.accessToken);
       localStorage.setItem("refreshToken", payload.refreshToken);
       yield put(userActions.loginUser.setFulfilled(payload));

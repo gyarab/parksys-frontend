@@ -7,7 +7,7 @@ export default apolloClient => {
   function* rootSaga(): IterableIterator<AllEffect<any>> {
     yield all([
       new SettingsSaga().watch(),
-      new UserSaga().watch(),
+      new UserSaga(apolloClient).watch(),
       new DevicesSaga(apolloClient).watch()
     ]);
   }
