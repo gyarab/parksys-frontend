@@ -7,20 +7,9 @@ import { stylesheet } from "typestyle";
 import { Color } from "../../constants";
 import { VEHICLE_FILTER_PICKER_SEARCH_QUERY } from "../../constants/Queries";
 import { useGenericMultiPicker } from "./GenericModelMultiPicker";
+import { Flag, FlagType } from "../Flag";
 
 const styles = stylesheet({
-  EXCLUDE: {
-    backgroundColor: Color.LIGHT_RED
-  },
-  INCLUDE: {
-    backgroundColor: Color.AQUAMARINE
-  },
-  action: {
-    padding: "5px",
-    marginTop: "5px",
-    marginBottom: "5px",
-    display: "block"
-  },
   filterItem: {
     display: "grid",
     gridTemplateColumns: "auto auto",
@@ -34,17 +23,20 @@ const styles = stylesheet({
   }
 });
 
+const RenderVehicleFilter = model => (
+  <div>
+    <Flag
+      text={model.action.substr(0, 3)}
+      type={model.action === "EXCLUDE" ? FlagType.NEGATIVE : FlagType.POSITIVE}
+    />
+    {model.name}
+  </div>
+);
+
 export const VehicleFilterPicker = GenericModelPicker({
   QUERY: VEHICLE_FILTER_PICKER_SEARCH_QUERY,
   arrayGetter: data => data.vehicleFilterSearch.data,
-  renderModel: model => (
-    <>
-      <span className={`${styles[model.action]} ${styles.action}`}>
-        {model.action}
-      </span>{" "}
-      {model.name}
-    </>
-  ),
+  renderModel: RenderVehicleFilter,
   identifierToOptions: name => ({ variables: { name } })
 });
 
@@ -56,14 +48,7 @@ export const useVehicleFilterPicker = useGenericPickerFromPicker(
 export const useVehicleFilterMultiPicker = useGenericMultiPicker({
   QUERY: VEHICLE_FILTER_PICKER_SEARCH_QUERY,
   arrayGetter: data => data.vehicleFilterSearch.data,
-  renderModel: model => (
-    <div className={styles.filterItem}>
-      <span className={styles.name}>{model.name}</span>
-      <span className={`${styles[model.action]} ${styles.action}`}>
-        {model.action}
-      </span>
-    </div>
-  ),
+  renderModel: RenderVehicleFilter,
   identifierAndCurrentModelsToOptions: (name, _) => ({ variables: { name } }),
   modelToIdentifier: model => model.name
 });

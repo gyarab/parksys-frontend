@@ -31,6 +31,7 @@ export enum FlagType {
 interface IProps {
   type: FlagType;
   text: string;
+  tooltip?: string;
 }
 
 const typeToClass = (status: FlagType) => {
@@ -46,7 +47,10 @@ const typeToClass = (status: FlagType) => {
 
 export const Flag = (props: IProps) => {
   return (
-    <span className={classes(typeToClass(props.type), styles.status)}>
+    <span
+      title={props.tooltip || null}
+      className={classes(typeToClass(props.type), styles.status)}
+    >
       {props.text}
     </span>
   );

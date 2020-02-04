@@ -48,9 +48,11 @@ const styles = stylesheet({
     display: "grid",
     gridTemplateColumns: "auto 3em", // content and an action
     gridColumnGap: "0.3em",
+    paddingTop: "0.6em",
+    paddingBottom: "0",
     $nest: {
       "&+&": {
-        borderTop: "1px solid #ccc"
+        // borderTop: "1px solid #ccc"
       }
     }
   },
