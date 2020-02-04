@@ -7,6 +7,7 @@ import { Color } from "../constants";
 import { Button } from "../components/Button";
 import { useMutation, MutationTuple } from "@apollo/react-hooks";
 import { PASSWORD_CHANGE_MUTATION } from "../constants/Mutations";
+import { Flag, FlagType } from "../components/Flag";
 
 export interface IStateToProps {
   user?: {
@@ -55,7 +56,8 @@ const uID = stylesheet({
     $nest: {
       h2: {
         margin: 0,
-        marginBottom: "0.3em"
+        marginBottom: "0.3em",
+        display: "inline-block"
       },
       h4: {
         margin: 0,
@@ -66,23 +68,20 @@ const uID = stylesheet({
 });
 
 const UserIdentifierDisplay = props => {
-  const { name, email } = props;
+  const { name, email, isAdmin } = props;
   return (
     <section className={uID.userDisplay}>
-      <h2>{name}</h2>
+      <div>
+        <h2>{name}</h2>
+        {isAdmin ? <Flag text="admin" type={FlagType.POSITIVE} /> : null}
+      </div>
       <h4>{email}</h4>
     </section>
   );
 };
 
-enum SectionMessageStatus {
-  SUCCESS,
-  FAILURE,
-  WARNING
-}
-
 interface SectionMessage {
-  status: SectionMessageStatus;
+  status: FlagType;
   message: string;
 }
 
@@ -99,32 +98,8 @@ const us = stylesheet({
   alert: {
     paddingLeft: "1em",
     borderLeft: `5px solid ${Color.LIGHT_RED}`
-  },
-  status: {
-    padding: "5px",
-    margin: "0.2em",
-    borderRadius: "3px",
-    marginTop: "-0.2em",
-    marginLeft: "0.5em"
-  },
-  statusFailure: {
-    backgroundColor: Color.LIGHT_RED
-  },
-  statusSuccess: {
-    backgroundColor: Color.LIGHT_BLUE
   }
 });
-
-const statusToClass = (status: SectionMessageStatus) => {
-  switch (status) {
-    case SectionMessageStatus.FAILURE:
-      return us.statusFailure;
-    case SectionMessageStatus.SUCCESS:
-      return us.statusSuccess;
-    default:
-      "";
-  }
-};
 
 const UserSection = (props: {
   title: string;
@@ -139,11 +114,7 @@ const UserSection = (props: {
       <div>
         <h2>{props.title}</h2>
         {!!props.message ? (
-          <span
-            className={classes(statusToClass(props.message.status), us.status)}
-          >
-            {props.message.message}
-          </span>
+          <Flag text={props.message.message} type={props.message.status} />
         ) : null}
       </div>
       {props.children}
@@ -177,6 +148,16 @@ const sec = stylesheet({
     }
   }
 });
+
+const UserPermissions = ({ permissions }) => {
+  return (
+    <div>
+      {permissions.map(perm => (
+        <Flag text={perm} type={FlagType.NONE} />
+      ))}
+    </div>
+  );
+};
 
 const UserSecurity = ({ changePassword }) => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -249,14 +230,14 @@ const UserPage = (props: IProps) => {
       .then(result => {
         console.log(result);
         setSecurityMessage({
-          status: SectionMessageStatus.SUCCESS,
+          status: FlagType.POSITIVE,
           message: "Password changed"
         });
       })
       .catch(error => {
         console.log(error);
         setSecurityMessage({
-          status: SectionMessageStatus.FAILURE,
+          status: FlagType.NEGATIVE,
           message: "Error while changing password"
         });
       });
@@ -265,12 +246,14 @@ const UserPage = (props: IProps) => {
     <div className={styles.userPage}>
       <UserIdentifierDisplay {...props.user} />
       <div className="sections">
+        <UserSection title="Permissions">
+          <UserPermissions permissions={props.user.permissions} />
+        </UserSection>
         <UserSection
           title="Security"
           message={securityMessage}
           alert={
-            !!securityMessage &&
-            securityMessage.status === SectionMessageStatus.FAILURE
+            !!securityMessage && securityMessage.status === FlagType.NEGATIVE
           }
         >
           <UserSecurity changePassword={changePassword} />
