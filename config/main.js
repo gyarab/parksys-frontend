@@ -20,6 +20,7 @@ const config = {
       title: "Parking System"
     }
   },
+  protocol: process.env.PROTOCOL || "http",
   env: process.env.NODE_ENV || "development",
   host: process.env.HOST || "localhost",
   port: process.env.PORT || 8889,
@@ -33,5 +34,6 @@ const config = {
     graphql: "/graphql"
   }
 };
+config.url = `${config.protocol}://${config.host}:${config.port}`;
 
 module.exports = config;
