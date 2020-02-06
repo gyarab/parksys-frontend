@@ -1,6 +1,7 @@
 const defaultConfig = require("./main");
 const localConfig = require("./main.local");
-module.exports.config = {
+const config = {
   ...defaultConfig,
   ...localConfig
 };
+module.exports.config = config;

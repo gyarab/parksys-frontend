@@ -1,7 +1,5 @@
 FROM mhart/alpine-node:latest
 
-MAINTAINER Crazy Factory dev@crazy-factory.com
-
 WORKDIR /app
 ADD . .
 
