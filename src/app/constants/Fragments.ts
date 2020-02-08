@@ -46,3 +46,13 @@ export const PARKING_RULE_ASSIGNMENT_FRAGMENT = gql`
   }
   ${PARKING_RULE_FRAGMENT}
 `;
+
+export const USER_FRAGMENT = gql`
+  fragment UserArgs on User {
+    id
+    name
+    email
+    permissions
+    isAdmin
+  }
+`;

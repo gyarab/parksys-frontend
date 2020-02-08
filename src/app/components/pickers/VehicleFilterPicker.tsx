@@ -4,7 +4,6 @@ import {
 } from "./GenericModelPicker";
 import React from "react";
 import { stylesheet } from "typestyle";
-import { Color } from "../../constants";
 import { VEHICLE_FILTER_PICKER_SEARCH_QUERY } from "../../constants/Queries";
 import { useGenericMultiPicker } from "./GenericModelMultiPicker";
 import { Flag, FlagType } from "../Flag";

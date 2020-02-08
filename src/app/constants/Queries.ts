@@ -2,7 +2,8 @@ import gql from "graphql-tag";
 import {
   PARKING_RULE_ASSIGNMENT_FRAGMENT,
   VEHICLE_FILTER_FRAGMENT,
-  PARKING_RULE_FRAGMENT
+  PARKING_RULE_FRAGMENT,
+  USER_FRAGMENT
 } from "./Fragments";
 
 export const RULE_PAGE_FETCH_PARKING_RULE_ASSIGNMENT_QUERY = gql`
@@ -121,4 +122,24 @@ export const STATS_PAGE_DAY_HOURLY_QUERY = gql`
       }
     }
   }
+`;
+
+export const USER_SEARCH_QUERY = gql`
+  query userSearch($query: String!) {
+    byEmail: userSearchByEmail(search: { email: $query }) {
+      data {
+        ...UserArgs
+      }
+      limit
+      page
+    }
+    byName: userSearch(search: { name: $query }) {
+      data {
+        ...UserArgs
+      }
+      limit
+      page
+    }
+  }
+  ${USER_FRAGMENT}
 `;

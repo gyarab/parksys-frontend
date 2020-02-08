@@ -14,6 +14,7 @@ import { Color } from "../constants/Color";
 import { Button } from "../components/Button";
 import { CHANGE_SELECTED_DAY } from "../redux/modules/statsPageActionCreators";
 import { DayStatsDetails } from "../components/DayStatsDetails";
+import moment from "moment";
 
 export interface IStateToProps {
   selectedDay: IStatsPageState["selectedDay"];
@@ -46,6 +47,15 @@ const styles = stylesheet({
   },
   rightPane: {}
 });
+
+const dayStrToArgs = (day: string) => {
+  const m = moment(day);
+  return {
+    year: m.year,
+    month: m.year,
+    date: m.date
+  };
+};
 
 const StatisticsPage = (props: IProps): JSX.Element => {
   const { loading, data } = props.useFetchStats();

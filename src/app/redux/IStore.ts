@@ -4,6 +4,7 @@ import { IUserState } from "./modules/userModule";
 import { IDevicesState } from "./modules/devicesModule";
 import { IRulePageState } from "./modules/rulePageModule";
 import { IStatsPageState } from "./modules/statsPageModule";
+import { IUserMngmtPageState } from "./modules/userMngmtPageModule";
 
 export interface IStore {
   router: RouterState;
@@ -12,4 +13,5 @@ export interface IStore {
   devices: IDevicesState;
   rulePage: IRulePageState;
   statsPage: IStatsPageState;
+  userMngmtPage: IUserMngmtPageState;
 }
