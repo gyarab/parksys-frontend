@@ -61,7 +61,7 @@ const dayStrToArgs = (day: string) => {
 
 const StatisticsPage = (props: IProps): JSX.Element => {
   const [loadYear, { data: yearData }] = props.useFetchYearStats();
-  const [loadMonth, { data: monthData }] = props.useFetchYearStats();
+  const [loadMonth, { data: monthData }] = props.useFetchMonthStats();
   const [loadDay, { data: dayData }] = props.useFetchDayStats();
 
   useEffect(() => {
@@ -95,11 +95,51 @@ const StatisticsPage = (props: IProps): JSX.Element => {
     }
   }, [props.selectedPeriod]);
 
-  const columns = useMemo(
+  const monthsColumns = useMemo(
+    () => [
+      {
+        Header: "Month",
+        accessor: "month"
+      },
+      {
+        Header: "Revenue",
+        accessor: "revenueCents",
+        Cell({ row }) {
+          return row.original.data.revenueCents / 100;
+        }
+      },
+      {
+        Header: "# of sessions",
+        accessor: "data.numParkingSessions"
+      },
+      {
+        Header: "Actions",
+        Cell({ row }) {
+          return (
+            <>
+              <Button
+                type="primary"
+                onClick={() =>
+                  props.setSelectedTime({
+                    year: props.selectedPeriod.year,
+                    month: row.original.month
+                  })
+                }
+              >
+                Show
+              </Button>
+            </>
+          );
+        }
+      }
+    ],
+    []
+  );
+  const daysColumns = useMemo(
     () => [
       {
         Header: "Day",
-        accessor: "day"
+        accessor: "date"
       },
       {
         Header: "Revenue",
@@ -132,13 +172,14 @@ const StatisticsPage = (props: IProps): JSX.Element => {
   );
 
   const chooseData = () => {
-    if (!!dayData) return ["hour", dayData];
-    if (!!monthData) return ["date", monthData];
-    if (!!yearData) return ["month", yearData];
+    if (!!dayData) return ["hour", dayData.dayStats.hourly];
+    if (!!monthData) return ["date", monthData.monthStats.daily];
+    if (!!yearData) return ["month", yearData.yearStats.monthly];
     return [null, null];
   };
   const [graphUnitKey, graphData] = chooseData();
   console.log(yearData);
+  console.log(monthData);
   return (
     <div>
       <label>
@@ -152,16 +193,24 @@ const StatisticsPage = (props: IProps): JSX.Element => {
         <div>
           {!!yearData ? (
             <DayStatsTable
-              columns={columns}
+              columns={monthsColumns}
               shouldBeHighlighted={() => false}
               data={yearData.yearStats.monthly}
             />
           ) : null}
         </div>
-        <div></div>
+        <div>
+          {!!monthData ? (
+            <DayStatsTable
+              columns={daysColumns}
+              shouldBeHighlighted={() => false}
+              data={monthData.monthStats.daily}
+            />
+          ) : null}
+        </div>
         <DayStatsDetails
           day={JSON.stringify(props.selectedPeriod)}
-          data={!!graphData ? graphData.yearStats.monthly : null}
+          data={graphData}
           unitKey={graphUnitKey}
         />
       </div>

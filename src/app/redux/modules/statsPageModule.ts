@@ -25,10 +25,7 @@ export const statsPageReducer = (
     case CHANGE_SELECTED_TIME:
       return {
         ...state,
-        selectedPeriod: {
-          ...state.selectedPeriod,
-          ...action.payload
-        }
+        selectedPeriod: action.payload
       };
     default:
       return state;
