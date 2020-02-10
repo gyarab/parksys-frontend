@@ -6,6 +6,7 @@ import { Chart } from "react-charts";
 interface IProps {
   day: string;
   data: any[] | null;
+  unitKey: string;
 }
 
 const styles = stylesheet({
@@ -36,14 +37,16 @@ const Section = ({ title, children }) => {
   );
 };
 
-function DayStatsChart({ inputData }) {
+function DayStatsChart({ inputData, unitKey }) {
   const hourlyData = useMemo(() => {
     const hourly = Array(24).fill({
       revenueCents: 0,
       numParkingSessions: 0
     });
-    for (const { hour, data } of inputData) {
-      hourly[hour] = {
+    for (const elem of inputData) {
+      const data = elem.data;
+      const unit = elem[unitKey];
+      hourly[unit] = {
         numParkingSessions: data.numParkingSessions,
         revenueCents: data.revenueCents / 100
       };
@@ -103,6 +106,7 @@ function DayStatsChart({ inputData }) {
 }
 
 export const DayStatsDetails = (props: IProps) => {
+  console.log(props);
   return (
     <div>
       <span>
@@ -110,7 +114,11 @@ export const DayStatsDetails = (props: IProps) => {
       </span>
       <div className={styles.sections}>
         <Section title={"Per Hour"}>
-          {!props.data ? "Loading" : <DayStatsChart inputData={props.data} />}
+          {!props.data ? (
+            "Loading"
+          ) : (
+            <DayStatsChart inputData={props.data} unitKey={props.unitKey} />
+          )}
         </Section>
       </div>
     </div>

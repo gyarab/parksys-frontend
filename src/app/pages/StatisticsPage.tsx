@@ -66,20 +66,23 @@ const StatisticsPage = (props: IProps): JSX.Element => {
 
   useEffect(() => {
     const period = props.selectedPeriod;
-    if (!!props.selectedPeriod.year) {
+    if (!!period.year) {
+      console.log("LOAD YEAR");
       loadYear({
         variables: {
           year: period.year
         }
       });
-      if (!!props.selectedPeriod.month) {
+      if (!!period.month) {
+        console.log("LOAD MONTH");
         loadMonth({
           variables: {
             year: period.year,
             month: period.month
           }
         });
-        if (!!props.selectedPeriod.date) {
+        if (!!period.date) {
+          console.log("LOAD DAY");
           loadDay({
             variables: {
               year: period.year,
@@ -127,6 +130,15 @@ const StatisticsPage = (props: IProps): JSX.Element => {
     ],
     []
   );
+
+  const chooseData = () => {
+    if (!!dayData) return ["hour", dayData];
+    if (!!monthData) return ["date", monthData];
+    if (!!yearData) return ["month", yearData];
+    return [null, null];
+  };
+  const [graphUnitKey, graphData] = chooseData();
+  console.log(yearData);
   return (
     <div>
       <label>
@@ -136,7 +148,23 @@ const StatisticsPage = (props: IProps): JSX.Element => {
           onChange={year => props.setSelectedTime({ year })}
         />
       </label>
-      <div className={styles.split}></div>
+      <div className={styles.split}>
+        <div>
+          {!!yearData ? (
+            <DayStatsTable
+              columns={columns}
+              shouldBeHighlighted={() => false}
+              data={yearData.yearStats.monthly}
+            />
+          ) : null}
+        </div>
+        <div></div>
+        <DayStatsDetails
+          day={JSON.stringify(props.selectedPeriod)}
+          data={!!graphData ? graphData.yearStats.monthly : null}
+          unitKey={graphUnitKey}
+        />
+      </div>
     </div>
   );
 };
