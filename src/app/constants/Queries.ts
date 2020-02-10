@@ -97,33 +97,6 @@ export const PARKING_RULE_SEARCH_QUERY = gql`
   ${PARKING_RULE_FRAGMENT}
 `;
 
-export const STATS_PAGE_DAY_STATS_QUERY = gql`
-  query dayStats {
-    dayStats {
-      day
-      data {
-        revenueCents
-        numParkingSessions
-      }
-    }
-  }
-`;
-
-export const STATS_PAGE_DAY_HOURLY_QUERY = gql`
-  query dayHourlyStats($day: String!) {
-    dayStatsPerHour(day: $day) {
-      day
-      data {
-        hour
-        data {
-          revenueCents
-          numParkingSessions
-        }
-      }
-    }
-  }
-`;
-
 export const USER_SEARCH_QUERY = gql`
   query userSearch($query: String!) {
     byEmail: userSearchByEmail(search: { email: $query }) {
@@ -143,3 +116,71 @@ export const USER_SEARCH_QUERY = gql`
   }
   ${USER_FRAGMENT}
 `;
+
+export const STATS_PAGE = {
+  YEAR: gql`
+    query yearStats($year: PositiveInt!) {
+      yearStats(year: $year) {
+        year
+
+        data {
+          numParkingSessions
+          revenueCents
+        }
+        monthly {
+          month
+          data {
+            numParkingSessions
+            revenueCents
+          }
+        }
+      }
+    }
+  `,
+  MONTH: gql`
+    query monthStats($year: PositiveInt!, $month: PositiveInt!) {
+      monthStats(year: $year, month: $month) {
+        year
+        month
+
+        data {
+          numParkingSessions
+          revenueCents
+        }
+        daily {
+          date
+
+          data {
+            numParkingSessions
+            revenueCents
+          }
+        }
+      }
+    }
+  `,
+  DAY: gql`
+    query dayStats(
+      $year: PositiveInt!
+      $month: PositiveInt!
+      $date: PositiveInt!
+    ) {
+      dayStats(year: $year, month: $month, date: $date) {
+        year
+        month
+        date
+
+        data {
+          numParkingSessions
+          revenueCents
+        }
+        hourly {
+          hour
+          data {
+            numParkingSessions
+            revenueCents
+          }
+        }
+      }
+    }
+  `
+};

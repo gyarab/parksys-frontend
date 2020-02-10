@@ -1,14 +1,20 @@
 import {
   StatsPageActionTypes,
-  CHANGE_SELECTED_DAY
+  CHANGE_SELECTED_TIME
 } from "./statsPageActionCreators";
 
 export interface IStatsPageState {
-  selectedDay: string;
+  selectedPeriod: {
+    year: number;
+    month?: number;
+    date?: number;
+  };
 }
 
 export const initialState: IStatsPageState = {
-  selectedDay: new Date().toISOString().slice(0, 10)
+  selectedPeriod: {
+    year: new Date().getFullYear()
+  }
 };
 
 export const statsPageReducer = (
@@ -16,10 +22,13 @@ export const statsPageReducer = (
   action: StatsPageActionTypes
 ): IStatsPageState => {
   switch (action.type) {
-    case CHANGE_SELECTED_DAY:
+    case CHANGE_SELECTED_TIME:
       return {
         ...state,
-        selectedDay: action.payload
+        selectedPeriod: {
+          ...state.selectedPeriod,
+          ...action.payload
+        }
       };
     default:
       return state;

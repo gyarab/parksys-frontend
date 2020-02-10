@@ -1,9 +1,9 @@
 import { IStatsPageState } from "./statsPageModule";
 
-export const CHANGE_SELECTED_DAY = "STATS_PAGE/CHANGE_OPENED_RULE_ASSIGNMENT";
-export interface ChangeSelectedDay {
-  type: typeof CHANGE_SELECTED_DAY;
-  payload: IStatsPageState["selectedDay"];
+export const CHANGE_SELECTED_TIME = "STATS_PAGE/CHANGE_SELECTED_TIME";
+export interface ChangeSelectedTime {
+  type: typeof CHANGE_SELECTED_TIME;
+  payload: Partial<IStatsPageState["selectedPeriod"]>;
 }
 
-export type StatsPageActionTypes = ChangeSelectedDay;
+export type StatsPageActionTypes = ChangeSelectedTime;

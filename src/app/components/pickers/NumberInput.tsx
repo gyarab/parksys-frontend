@@ -9,10 +9,12 @@ const filterValue = newValue => {
   }
 };
 
-export const NumberInput = ({ value, onChange }) => {
+export const NumberInput = props => {
+  const { value, onChange } = props;
   return (
     <input
-      type="text"
+      {...props}
+      type="number"
       value={`${value || 0}`}
       onChange={e => onChange(filterValue(e.target.value))}
     />
@@ -20,11 +22,18 @@ export const NumberInput = ({ value, onChange }) => {
 };
 
 export const useNumberInput = (
-  initial?: number | string
+  initial?: number | string,
+  min?: number,
+  max?: number
 ): [JSX.Element, string | number, (newValue: number | string) => void] => {
   const [value, _setValue] = useState<string | number>(initial || 0);
   return [
-    <NumberInput value={value} onChange={v => _setValue(v)} />,
+    <NumberInput
+      value={value}
+      onChange={v => _setValue(v)}
+      max={max}
+      min={min}
+    />,
     value,
     filterValue
   ];
