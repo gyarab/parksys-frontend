@@ -34,8 +34,9 @@ const styles = stylesheet({
   split: {
     height: "70%",
     display: "grid",
-    gridTemplateColumns: "auto auto auto 1fr",
-    gridColumnGap: "1em"
+    gridTemplateColumns: "1fr 1fr 1fr",
+    gridColumnGap: "1em",
+    paddingRight: "4em"
   },
   pane: {
     paddingTop: "1em",
@@ -121,8 +122,11 @@ const StatisticsPage = (props: IProps): JSX.Element => {
                 type="primary"
                 onClick={() =>
                   props.setSelectedTime({
-                    year: props.selectedPeriod.year,
-                    month: row.original.month
+                    action: "set",
+                    time: {
+                      year: props.selectedPeriod.year,
+                      month: row.original.month
+                    }
                   })
                 }
               >
@@ -159,9 +163,16 @@ const StatisticsPage = (props: IProps): JSX.Element => {
             <>
               <Button
                 type="primary"
-                // onClick={() => selectDay(row.original.day)}
+                onClick={() =>
+                  props.setSelectedTime({
+                    action: "merge",
+                    time: {
+                      date: row.original.date
+                    }
+                  })
+                }
               >
-                Show
+                Showx
               </Button>
             </>
           );
@@ -172,9 +183,13 @@ const StatisticsPage = (props: IProps): JSX.Element => {
   );
 
   const chooseData = () => {
-    if (!!dayData) return ["hour", dayData.dayStats.hourly];
-    if (!!monthData) return ["date", monthData.monthStats.daily];
-    if (!!yearData) return ["month", yearData.yearStats.monthly];
+    const period = props.selectedPeriod;
+    if (!!period.date && !!period.month && !!period.year && !!dayData)
+      return ["hour", dayData.dayStats.hourly];
+    if (!!period.month && !!period.year && !!monthData)
+      return ["date", monthData.monthStats.daily];
+    if (!!period.year && !!yearData)
+      return ["month", yearData.yearStats.monthly];
     return [null, null];
   };
   const [graphUnitKey, graphData] = chooseData();
@@ -186,8 +201,20 @@ const StatisticsPage = (props: IProps): JSX.Element => {
         <span>Year</span>
         <NumberInput
           value={props.selectedPeriod.year}
-          onChange={year => props.setSelectedTime({ year })}
+          onChange={year =>
+            props.setSelectedTime({ action: "set", time: { year } })
+          }
         />
+        <button
+          onClick={() =>
+            props.setSelectedTime({
+              action: "set",
+              time: { year: props.selectedPeriod.year }
+            })
+          }
+        >
+          Show Per Month Stats
+        </button>
       </label>
       <div className={styles.split}>
         <div>
@@ -200,13 +227,15 @@ const StatisticsPage = (props: IProps): JSX.Element => {
           ) : null}
         </div>
         <div>
-          {!!monthData ? (
+          {!!monthData && !!props.selectedPeriod.month ? (
             <DayStatsTable
               columns={daysColumns}
               shouldBeHighlighted={() => false}
               data={monthData.monthStats.daily}
             />
-          ) : null}
+          ) : (
+            <div>Select month</div>
+          )}
         </div>
         <DayStatsDetails
           day={JSON.stringify(props.selectedPeriod)}

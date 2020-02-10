@@ -25,7 +25,16 @@ export const statsPageReducer = (
     case CHANGE_SELECTED_TIME:
       return {
         ...state,
-        selectedPeriod: action.payload
+        selectedPeriod:
+          action.payload.action === "merge"
+            ? {
+                ...state.selectedPeriod,
+                ...action.payload.time
+              }
+            : {
+                year: initialState.selectedPeriod.year,
+                ...action.payload.time
+              }
       };
     default:
       return state;
