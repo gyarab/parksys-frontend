@@ -3,7 +3,7 @@ import { stylesheet, classes } from "typestyle";
 import { IStore } from "../redux/IStore";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
-import { useQuery, useLazyQuery } from "@apollo/react-hooks";
+import { useLazyQuery } from "@apollo/react-hooks";
 import { STATS_PAGE } from "../constants/Queries";
 import { DayStatsTable } from "../components/DayStatsTable";
 import { IStatsPageState } from "../redux/modules/statsPageModule";
@@ -11,27 +11,37 @@ import { Color } from "../constants/Color";
 import { Button } from "../components/Button";
 import {
   CHANGE_SELECTED_TIME,
-  ChangeSelectedTime
+  ChangeSelectedTime,
+  ChangeGraphTime,
+  CHANGE_GRAPH_TIME
 } from "../redux/modules/statsPageActionCreators";
-import { DayStatsDetails } from "../components/DayStatsDetails";
 import moment from "moment";
 import { NumberInput } from "../components/pickers/NumberInput";
+import { Chart } from "react-google-charts";
 
 export interface IStateToProps {
   selectedPeriod: IStatsPageState["selectedPeriod"];
+  graphPeriod: IStatsPageState["graph"];
 }
 
 export interface IDispatchToProps {
   setSelectedTime: (payload: ChangeSelectedTime["payload"]) => void;
-  useFetchYearStats: () => any;
-  useFetchMonthStats: () => any;
-  useFetchDayStats: () => any;
+  setGraphTime: (payload: ChangeGraphTime["payload"]) => void;
+  useFetchYearStats: (onCompleted) => any;
+  useFetchMonthStats: (onCompleted) => any;
+  useFetchDayStats: (onCompleted) => any;
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
 
 const styles = stylesheet({
-  split: {
+  graphs: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gridColumnGap: "2em",
+    marginBottom: "3em"
+  },
+  periodSelection: {
     height: "70%",
     display: "grid",
     gridTemplateColumns: "1fr 1fr 1fr",
@@ -60,10 +70,65 @@ const dayStrToArgs = (day: string) => {
   };
 };
 
+const dataTransform = (inputData, unitKey, max) => {
+  const output = Array(max + 1);
+  output[0] = ["", "# of Sessions", "Revenue"];
+  for (let i = 1; i < output.length; i++) {
+    output[i] = [i, 0, 0];
+  }
+  for (const elem of inputData) {
+    const data = elem.data;
+    const unit = elem[unitKey];
+    output[unit] = [
+      output[unit][0],
+      data.numParkingSessions,
+      data.revenueCents / 100
+    ];
+  }
+  return output;
+};
+
+// arg month - 1 is Jan
+const daysInMonth = (year: number, month: number) => {
+  return new Date(year, month, 0).getDate();
+};
+
 const StatisticsPage = (props: IProps): JSX.Element => {
-  const [loadYear, { data: yearData }] = props.useFetchYearStats();
-  const [loadMonth, { data: monthData }] = props.useFetchMonthStats();
-  const [loadDay, { data: dayData }] = props.useFetchDayStats();
+  // Raw data from GraphQL
+  const [yearData, setYearData] = useState(null);
+  const [monthData, setMonthData] = useState(null);
+  const [dayData, setDayData] = useState(null);
+  // Graph Data - transformed into x,y pairs
+  const [yearGraphData, setYearGraphData] = useState(null);
+  const [monthGraphData, setMonthGraphData] = useState(null);
+  const [dayGraphData, setDayGraphData] = useState(null);
+  // Lazy Queries
+  const [loadYear] = props.useFetchYearStats(data => {
+    setYearData(data);
+    setYearGraphData(dataTransform(data.yearStats.monthly, "month", 12));
+  });
+  const [loadMonth] = props.useFetchMonthStats(data => {
+    const {
+      monthStats: { daily, year, month }
+    } = data;
+    setMonthData(data);
+    setMonthGraphData(dataTransform(daily, "date", daysInMonth(year, month)));
+  });
+  const [loadDay] = props.useFetchDayStats(data => {
+    setDayData(dayData);
+    setDayGraphData(dataTransform(data.dayStats.hourly, "hour", 24));
+  });
+
+  // Choose graph data
+  const graphData = useMemo(() => {
+    if (props.graphPeriod === "hours") {
+      return dayGraphData;
+    } else if (props.graphPeriod === "days") {
+      return monthGraphData;
+    } else if (props.graphPeriod === "months") {
+      return yearGraphData;
+    }
+  }, [props.graphPeriod]);
 
   useEffect(() => {
     const period = props.selectedPeriod;
@@ -120,15 +185,14 @@ const StatisticsPage = (props: IProps): JSX.Element => {
             <>
               <Button
                 type="primary"
-                onClick={() =>
+                onClick={() => {
                   props.setSelectedTime({
-                    action: "set",
-                    time: {
-                      year: props.selectedPeriod.year,
-                      month: row.original.month
-                    }
-                  })
-                }
+                    year: props.selectedPeriod.year,
+                    month: row.original.month,
+                    date: null
+                  });
+                  props.setGraphTime("days");
+                }}
               >
                 Show
               </Button>
@@ -163,16 +227,14 @@ const StatisticsPage = (props: IProps): JSX.Element => {
             <>
               <Button
                 type="primary"
-                onClick={() =>
+                onClick={() => {
                   props.setSelectedTime({
-                    action: "merge",
-                    time: {
-                      date: row.original.date
-                    }
-                  })
-                }
+                    date: row.original.date
+                  });
+                  props.setGraphTime("hours");
+                }}
               >
-                Showx
+                Show
               </Button>
             </>
           );
@@ -182,41 +244,91 @@ const StatisticsPage = (props: IProps): JSX.Element => {
     []
   );
 
-  const chooseData = () => {
-    const period = props.selectedPeriod;
-    if (!!period.date && !!period.month && !!period.year && !!dayData)
-      return ["hour", dayData.dayStats.hourly];
-    if (!!period.month && !!period.year && !!monthData)
-      return ["date", monthData.monthStats.daily];
-    if (!!period.year && !!yearData)
-      return ["month", yearData.yearStats.monthly];
-    return [null, null];
-  };
-  const [graphUnitKey, graphData] = chooseData();
-  console.log(yearData);
-  console.log(monthData);
+  const graphMaker = (title, data, maxX, type?) => (
+    <Chart
+      width={"100%"}
+      height={"400"}
+      chartType={type || "Line"}
+      loader={<div>Loading Chart</div>}
+      data={data}
+      options={{
+        chart: { title },
+        height: 500,
+        series: {
+          // Gives each series an axis name that matches the Y-axis below.
+          0: { axis: "# of Sessions" },
+          1: { axis: "Revenue" }
+        },
+        axes: {
+          // Adds labels to each axis; they don't have to match the axis names.
+          y: {
+            "# of Sessions": { label: "# of Sessions" },
+            Revenue: { label: "Revenue" }
+          }
+        },
+        vAxis: {
+          viewWindowMode: "explicit",
+          viewWindow: {
+            max: maxX,
+            min: 1
+          }
+        },
+        legend: { position: "none" }
+      }}
+      rootProps={{ "data-testid": "4" }}
+    />
+  );
+  console.log(monthGraphData);
   return (
     <div>
+      <div className={styles.graphs}>
+        {props.graphPeriod === "days"
+          ? graphMaker(
+              `Month: ${props.selectedPeriod.year}-${String(
+                props.selectedPeriod.month
+              ).padStart(2, "0")}`,
+              monthGraphData,
+              daysInMonth(
+                props.selectedPeriod.year,
+                props.selectedPeriod.month
+              ),
+              null
+            )
+          : props.graphPeriod === "months"
+          ? graphMaker(
+              `Year: ${props.selectedPeriod.year}`,
+              yearGraphData,
+              12,
+              null
+            )
+          : props.graphPeriod === "hours"
+          ? graphMaker(
+              `Day: ${props.selectedPeriod.year}-${String(
+                props.selectedPeriod.month
+              ).padStart(2, "0")}-${String(props.selectedPeriod.date).padStart(
+                2,
+                "0"
+              )}`,
+              dayGraphData,
+              24,
+              null
+            )
+          : null}
+      </div>
       <label>
         <span>Year</span>
         <NumberInput
           value={props.selectedPeriod.year}
-          onChange={year =>
-            props.setSelectedTime({ action: "set", time: { year } })
-          }
+          onChange={year => {
+            props.setSelectedTime({ year, month: null, date: null });
+            props.setGraphTime("months");
+          }}
         />
-        <button
-          onClick={() =>
-            props.setSelectedTime({
-              action: "set",
-              time: { year: props.selectedPeriod.year }
-            })
-          }
-        >
+        <button onClick={() => props.setGraphTime("months")}>
           Show Per Month Stats
         </button>
       </label>
-      <div className={styles.split}>
+      <div className={styles.periodSelection}>
         <div>
           {!!yearData ? (
             <DayStatsTable
@@ -227,7 +339,8 @@ const StatisticsPage = (props: IProps): JSX.Element => {
           ) : null}
         </div>
         <div>
-          {!!monthData && !!props.selectedPeriod.month ? (
+          {!!monthData &&
+          monthData.monthStats.year === props.selectedPeriod.year ? (
             <DayStatsTable
               columns={daysColumns}
               shouldBeHighlighted={() => false}
@@ -237,11 +350,6 @@ const StatisticsPage = (props: IProps): JSX.Element => {
             <div>Select month</div>
           )}
         </div>
-        <DayStatsDetails
-          day={JSON.stringify(props.selectedPeriod)}
-          data={graphData}
-          unitKey={graphUnitKey}
-        />
       </div>
     </div>
   );
@@ -249,7 +357,8 @@ const StatisticsPage = (props: IProps): JSX.Element => {
 
 const mapStateToProps = (state: Pick<IStore, "statsPage">): IStateToProps => {
   return {
-    selectedPeriod: state.statsPage.selectedPeriod
+    selectedPeriod: state.statsPage.selectedPeriod,
+    graphPeriod: state.statsPage.graph
   };
 };
 
@@ -257,10 +366,13 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
     setSelectedTime: payload =>
       dispatch({ type: CHANGE_SELECTED_TIME, payload }),
-    // TODO: Fetch interval
-    useFetchDayStats: () => useLazyQuery(STATS_PAGE.DAY),
-    useFetchMonthStats: () => useLazyQuery(STATS_PAGE.MONTH),
-    useFetchYearStats: () => useLazyQuery(STATS_PAGE.YEAR)
+    setGraphTime: payload => dispatch({ type: CHANGE_GRAPH_TIME, payload }),
+    useFetchDayStats: onCompleted =>
+      useLazyQuery(STATS_PAGE.DAY, { onCompleted }),
+    useFetchMonthStats: onCompleted =>
+      useLazyQuery(STATS_PAGE.MONTH, { onCompleted }),
+    useFetchYearStats: onCompleted =>
+      useLazyQuery(STATS_PAGE.YEAR, { onCompleted })
   };
 };
 
