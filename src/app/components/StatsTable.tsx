@@ -36,7 +36,7 @@ const classNames = stylesheet({
   }
 });
 
-export const DayStatsTable = ({
+export const StatsTable = ({
   columns,
   data,
   renderSubcomponent = null,

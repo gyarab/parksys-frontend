@@ -182,5 +182,22 @@ export const STATS_PAGE = {
         }
       }
     }
+  `,
+  YEAR_DAY: gql`
+    query yearDayStats($year: PositiveInt!) {
+      yearStats(year: $year) {
+        year
+        daily {
+          year
+          month
+          date
+
+          data {
+            numParkingSessions
+            revenueCents
+          }
+        }
+      }
+    }
   `
 };

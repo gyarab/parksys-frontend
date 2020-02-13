@@ -5,7 +5,7 @@ import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { useLazyQuery } from "@apollo/react-hooks";
 import { STATS_PAGE } from "../constants/Queries";
-import { DayStatsTable } from "../components/DayStatsTable";
+import { StatsTable } from "../components/StatsTable";
 import { IStatsPageState } from "../redux/modules/statsPageModule";
 import { Color } from "../constants/Color";
 import { Button } from "../components/Button";
@@ -30,6 +30,7 @@ export interface IDispatchToProps {
   useFetchYearStats: (onCompleted) => any;
   useFetchMonthStats: (onCompleted) => any;
   useFetchDayStats: (onCompleted) => any;
+  useFetchYearDayStats: (onCompleted) => any;
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
@@ -37,7 +38,7 @@ export interface IProps extends IStateToProps, IDispatchToProps {}
 const styles = stylesheet({
   graphs: {
     display: "grid",
-    gridTemplateColumns: "1fr 1fr",
+    gridTemplateColumns: "auto auto",
     gridColumnGap: "2em",
     marginBottom: "3em"
   },
@@ -58,23 +59,24 @@ const styles = stylesheet({
     paddingRight: "1em",
     borderRight: `1px solid ${Color.LIGHT_GREY}`
   },
-  rightPane: {}
+  rightPane: {},
+  calGraphs: {
+    display: "grid",
+    gridTemplateColumns: "1fr",
+    gridTemplateRows: "1fr 1fr"
+  }
 });
 
-const dayStrToArgs = (day: string) => {
-  const m = moment(day);
-  return {
-    year: m.year,
-    month: m.year,
-    date: m.date
-  };
-};
-
-const dataTransform = (inputData, unitKey, max) => {
+const dataTransform = (
+  inputData,
+  unitKey,
+  max,
+  indexFunc = (i, elem?) => i
+) => {
   const output = Array(max + 1);
   output[0] = ["", "# of Sessions", "Revenue"];
   for (let i = 1; i < output.length; i++) {
-    output[i] = [i, 0, 0];
+    output[i] = [indexFunc(i), 0, 0];
   }
   for (const elem of inputData) {
     const data = elem.data;
@@ -88,9 +90,78 @@ const dataTransform = (inputData, unitKey, max) => {
   return output;
 };
 
+const calendarDataTransform = inputData => {
+  console.log(inputData);
+  const l = inputData.length + 1;
+  const revenue = Array(l);
+  const sessions = Array(l);
+  revenue[0] = [{ type: "date", id: "Date" }, "Revenue"];
+  sessions[0] = [{ type: "date", id: "Date" }, "# of Sessions"];
+  for (let i = 0; i < inputData.length; i++) {
+    const elem = inputData[i];
+    const date = new Date(elem.year, elem.month - 1, elem.date);
+    revenue[i + 1] = [date, elem.data.revenueCents / 100];
+    sessions[i + 1] = [date, elem.data.numParkingSessions];
+  }
+  return [revenue, sessions];
+};
+
 // arg month - 1 is Jan
 const daysInMonth = (year: number, month: number) => {
   return new Date(year, month, 0).getDate();
+};
+
+const graphMaker = (title, data, maxX, type?) => (
+  <Chart
+    width={"100%"}
+    height={"400"}
+    chartType={type || "Line"}
+    loader={<div>Loading Chart</div>}
+    data={data}
+    options={{
+      chart: { title },
+      height: 500,
+      series: {
+        // Gives each series an axis name that matches the Y-axis below.
+        0: { axis: "# of Sessions" },
+        1: { axis: "Revenue" }
+      },
+      axes: {
+        // Adds labels to each axis; they don't have to match the axis names.
+        y: {
+          "# of Sessions": { label: "# of Sessions" },
+          Revenue: { label: "Revenue" }
+        }
+      },
+      vAxis: {
+        viewWindowMode: "explicit",
+        viewWindow: {
+          min: 1,
+          max: maxX
+        }
+      },
+      legend: { position: "none" }
+    }}
+    rootProps={{ "data-testid": "4" }}
+  />
+);
+
+const calendarGraphMaker = (title, data) => {
+  console.log(data);
+  return (
+    <Chart
+      width={"1300"}
+      height={"400"}
+      chartType={"Calendar"}
+      loader={<div>Loading Chart</div>}
+      data={data}
+      options={{
+        title
+        // legend: { position: "none" }
+      }}
+      rootProps={{ "data-testid": "1" }}
+    />
+  );
 };
 
 const StatisticsPage = (props: IProps): JSX.Element => {
@@ -98,10 +169,12 @@ const StatisticsPage = (props: IProps): JSX.Element => {
   const [yearData, setYearData] = useState(null);
   const [monthData, setMonthData] = useState(null);
   const [dayData, setDayData] = useState(null);
+  const [yearDayData, setYearDayData] = useState(null);
   // Graph Data - transformed into x,y pairs
   const [yearGraphData, setYearGraphData] = useState(null);
   const [monthGraphData, setMonthGraphData] = useState(null);
   const [dayGraphData, setDayGraphData] = useState(null);
+  const [yearDayGraphData, setYearDayGraphData] = useState(null);
   // Lazy Queries
   const [loadYear] = props.useFetchYearStats(data => {
     setYearData(data);
@@ -115,26 +188,23 @@ const StatisticsPage = (props: IProps): JSX.Element => {
     setMonthGraphData(dataTransform(daily, "date", daysInMonth(year, month)));
   });
   const [loadDay] = props.useFetchDayStats(data => {
-    setDayData(dayData);
+    setDayData(data);
     setDayGraphData(dataTransform(data.dayStats.hourly, "hour", 24));
   });
-
-  // Choose graph data
-  const graphData = useMemo(() => {
-    if (props.graphPeriod === "hours") {
-      return dayGraphData;
-    } else if (props.graphPeriod === "days") {
-      return monthGraphData;
-    } else if (props.graphPeriod === "months") {
-      return yearGraphData;
-    }
-  }, [props.graphPeriod]);
-
+  const [loadYearDay] = props.useFetchYearDayStats(data => {
+    setYearDayData(data);
+    setYearDayGraphData(calendarDataTransform(data.yearStats.daily));
+  });
   useEffect(() => {
     const period = props.selectedPeriod;
     if (!!period.year) {
       console.log("LOAD YEAR");
       loadYear({
+        variables: {
+          year: period.year
+        }
+      });
+      loadYearDay({
         variables: {
           year: period.year
         }
@@ -159,7 +229,7 @@ const StatisticsPage = (props: IProps): JSX.Element => {
         }
       }
     }
-  }, [props.selectedPeriod]);
+  }, [props.selectedPeriod, props.graphPeriod]);
 
   const monthsColumns = useMemo(
     () => [
@@ -244,76 +314,43 @@ const StatisticsPage = (props: IProps): JSX.Element => {
     []
   );
 
-  const graphMaker = (title, data, maxX, type?) => (
-    <Chart
-      width={"100%"}
-      height={"400"}
-      chartType={type || "Line"}
-      loader={<div>Loading Chart</div>}
-      data={data}
-      options={{
-        chart: { title },
-        height: 500,
-        series: {
-          // Gives each series an axis name that matches the Y-axis below.
-          0: { axis: "# of Sessions" },
-          1: { axis: "Revenue" }
-        },
-        axes: {
-          // Adds labels to each axis; they don't have to match the axis names.
-          y: {
-            "# of Sessions": { label: "# of Sessions" },
-            Revenue: { label: "Revenue" }
-          }
-        },
-        vAxis: {
-          viewWindowMode: "explicit",
-          viewWindow: {
-            max: maxX,
-            min: 1
-          }
-        },
-        legend: { position: "none" }
-      }}
-      rootProps={{ "data-testid": "4" }}
-    />
-  );
-  console.log(monthGraphData);
   return (
     <div>
       <div className={styles.graphs}>
-        {props.graphPeriod === "days"
-          ? graphMaker(
-              `Month: ${props.selectedPeriod.year}-${String(
-                props.selectedPeriod.month
-              ).padStart(2, "0")}`,
-              monthGraphData,
-              daysInMonth(
-                props.selectedPeriod.year,
-                props.selectedPeriod.month
-              ),
-              null
-            )
-          : props.graphPeriod === "months"
-          ? graphMaker(
-              `Year: ${props.selectedPeriod.year}`,
-              yearGraphData,
-              12,
-              null
-            )
-          : props.graphPeriod === "hours"
-          ? graphMaker(
-              `Day: ${props.selectedPeriod.year}-${String(
-                props.selectedPeriod.month
-              ).padStart(2, "0")}-${String(props.selectedPeriod.date).padStart(
-                2,
-                "0"
-              )}`,
-              dayGraphData,
-              24,
-              null
-            )
-          : null}
+        {props.graphPeriod === "days" ? (
+          graphMaker(
+            `Month: ${props.selectedPeriod.year}-${String(
+              props.selectedPeriod.month
+            ).padStart(2, "0")}`,
+            monthGraphData,
+            daysInMonth(props.selectedPeriod.year, props.selectedPeriod.month),
+            null
+          )
+        ) : props.graphPeriod === "months" ? (
+          graphMaker(
+            `Year: ${props.selectedPeriod.year}`,
+            yearGraphData,
+            12,
+            null
+          )
+        ) : props.graphPeriod === "hours" ? (
+          graphMaker(
+            `Day: ${props.selectedPeriod.year}-${String(
+              props.selectedPeriod.month
+            ).padStart(2, "0")}-${String(props.selectedPeriod.date).padStart(
+              2,
+              "0"
+            )}`,
+            dayGraphData,
+            24,
+            null
+          )
+        ) : (
+          <div className={styles.calGraphs}>
+            {calendarGraphMaker(`Revenue`, yearDayGraphData[0])}
+            {calendarGraphMaker(`Number of Sessions`, yearDayGraphData[1])}
+          </div>
+        )}
       </div>
       <label>
         <span>Year</span>
@@ -324,14 +361,18 @@ const StatisticsPage = (props: IProps): JSX.Element => {
             props.setGraphTime("months");
           }}
         />
-        <button onClick={() => props.setGraphTime("months")}>
+        <Button onClick={() => props.setGraphTime("months")}>
           Show Per Month Stats
-        </button>
+        </Button>
+        <Button onClick={() => props.setGraphTime("yearDays")}>
+          Show Per Day Stats
+        </Button>
       </label>
       <div className={styles.periodSelection}>
         <div>
+          <h2>Month</h2>
           {!!yearData ? (
-            <DayStatsTable
+            <StatsTable
               columns={monthsColumns}
               shouldBeHighlighted={() => false}
               data={yearData.yearStats.monthly}
@@ -339,9 +380,24 @@ const StatisticsPage = (props: IProps): JSX.Element => {
           ) : null}
         </div>
         <div>
+          <div>
+            <h2 style={{ display: "inline-block" }}>Day</h2>
+            {/* <input
+              type="date"
+              name="day"
+              value={new Date(
+                props.selectedPeriod.year,
+                props.selectedPeriod.month || 0,
+                props.selectedPeriod.date || 1
+              )
+                .toISOString()
+                .slice(0, 10)}
+              // onChange={onChange}
+            /> */}
+          </div>
           {!!monthData &&
           monthData.monthStats.year === props.selectedPeriod.year ? (
-            <DayStatsTable
+            <StatsTable
               columns={daysColumns}
               shouldBeHighlighted={() => false}
               data={monthData.monthStats.daily}
@@ -372,7 +428,9 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
     useFetchMonthStats: onCompleted =>
       useLazyQuery(STATS_PAGE.MONTH, { onCompleted }),
     useFetchYearStats: onCompleted =>
-      useLazyQuery(STATS_PAGE.YEAR, { onCompleted })
+      useLazyQuery(STATS_PAGE.YEAR, { onCompleted }),
+    useFetchYearDayStats: onCompleted =>
+      useLazyQuery(STATS_PAGE.YEAR_DAY, { onCompleted })
   };
 };
 

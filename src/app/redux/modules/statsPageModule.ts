@@ -10,7 +10,7 @@ export interface IStatsPageState {
     month?: number | null;
     date?: number | null;
   };
-  graph: "months" | "days" | "hours";
+  graph: "months" | "days" | "hours" | "yearDays";
 }
 
 export const initialState: IStatsPageState = {
