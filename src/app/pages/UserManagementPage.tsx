@@ -5,7 +5,7 @@ import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { useQuery, useLazyQuery } from "@apollo/react-hooks";
 import { Color } from "../constants/Color";
-import { UserPicker } from "../components/pickers/UserPicker";
+import { UserPicker, useUserPicker } from "../components/pickers/UserPicker";
 import { IUserMngmtPageState } from "../redux/modules/userMngmtPageModule";
 import {
   SetSelectedUser,
@@ -45,9 +45,9 @@ const styles = stylesheet({
 const UserManagementPage = (props: IProps): JSX.Element => {
   return (
     <div className={styles.split}>
-      <div>
+      <div style={{ height: "25em" }}>
         <UserPicker
-          identifier={!!props.selectedUser ? props.selectedUser.name : ""}
+          model={props.selectedUser || null}
           onSelect={user => props.setSelectedUser(user)}
         />
       </div>

@@ -74,7 +74,10 @@ class App extends React.Component<IStateToProps> {
       page: UserPage
     },
     userMngmtPage: {
-      page: UserManagementPage
+      page: UserManagementPage,
+      props: {
+        title: "User Management"
+      }
     }
   };
   private defaultNavigation = Navigation;

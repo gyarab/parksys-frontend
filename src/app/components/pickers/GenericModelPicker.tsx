@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { stylesheet } from "typestyle";
-import { useLazyQuery } from "@apollo/react-hooks";
+import { useLazyQuery, useQuery } from "@apollo/react-hooks";
+import { Color } from "../../constants";
 
 const styles = stylesheet({
   modelPicker: {
@@ -40,6 +41,46 @@ const styles = stylesheet({
                 backgroundColor: "#CCC"
               }
             }
+          }
+        }
+      }
+    }
+  },
+  modelListPicker: {
+    border: `1px solid ${Color.LIGHT_GREY}`,
+    padding: "0.6em",
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
+    $nest: {
+      ".searchBox": {
+        flex: "0 1 4em"
+      },
+      ".selectedModel": {
+        marginTop: "0.2em",
+        padding: "0.1em 0 0.1em 0.5em",
+        backgroundColor: `#ddd`,
+        flex: "0 1 auto"
+      },
+      ".modelList": {
+        marginTop: "0.2em",
+        overflowY: "auto",
+        flex: "1 1 auto"
+      }
+    }
+  },
+  modelList: {
+    $nest: {
+      "div + div": {
+        borderTop: `1px solid ${Color.LIGHT_GREY}`
+      },
+      div: {
+        height: "auto",
+        paddingBottom: "0.1em",
+        paddingLeft: "0.2em",
+        $nest: {
+          "&:hover": {
+            backgroundColor: "#eee"
           }
         }
       }
@@ -181,4 +222,106 @@ export const useGenericPicker = (
 ) => {
   const PickerInstance = GenericModelPicker(gProps);
   return useGenericPickerFromPicker(PickerInstance, identifierFromModel);
+};
+
+interface IListProps {
+  onSelect: (obj: any) => void;
+  model: any;
+  disabled?: boolean;
+}
+
+const ModelList = ({
+  loading,
+  error,
+  gProps: { arrayGetter, renderModel },
+  data,
+  onSelect
+}) => {
+  return loading ? (
+    <span>Loading</span>
+  ) : error ? (
+    <span>{error.toString()}</span>
+  ) : (
+    <div className={styles.modelList}>
+      {arrayGetter(data).map(model => (
+        <div onClick={() => onSelect(model)}>{renderModel(model)}</div>
+      ))}
+    </div>
+  );
+};
+
+export const GenericModelListPicker = (gProps: IGProps) => (
+  props: IListProps
+) => {
+  const disabled = props.disabled || false;
+  const [identifier, setIdentifier] = useState("");
+  const { loading, error, data } = useQuery(gProps.QUERY, {
+    variables: { query: identifier }
+  });
+  const onSelect = (model: any) => {
+    props.onSelect(model);
+    setIdentifier("");
+  };
+
+  return (
+    <div className={styles.modelListPicker}>
+      <div className="searchBox">
+        <input
+          placeholder="Search"
+          type="text"
+          disabled={disabled}
+          value={identifier}
+          onChange={e => setIdentifier(e.target.value)}
+        />
+        <button
+          disabled={disabled}
+          onClick={() => {
+            props.onSelect(null);
+          }}
+        >
+          X
+        </button>
+        <div className="selectedModel">
+          {!!props.model ? (
+            gProps.renderModel(props.model)
+          ) : (
+            <span style={{ color: Color.GREY }}>No model selected</span>
+          )}
+        </div>
+      </div>
+
+      <div className="modelList">
+        <ModelList
+          loading={loading}
+          onSelect={onSelect}
+          data={data}
+          gProps={gProps}
+          error={error}
+        />
+      </div>
+    </div>
+  );
+};
+
+export const useGenericListPickerFromListPicker = (
+  PickerInstance: (props: IListProps) => JSX.Element
+) => {
+  return (disabled: boolean = false, defaultModel: any | null = null) => {
+    const [model, setModel] = useState<any | null>(defaultModel);
+    const render = (
+      <PickerInstance
+        model={!!model ? model : null}
+        onSelect={model => {
+          setModel(model);
+        }}
+        disabled={disabled}
+      />
+    );
+    return [render, model, setModel];
+  };
+};
+
+export const useGenericListPicker = (gProps: IGProps) => {
+  const PickerInstance = GenericModelListPicker(gProps);
+  return useGenericListPickerFromListPicker(PickerInstance);
 };
