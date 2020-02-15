@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { stylesheet } from "typestyle";
 import { useLazyQuery, useQuery } from "@apollo/react-hooks";
 import { Color } from "../../constants";
+import { Button } from "../Button";
 
 const styles = stylesheet({
   modelPicker: {
@@ -54,7 +55,12 @@ const styles = stylesheet({
     height: "100%",
     $nest: {
       ".searchBox": {
-        flex: "0 1 4em"
+        flex: "0 1 4em",
+        $nest: {
+          button: {
+            marginLeft: "0.3em"
+          }
+        }
       },
       ".selectedModel": {
         marginTop: "0.2em",
@@ -172,14 +178,15 @@ export const GenericModelPicker = (gProps: IGProps) => (props: IProps) => {
         onFocus={onEditing}
         onBlur={onStopEditing}
       />
-      <button
+      <Button
         disabled={disabled}
         onClick={() => {
           props.onSelect(null);
         }}
+        type="negative"
       >
         X
-      </button>
+      </Button>
       {focused || selecting ? (
         <div className={styles.belowInput}>
           <PopUp
@@ -273,14 +280,15 @@ export const GenericModelListPicker = (gProps: IGProps) => (
           value={identifier}
           onChange={e => setIdentifier(e.target.value)}
         />
-        <button
+        <Button
           disabled={disabled}
           onClick={() => {
             props.onSelect(null);
           }}
+          type="negative"
         >
           X
-        </button>
+        </Button>
         <div className="selectedModel">
           {!!props.model ? (
             gProps.renderModel(props.model)
