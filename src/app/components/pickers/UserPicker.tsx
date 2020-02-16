@@ -45,7 +45,8 @@ export const UserPicker = GenericModelListPicker({
     }
     return Object.values(usersById);
   },
-  renderModel: RenderUser
+  renderModel: RenderUser,
+  modelName: "user"
 });
 
 export const useUserPicker = useGenericListPickerFromListPicker(UserPicker);

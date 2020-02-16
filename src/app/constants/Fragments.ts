@@ -54,5 +54,6 @@ export const USER_FRAGMENT = gql`
     email
     permissions
     isAdmin
+    active
   }
 `;

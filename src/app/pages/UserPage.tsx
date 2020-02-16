@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { connect } from "react-redux";
 import { IStore } from "../redux/IStore";
 import { Dispatch } from "redux";
-import { stylesheet, classes } from "typestyle";
-import { Color } from "../constants";
+import { stylesheet } from "typestyle";
 import { Button } from "../components/Button";
 import { useMutation, MutationTuple } from "@apollo/react-hooks";
 import { PASSWORD_CHANGE_MUTATION } from "../constants/Mutations";
 import { Flag, FlagType } from "../components/Flag";
+import { UserIdentifierDisplay } from "../components/user/UserIdentifierDisplay";
+import { UserSections } from "../components/user/UserSections";
+import { UserSection, SectionMessage } from "../components/user/UserSection";
 
 export interface IStateToProps {
   user?: {
@@ -32,94 +34,6 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
     usePasswordChange: () => useMutation(PASSWORD_CHANGE_MUTATION)
   };
-};
-
-const styles = stylesheet({
-  userPage: {
-    $nest: {
-      ".sections": {
-        $nest: {
-          "section + section": {
-            marginTop: "2em"
-          }
-        }
-      }
-    }
-  }
-});
-
-const uID = stylesheet({
-  userDisplay: {
-    margin: "1em 2em 2em auto",
-    paddingBottom: "2em",
-    borderBottom: "1px solid #ccc",
-    $nest: {
-      h2: {
-        margin: 0,
-        marginBottom: "0.3em",
-        display: "inline-block"
-      },
-      h4: {
-        margin: 0,
-        marginTop: "0.3em"
-      }
-    }
-  }
-});
-
-const UserIdentifierDisplay = props => {
-  const { name, email, isAdmin } = props;
-  return (
-    <section className={uID.userDisplay}>
-      <div>
-        <h2>{name}</h2>
-        {isAdmin ? <Flag text="admin" type={FlagType.POSITIVE} /> : null}
-      </div>
-      <h4>{email}</h4>
-    </section>
-  );
-};
-
-interface SectionMessage {
-  status: FlagType;
-  message: string;
-}
-
-const us = stylesheet({
-  userSection: {
-    padding: "0",
-    $nest: {
-      h2: {
-        marginTop: 0,
-        display: "inline-block"
-      }
-    }
-  },
-  alert: {
-    paddingLeft: "1em",
-    borderLeft: `5px solid ${Color.LIGHT_RED}`
-  }
-});
-
-const UserSection = (props: {
-  title: string;
-  children?: any;
-  alert?: boolean;
-  message?: SectionMessage;
-}) => {
-  const alert = props.alert || false;
-  return (
-    <section className={classes(us.userSection, alert && us.alert)}>
-      <a href={`#${props.title.toLowerCase()}`} />
-      <div>
-        <h2>{props.title}</h2>
-        {!!props.message ? (
-          <Flag text={props.message.message} type={props.message.status} />
-        ) : null}
-      </div>
-      {props.children}
-    </section>
-  );
 };
 
 const sec = stylesheet({
@@ -243,9 +157,16 @@ const UserPage = (props: IProps) => {
       });
   };
   return (
-    <div className={styles.userPage}>
-      <UserIdentifierDisplay {...props.user} />
-      <div className="sections">
+    <div>
+      <div
+        style={{
+          borderBottom: "1px solid #ccc",
+          marginBottom: "2em"
+        }}
+      >
+        <UserIdentifierDisplay {...props.user} />
+      </div>
+      <UserSections>
         <UserSection title="Permissions">
           <UserPermissions permissions={props.user.permissions} />
         </UserSection>
@@ -258,7 +179,7 @@ const UserPage = (props: IProps) => {
         >
           <UserSecurity changePassword={changePassword} />
         </UserSection>
-      </div>
+      </UserSections>
     </div>
   );
 };

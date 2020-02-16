@@ -10,7 +10,7 @@ import { translationsSelector } from "../selectors/translationsSelector";
 import { ConnectedLink } from "react-router5";
 import { routes } from "../routes/routes";
 import { Footer } from "./Footer";
-import { UserNavigation } from "./UserNavigation";
+import { UserNavigation } from "./user/UserNavigation";
 
 const classNames = stylesheet({
   nav: {

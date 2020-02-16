@@ -1,12 +1,12 @@
 import { stylesheet } from "typestyle";
 import React from "react";
-import { Color } from "../constants";
-import { IStore } from "../redux/IStore";
-import { logoutUser as logoutUserActionCreator } from "../redux/modules/userActionCreators";
+import { Color } from "../../constants";
+import { IStore } from "../../redux/IStore";
+import { logoutUser as logoutUserActionCreator } from "../../redux/modules/userActionCreators";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
-import { Button } from "./Button";
-import { navigate } from "../routes/routes";
+import { Button } from "../Button";
+import { navigate } from "../../routes/routes";
 
 interface IStateToProps {
   user?: {

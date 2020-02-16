@@ -1,7 +1,10 @@
 import { shallow } from "enzyme";
 import * as React from "react";
 import { IUserState } from "../../redux/modules/userModule";
-import { mapStateToProps, UnconnectedUserNavigation } from "../UserNavigation";
+import {
+  mapStateToProps,
+  UnconnectedUserNavigation
+} from "../user/UserNavigation";
 
 const userProps = {
   id: "1234",

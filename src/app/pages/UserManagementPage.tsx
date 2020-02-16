@@ -11,9 +11,14 @@ import {
   SetSelectedUser,
   SET_SELECTED_USER
 } from "../redux/modules/userMngmtActionCreators";
+import { UserEditor } from "../components/editors/UserEditor";
+import { Flag, FlagType } from "../components/Flag";
+import { IUserState } from "../redux/modules/userModule";
+import { Button } from "../components/Button";
 
 export interface IStateToProps {
   selectedUser?: IUserMngmtPageState["selectedUser"];
+  currentUserId?: IUserState["user"]["id"];
 }
 
 export interface IDispatchToProps {
@@ -23,33 +28,41 @@ export interface IDispatchToProps {
 export interface IProps extends IStateToProps, IDispatchToProps {}
 
 const styles = stylesheet({
-  split: {
+  userManagementPage: {
     height: "70%",
     display: "grid",
-    gridTemplateColumns: "auto 1fr",
+    marginRight: "1em",
+    gridTemplateColumns: "1fr auto",
     gridColumnGap: "1em"
   },
-  pane: {
-    paddingTop: "1em",
-    height: "100%"
-  },
-  leftPane: {
-    minWidth: "20em",
-    maxWidth: "25em",
-    paddingRight: "1em",
-    borderRight: `1px solid ${Color.LIGHT_GREY}`
-  },
-  rightPane: {}
+  rightPane: {
+    $nest: {
+      "> button": {
+        marginBottom: "0.5em"
+      }
+    }
+  }
 });
 
 const UserManagementPage = (props: IProps): JSX.Element => {
+  const isUser = !!props.selectedUser;
   return (
-    <div className={styles.split}>
-      <div style={{ height: "25em" }}>
-        <UserPicker
-          model={props.selectedUser || null}
-          onSelect={user => props.setSelectedUser(user)}
-        />
+    <div className={styles.userManagementPage}>
+      <div>
+        {isUser ? (
+          <UserEditor user={props.selectedUser} />
+        ) : (
+          <Flag text="Select user on the right" type={FlagType.NEGATIVE} />
+        )}
+      </div>
+      <div className={styles.rightPane}>
+        <Button>Add New User</Button>
+        <div style={{ height: "25em" }}>
+          <UserPicker
+            model={props.selectedUser || null}
+            onSelect={user => props.setSelectedUser(user)}
+          />
+        </div>
       </div>
     </div>
   );

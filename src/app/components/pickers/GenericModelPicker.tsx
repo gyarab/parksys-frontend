@@ -231,6 +231,10 @@ export const useGenericPicker = (
   return useGenericPickerFromPicker(PickerInstance, identifierFromModel);
 };
 
+interface IGListProps extends IGProps {
+  modelName?: string;
+}
+
 interface IListProps {
   onSelect: (obj: any) => void;
   model: any;
@@ -257,7 +261,7 @@ const ModelList = ({
   );
 };
 
-export const GenericModelListPicker = (gProps: IGProps) => (
+export const GenericModelListPicker = (gProps: IGListProps) => (
   props: IListProps
 ) => {
   const disabled = props.disabled || false;
@@ -293,7 +297,9 @@ export const GenericModelListPicker = (gProps: IGProps) => (
           {!!props.model ? (
             gProps.renderModel(props.model)
           ) : (
-            <span style={{ color: Color.GREY }}>No model selected</span>
+            <span style={{ color: Color.GREY }}>
+              No {!gProps.modelName ? "model" : gProps.modelName} selected
+            </span>
           )}
         </div>
       </div>
@@ -329,7 +335,7 @@ export const useGenericListPickerFromListPicker = (
   };
 };
 
-export const useGenericListPicker = (gProps: IGProps) => {
+export const useGenericListPicker = (gProps: IGListProps) => {
   const PickerInstance = GenericModelListPicker(gProps);
   return useGenericListPickerFromListPicker(PickerInstance);
 };

@@ -71,7 +71,10 @@ class App extends React.Component<IStateToProps> {
       }
     },
     userPage: {
-      page: UserPage
+      page: UserPage,
+      props: {
+        title: "Profile"
+      }
     },
     userMngmtPage: {
       page: UserManagementPage,

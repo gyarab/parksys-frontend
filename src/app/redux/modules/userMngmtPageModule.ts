@@ -10,6 +10,7 @@ export interface IUserMngmtPageState {
     email: string;
     permissions: Array<string>;
     isAdmin: boolean;
+    active: boolean;
   };
 }
 
