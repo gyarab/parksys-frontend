@@ -124,7 +124,6 @@ const DeviceRowSubcomponent = ({
 
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(SaveStatus.NONE);
   const updateConfig = config => {
-    console.log("CONF=", config);
     setSaveStatus(SaveStatus.SAVING);
     updateConfigEffect({ variables: { id: device.id, config } })
       .then(result => {
