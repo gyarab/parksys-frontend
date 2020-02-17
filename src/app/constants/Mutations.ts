@@ -41,6 +41,17 @@ export const DEVICE_PAGE_DELETE_DEVICE_MUTATION = gql`
   }
 `;
 
+export const DEVICE_PAGE_UPDATE_CONFIG_MUTATION = gql`
+  mutation updateDeviceConfig($id: ID!, $config: DeviceConfigUpdateInput!) {
+    updateDeviceConfig(id: $id, config: $config) {
+      config {
+        type
+        capturing
+      }
+    }
+  }
+`;
+
 // ParkingRuleAssignment
 export const RULE_PAGE_UPDATE_RULE_ASSIGNMENT_MUTATION = gql`
   mutation updateRuleAssignment(

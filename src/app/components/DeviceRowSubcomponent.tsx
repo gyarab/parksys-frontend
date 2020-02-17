@@ -1,11 +1,63 @@
 import React, { useState, useEffect } from "react";
 import imageGetter from "../helpers/imageGetter";
 import { Button } from "./Button";
+import { stylesheet } from "typestyle";
+import { TwoPicker } from "./pickers/TwoPicker";
+import SaveStatus from "../constants/SaveStatus";
+
+const styles = stylesheet({
+  pickers: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, auto)",
+    gridGap: "0.3em 0.4em",
+    alignItems: "center"
+  }
+});
+
+const DeviceConfigEditor = ({ device, onSave, saveStatus }) => {
+  const [config, setConfig] = useState({
+    ...device.config,
+    __typename: undefined
+  });
+  return (
+    <div>
+      <div className={styles.pickers}>
+        <span>Type</span>
+        <TwoPicker
+          optionLeft="OUT"
+          optionRight="IN"
+          rightIsSelected={config.type === "IN"}
+          onChange={type => setConfig({ ...config, type })}
+        />
+        <span>Capturing</span>
+        <TwoPicker
+          optionLeft="NO"
+          optionRight="YES"
+          rightIsSelected={!!config.capturing}
+          onChange={capturingOption =>
+            setConfig({ ...config, capturing: capturingOption === "YES" })
+          }
+        />
+      </div>
+      <Button
+        type="primary"
+        onClick={() => onSave(config)}
+        disabled={
+          saveStatus !== SaveStatus.NONE && saveStatus !== SaveStatus.FAILED
+        }
+      >
+        {saveStatus}
+      </Button>
+    </div>
+  );
+};
 
 const DeviceRowSubcomponent = ({
   regenerateActivationPasswordEffect,
+  updateConfigEffect,
   updateDevice,
-  device
+  device,
+  toggleExpand
 }) => {
   const [expiresAt, setExpiration] = useState(
     new Date(device.activationPasswordExpiresAt)
@@ -70,8 +122,34 @@ const DeviceRowSubcomponent = ({
     );
   };
 
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>(SaveStatus.NONE);
+  const updateConfig = config => {
+    console.log("CONF=", config);
+    setSaveStatus(SaveStatus.SAVING);
+    updateConfigEffect({ variables: { id: device.id, config } })
+      .then(result => {
+        setSaveStatus(SaveStatus.SUCCEEDED);
+        updateDevice(device.id, {
+          ...device,
+          config: result.data.updateDeviceConfig.config
+        });
+      })
+      .catch(err => {
+        console.log(err);
+        setSaveStatus(SaveStatus.FAILED);
+      });
+    toggleExpand(device.id, false);
+  };
+
   if (device.activated) {
-    return <div>Device is activated</div>;
+    // Config
+    return (
+      <DeviceConfigEditor
+        device={device}
+        onSave={updateConfig}
+        saveStatus={saveStatus}
+      />
+    );
   } else if (!shouldFetchImg || expired) {
     return (
       <div>

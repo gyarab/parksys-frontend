@@ -22,7 +22,8 @@ import { Color } from "../constants";
 import DeviceRowSubcomponent from "../components/DeviceRowSubcomponent";
 import {
   DEVICE_PAGE_CREATE_DEVICE_MUTATION,
-  DEVICE_PAGE_DELETE_DEVICE_MUTATION
+  DEVICE_PAGE_DELETE_DEVICE_MUTATION,
+  DEVICE_PAGE_UPDATE_CONFIG_MUTATION
 } from "../constants/Mutations";
 
 const coloredStatus = (backgroundColor, textColor = Color.BLACK): any => {
@@ -61,6 +62,7 @@ export interface IDispatchToProps {
   useDeleteDevice: () => MutationTuple<any, { id: string }>;
   useRegenerateActivationPassword: () => MutationTuple<any, { id: string }>;
   toggleExpand: (id: string, isExpanded: boolean) => void;
+  useUpdateDeviceConfig: () => MutationTuple<any, { id: string; config: any }>;
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
@@ -150,7 +152,7 @@ const DevicesPage = (props: IProps): JSX.Element => {
           return (
             <>
               <Button
-                disabled={row.original.activated && !row.isExpanded}
+                // disabled={row.original.activated && !row.isExpanded}
                 onClick={detailsClick}
               >
                 Details
@@ -166,6 +168,8 @@ const DevicesPage = (props: IProps): JSX.Element => {
     []
   );
 
+  const [updateConfigEffect] = props.useUpdateDeviceConfig();
+
   const table = (
     <>
       <DeviceTable
@@ -176,8 +180,10 @@ const DevicesPage = (props: IProps): JSX.Element => {
             regenerateActivationPasswordEffect={
               regenerateActivationPasswordEffect
             }
+            updateConfigEffect={updateConfigEffect}
             device={row.original}
             updateDevice={props.updateDevice}
+            toggleExpand={props.toggleExpand}
           />
         )}
       />
@@ -269,7 +275,8 @@ export const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
         }
       `),
     toggleExpand: (id, isExpanded) =>
-      dispatch(toggleDeviceExpand({ id, isExpanded }))
+      dispatch(toggleDeviceExpand({ id, isExpanded })),
+    useUpdateDeviceConfig: () => useMutation(DEVICE_PAGE_UPDATE_CONFIG_MUTATION)
   };
 };
 

@@ -36,6 +36,10 @@ export class DevicesSaga extends BaseSaga {
               activatedAt
               activationQrUrl
               activationPasswordExpiresAt
+              config {
+                capturing
+                type
+              }
             }
           }
         `,
