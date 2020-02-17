@@ -91,7 +91,6 @@ const dataTransform = (
 };
 
 const calendarDataTransform = inputData => {
-  console.log(inputData);
   const l = inputData.length + 1;
   const revenue = Array(l);
   const sessions = Array(l);
@@ -147,7 +146,6 @@ const graphMaker = (title, data, maxX, type?) => (
 );
 
 const calendarGraphMaker = (title, data) => {
-  console.log(data);
   return (
     <Chart
       width={"1300"}
@@ -198,7 +196,6 @@ const StatisticsPage = (props: IProps): JSX.Element => {
   useEffect(() => {
     const period = props.selectedPeriod;
     if (!!period.year) {
-      console.log("LOAD YEAR");
       loadYear({
         variables: {
           year: period.year
@@ -210,7 +207,6 @@ const StatisticsPage = (props: IProps): JSX.Element => {
         }
       });
       if (!!period.month) {
-        console.log("LOAD MONTH");
         loadMonth({
           variables: {
             year: period.year,
@@ -218,7 +214,6 @@ const StatisticsPage = (props: IProps): JSX.Element => {
           }
         });
         if (!!period.date) {
-          console.log("LOAD DAY");
           loadDay({
             variables: {
               year: period.year,
@@ -316,12 +311,13 @@ const StatisticsPage = (props: IProps): JSX.Element => {
 
   // This fixes a react-google-charts bug where the months are not fully shown
   // unless resized.
-  const [calendarGraphW, setCalendarGraphW] = useState(1);
+  const [calendarGraphW, setCalendarGraphW] = useState(0);
   useEffect(() => {
     if (props.graphPeriod === "yearDays") {
+      setCalendarGraphW(1);
       setTimeout(() => setCalendarGraphW(0), 1);
     }
-  }, [props.graphPeriod]);
+  }, [props.graphPeriod, props.selectedPeriod]);
 
   return (
     <div>
