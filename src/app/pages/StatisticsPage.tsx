@@ -314,6 +314,15 @@ const StatisticsPage = (props: IProps): JSX.Element => {
     []
   );
 
+  // This fixes a react-google-charts bug where the months are not fully shown
+  // unless resized.
+  const [calendarGraphW, setCalendarGraphW] = useState(1);
+  useEffect(() => {
+    if (props.graphPeriod === "yearDays") {
+      setTimeout(() => setCalendarGraphW(0), 1);
+    }
+  }, [props.graphPeriod]);
+
   return (
     <div>
       <div className={styles.graphs}>
@@ -346,7 +355,10 @@ const StatisticsPage = (props: IProps): JSX.Element => {
             null
           )
         ) : (
-          <div className={styles.calGraphs}>
+          <div
+            className={styles.calGraphs}
+            style={{ width: `calc(auto - ${calendarGraphW}px)` }}
+          >
             {calendarGraphMaker(`Revenue`, yearDayGraphData[0])}
             {calendarGraphMaker(`Number of Sessions`, yearDayGraphData[1])}
           </div>
@@ -382,18 +394,6 @@ const StatisticsPage = (props: IProps): JSX.Element => {
         <div>
           <div>
             <h2 style={{ display: "inline-block" }}>Day</h2>
-            {/* <input
-              type="date"
-              name="day"
-              value={new Date(
-                props.selectedPeriod.year,
-                props.selectedPeriod.month || 0,
-                props.selectedPeriod.date || 1
-              )
-                .toISOString()
-                .slice(0, 10)}
-              // onChange={onChange}
-            /> */}
           </div>
           {!!monthData &&
           monthData.monthStats.year === props.selectedPeriod.year ? (
