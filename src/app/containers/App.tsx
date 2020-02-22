@@ -22,6 +22,7 @@ import { RulePage } from "../pages/RulePage";
 import { UserPage } from "../pages/UserPage";
 import { StatisticsPage } from "../pages/StatisticsPage";
 import { UserManagementPage } from "../pages/UserManagementPage";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 setupCss();
 
@@ -133,13 +134,12 @@ class App extends React.Component<IStateToProps> {
       return <NotFoundPage message={notFound} />;
     }
   }
-
   public render(): JSX.Element {
     const display = this.getDisplay();
     return (
       <section className={classNames.container}>
         <Helmet {...appConfig.app.head} />
-        {display}
+        <ErrorBoundary>{display}</ErrorBoundary>
       </section>
     );
   }

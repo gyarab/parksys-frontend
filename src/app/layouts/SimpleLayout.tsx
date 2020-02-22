@@ -1,7 +1,7 @@
 import React from "react";
 import { ILayoutProps, LayoutComponent } from "./Layout";
 import { stylesheet } from "typestyle";
-// import { UserNavigation } from "../components/UserNavigation";
+import { ErrorBoundary } from "../containers/ErrorBoundary";
 
 // Sidebar src: https://every-layout.dev/layouts/sidebar/
 const classNames = stylesheet({
@@ -62,7 +62,7 @@ class SimpleLayout extends LayoutComponent {
           </div>
           <div className={classNames.mainContent}>
             {!!this.props.title ? <h2>{this.props.title}</h2> : null}
-            {this.props.children}
+            <ErrorBoundary>{this.props.children}</ErrorBoundary>
             <div className="spacer"></div>
           </div>
         </div>
