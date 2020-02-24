@@ -34,7 +34,10 @@ const RenderUser = user => (
 
 export const UserPicker = GenericModelListPicker({
   QUERY: USER_SEARCH_QUERY,
-  identifierToOptions: query => ({ variables: { query } }),
+  identifierToOptions: query => ({
+    variables: { query },
+    fetchPolicy: "no-cache"
+  }),
   arrayGetter: data => {
     const usersById = {};
     for (const user of data.byEmail.data) {

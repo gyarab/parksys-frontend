@@ -158,3 +158,12 @@ export const PASSWORD_CHANGE_MUTATION = gql`
     passwordChange(input: $input)
   }
 `;
+
+// User Management
+export const USER_UPDATE_MUTATION = gql`
+  mutation updateUser($id: ID!, $input: UserUpdateInput!) {
+    updateUser(id: $id, input: $input) {
+      id
+    }
+  }
+`;

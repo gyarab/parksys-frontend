@@ -37,6 +37,7 @@ const styles = stylesheet({
 
 interface IProps {
   user: IUserMngmtPageState["selectedUser"];
+  updateUser: (updates) => void;
 }
 
 const UserPermissionEditor = ({ permissions }) => {
@@ -48,7 +49,9 @@ export const UserEditor = (props: IProps): JSX.Element => {
     console.log(`DELETE ${props.user.email}`);
   };
   const toggleActivation = () => {
-    console.log(`TOGGLE ${props.user.email}`);
+    props.updateUser({
+      active: !props.user.active
+    });
   };
   return (
     <div className={styles.userEditor}>
