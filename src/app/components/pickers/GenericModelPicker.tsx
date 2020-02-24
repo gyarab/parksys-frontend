@@ -266,9 +266,10 @@ export const GenericModelListPicker = (gProps: IGListProps) => (
 ) => {
   const disabled = props.disabled || false;
   const [identifier, setIdentifier] = useState("");
-  const { loading, error, data } = useQuery(gProps.QUERY, {
-    variables: { query: identifier }
-  });
+  const { loading, error, data } = useQuery(
+    gProps.QUERY,
+    gProps.identifierToOptions(identifier)
+  );
   const onSelect = (model: any) => {
     props.onSelect(model);
     setIdentifier("");

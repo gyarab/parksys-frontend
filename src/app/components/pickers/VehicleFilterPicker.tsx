@@ -1,6 +1,8 @@
 import {
   useGenericPickerFromPicker,
-  GenericModelPicker
+  GenericModelPicker,
+  GenericModelListPicker,
+  useGenericListPickerFromListPicker
 } from "./GenericModelPicker";
 import React from "react";
 import { stylesheet } from "typestyle";
@@ -32,16 +34,15 @@ const RenderVehicleFilter = model => (
   </div>
 );
 
-export const VehicleFilterPicker = GenericModelPicker({
+export const VehicleFilterPicker = GenericModelListPicker({
   QUERY: VEHICLE_FILTER_PICKER_SEARCH_QUERY,
   arrayGetter: data => data.vehicleFilterSearch.data,
   renderModel: RenderVehicleFilter,
   identifierToOptions: name => ({ variables: { name } })
 });
 
-export const useVehicleFilterPicker = useGenericPickerFromPicker(
-  VehicleFilterPicker,
-  model => model.name
+export const useVehicleFilterPicker = useGenericListPickerFromListPicker(
+  VehicleFilterPicker
 );
 
 export const useVehicleFilterMultiPicker = useGenericMultiPicker({

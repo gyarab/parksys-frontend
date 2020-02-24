@@ -1,11 +1,9 @@
-import React, { useMemo, useEffect, useState } from "react";
-import { stylesheet, classes } from "typestyle";
+import React, { useState } from "react";
+import { stylesheet } from "typestyle";
 import { IStore } from "../redux/IStore";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
-import { useQuery, useLazyQuery } from "@apollo/react-hooks";
-import { Color } from "../constants/Color";
-import { UserPicker, useUserPicker } from "../components/pickers/UserPicker";
+import { UserPicker } from "../components/pickers/UserPicker";
 import { IUserMngmtPageState } from "../redux/modules/userMngmtPageModule";
 import {
   SetSelectedUser,
@@ -16,16 +14,20 @@ import { Flag, FlagType } from "../components/Flag";
 import { IUserState } from "../redux/modules/userModule";
 import { Button } from "../components/Button";
 import { useMutation, MutationTuple } from "@apollo/react-hooks";
-import { USER_UPDATE_MUTATION } from "../constants/Mutations";
+import {
+  USER_UPDATE_MUTATION,
+  USER_DELETE_MUTATION
+} from "../constants/Mutations";
 
 export interface IStateToProps {
+  currentUser?: IUserState["user"];
   selectedUser?: IUserMngmtPageState["selectedUser"];
-  currentUserId?: IUserState["user"]["id"];
 }
 
 export interface IDispatchToProps {
   setSelectedUser: (payload: SetSelectedUser["payload"]) => void;
   useUpdateUser: () => MutationTuple<any, { id: string; input: any }>;
+  useDeleteUser: () => MutationTuple<any, { id: string }>;
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
@@ -50,8 +52,19 @@ const styles = stylesheet({
 const UserManagementPage = (props: IProps): JSX.Element => {
   const isUser = !!props.selectedUser;
   const [i, setI] = useState(0);
+  const [err, setErr] = useState("");
   const [updateUserEffect] = props.useUpdateUser();
+  const [deleteUserEffect] = props.useDeleteUser();
   const updateUser = updates => {
+    if (
+      props.selectedUser.id === props.currentUser.id &&
+      typeof updates.active === "boolean" &&
+      !updates.active
+    ) {
+      setErr("Cannot deactivate yourself.");
+      return;
+    }
+    setErr("");
     updateUserEffect({
       variables: {
         id: props.selectedUser.id,
@@ -60,11 +73,27 @@ const UserManagementPage = (props: IProps): JSX.Element => {
     });
     props.setSelectedUser(null);
   };
+  const deleteUser = (id: string) => {
+    if (props.selectedUser.id === props.currentUser.id) {
+      setErr("Cannot delete yourself.");
+      return;
+    }
+    setErr("");
+    deleteUserEffect({
+      variables: { id }
+    });
+    props.setSelectedUser(null);
+  };
   return (
     <div className={styles.userManagementPage}>
       <div>
+        {err.length > 0 ? <Flag text={err} type={FlagType.NEGATIVE} /> : null}
         {isUser ? (
-          <UserEditor user={props.selectedUser} updateUser={updateUser} />
+          <UserEditor
+            user={props.selectedUser}
+            updateUser={updateUser}
+            deleteUser={deleteUser}
+          />
         ) : (
           <Flag text="Select user on the right" type={FlagType.NEGATIVE} />
         )}
@@ -83,9 +112,10 @@ const UserManagementPage = (props: IProps): JSX.Element => {
 };
 
 const mapStateToProps = (
-  state: Pick<IStore, "userMngmtPage">
+  state: Pick<IStore, "userMngmtPage"> & Pick<IStore, "user">
 ): IStateToProps => {
   return {
+    currentUser: state.user.user,
     selectedUser: state.userMngmtPage.selectedUser
   };
 };
@@ -93,7 +123,8 @@ const mapStateToProps = (
 const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
     setSelectedUser: payload => dispatch({ type: SET_SELECTED_USER, payload }),
-    useUpdateUser: () => useMutation(USER_UPDATE_MUTATION)
+    useUpdateUser: () => useMutation(USER_UPDATE_MUTATION),
+    useDeleteUser: () => useMutation(USER_DELETE_MUTATION)
   };
 };
 

@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useState } from "react";
-import { stylesheet, classes } from "typestyle";
+import { stylesheet } from "typestyle";
 import { IStore } from "../redux/IStore";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
@@ -15,7 +15,6 @@ import {
   ChangeGraphTime,
   CHANGE_GRAPH_TIME
 } from "../redux/modules/statsPageActionCreators";
-import moment from "moment";
 import { NumberInput } from "../components/pickers/NumberInput";
 import { Chart } from "react-google-charts";
 
@@ -313,15 +312,16 @@ const StatisticsPage = (props: IProps): JSX.Element => {
   // unless resized.
   const [calendarGraphW, setCalendarGraphW] = useState(0);
   useEffect(() => {
-    if (props.graphPeriod === "yearDays") {
-      setCalendarGraphW(1);
-      setTimeout(() => setCalendarGraphW(0), 1);
-    }
+    setCalendarGraphW(1);
+    setTimeout(() => setCalendarGraphW(0), 1);
   }, [props.graphPeriod, props.selectedPeriod]);
 
   return (
     <div>
-      <div className={styles.graphs}>
+      <div
+        className={styles.graphs}
+        style={{ width: `calc(auto - ${calendarGraphW}px)` }}
+      >
         {props.graphPeriod === "days" ? (
           graphMaker(
             `Month: ${props.selectedPeriod.year}-${String(
@@ -351,10 +351,7 @@ const StatisticsPage = (props: IProps): JSX.Element => {
             null
           )
         ) : (
-          <div
-            className={styles.calGraphs}
-            style={{ width: `calc(auto - ${calendarGraphW}px)` }}
-          >
+          <div className={styles.calGraphs}>
             {calendarGraphMaker(`Revenue`, yearDayGraphData[0])}
             {calendarGraphMaker(`Number of Sessions`, yearDayGraphData[1])}
           </div>

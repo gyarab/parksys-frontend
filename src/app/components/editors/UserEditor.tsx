@@ -37,7 +37,8 @@ const styles = stylesheet({
 
 interface IProps {
   user: IUserMngmtPageState["selectedUser"];
-  updateUser: (updates) => void;
+  updateUser: (updates: any) => void;
+  deleteUser: (id: string) => void;
 }
 
 const UserPermissionEditor = ({ permissions }) => {
@@ -45,9 +46,6 @@ const UserPermissionEditor = ({ permissions }) => {
 };
 
 export const UserEditor = (props: IProps): JSX.Element => {
-  const deleteUser = () => {
-    console.log(`DELETE ${props.user.email}`);
-  };
   const toggleActivation = () => {
     props.updateUser({
       active: !props.user.active
@@ -61,7 +59,10 @@ export const UserEditor = (props: IProps): JSX.Element => {
         </div>
         <div className="controls">
           <div>
-            <Button type="negative" onClick={deleteUser}>
+            <Button
+              type="negative"
+              onClick={() => props.deleteUser(props.user.id)}
+            >
               Delete
             </Button>
           </div>

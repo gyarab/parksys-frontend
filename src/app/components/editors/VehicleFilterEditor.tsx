@@ -184,7 +184,7 @@ const VehicleFilterWidget = (props: IProps) => {
       </div>
       {isNew ? null : (
         <VehicleFilterPicker
-          identifier={props.vehicleFilter ? props.vehicleFilter.name : ""}
+          model={!!props.vehicleFilter ? props.vehicleFilter : null}
           onSelect={filter => props.setSelectedVehicleFilter(filter)}
         />
       )}
