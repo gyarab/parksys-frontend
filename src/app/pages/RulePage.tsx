@@ -105,6 +105,7 @@ const RulePage = (props: IProps) => {
                 ? dataSimul.simulateRuleAssignmentApplication
                 : null
             }
+            onNewOrDel={refetch}
           />
           <div className={styles.widgetContainer}>
             <OptionsWidget>

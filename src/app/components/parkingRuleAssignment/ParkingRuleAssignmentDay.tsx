@@ -82,7 +82,12 @@ const calcMaxPriority = data =>
     return Math.max(assignment.priority, prevMax);
   }, -1);
 
-export const ParkingRuleAssignmentDay = ({ appliedData, data, day }) => {
+export const ParkingRuleAssignmentDay = ({
+  appliedData,
+  data,
+  day,
+  onNewOrDel
+}) => {
   const dayStartM = moment(day).startOf("day");
   const dayStart = dayStartM.toDate();
   const dayEnd = dayStartM.endOf("day").toDate();
@@ -160,6 +165,7 @@ export const ParkingRuleAssignmentDay = ({ appliedData, data, day }) => {
                 maxPriority={maxPriority}
                 priority={maxPriority - priority + 1}
                 dayStart={dayStart}
+                onNewOrDel={onNewOrDel}
               />
             </React.Fragment>
           ))}

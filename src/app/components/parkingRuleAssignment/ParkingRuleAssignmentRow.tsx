@@ -94,6 +94,7 @@ export interface IProps extends IStateToProps, IDispatchToProps {
   maxPriority: number;
   priority: number;
   dayStart: Date;
+  onNewOrDel: () => void;
 }
 
 const addPRAStyles = stylesheet({
@@ -148,7 +149,8 @@ const ParkingRuleAssignmentRow = ({
   dayStart,
   setSelectedDay,
   setOpenedNewRuleAssignment,
-  openedNewRuleAssignment
+  openedNewRuleAssignment,
+  onNewOrDel
 }: IProps) => {
   const dayEnd = moment(dayStart)
     .endOf("day")
@@ -198,9 +200,9 @@ const ParkingRuleAssignmentRow = ({
               rules: [],
               active: false
             }}
-            close={() => {
-              console.log("CLOSE!");
+            close={wasNew => {
               setOpenedNewRuleAssignment(null);
+              onNewOrDel();
             }}
           />
         </div>
@@ -267,7 +269,10 @@ const ParkingRuleAssignmentRow = ({
             zIndex: priority + 1
           }}
         >
-          <ParkingRuleAssignment assignment={assignment} />
+          <ParkingRuleAssignment
+            assignment={assignment}
+            onNewOrDel={onNewOrDel}
+          />
         </div>
       </React.Fragment>
     );

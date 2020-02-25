@@ -163,7 +163,7 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
   const [deleteEffect] = props.useDeleteRuleAssignment();
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(SaveStatus.NONE);
   const close = () => {
-    if (saveStatus !== SaveStatus.SAVING) props.close();
+    props.close(isNew);
   };
 
   const save = () => {
@@ -200,11 +200,13 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
       });
   };
   const del = () => {
+    console.log("PRE DELETE");
     deleteEffect({
       variables: {
         id: props.assignment.id
       }
     }).then(({ data }) => {
+      console.log("POST DELETE");
       props.setCollidingRuleAssignments([]);
       close();
     });

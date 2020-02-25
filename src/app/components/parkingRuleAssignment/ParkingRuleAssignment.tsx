@@ -18,6 +18,7 @@ export interface IStateToProps {
 
 export interface IProps extends IStateToProps, IDispatchToProps {
   assignment: any;
+  onNewOrDel: () => void;
 }
 
 const styles = stylesheet({
@@ -52,12 +53,14 @@ const ParkingRuleAssignment = ({
   assignment,
   toggledId,
   changeOpenedRuleAssignment,
-  collidingIds
+  collidingIds,
+  onNewOrDel
 }: IProps) => {
   modifyAssignment(assignment);
   const toggled = toggledId === assignment.id;
   const toggleDetails = () => {
     changeOpenedRuleAssignment(assignment.id);
+    onNewOrDel();
   };
   const extraStyle = collidingIds.has(assignment.id)
     ? { border: `2px solid ${Color.LIGHT_RED}` }
