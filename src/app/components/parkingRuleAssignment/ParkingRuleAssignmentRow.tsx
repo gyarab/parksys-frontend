@@ -14,6 +14,7 @@ import { connect } from "react-redux";
 import { ParkingRuleAssignmentDetails } from "./ParkingRuleAssignmentDetails";
 import { IRulePageState } from "../../redux/modules/rulePageModule";
 import { IStore } from "../../redux/IStore";
+import { CloseAction } from "./CloseAction";
 
 const border = (width = "1px") => `${width} solid #c3c3c3`;
 const hourWidth = 100 / 24;
@@ -200,9 +201,14 @@ const ParkingRuleAssignmentRow = ({
               rules: [],
               active: false
             }}
-            close={wasNew => {
+            close={action => {
               setOpenedNewRuleAssignment(null);
-              onNewOrDel();
+              if (
+                action === CloseAction.DELETE ||
+                action === CloseAction.SAVE
+              ) {
+                onNewOrDel();
+              }
             }}
           />
         </div>

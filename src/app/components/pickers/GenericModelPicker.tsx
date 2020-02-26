@@ -294,7 +294,7 @@ export const GenericModelListPicker = (gProps: IGListProps) => {
     typeof gProps.clearIdentifierOnSelect === "undefined"
       ? true
       : gProps.clearIdentifierOnSelect;
-  const paging = typeof gProps.paging === "undefined" ? true : gProps.paging;
+  const paging = typeof gProps.paging === "undefined" ? false : gProps.paging;
   return (props: IListProps) => {
     const disabled = props.disabled || false;
     const [identifier, setIdentifier] = useState("");

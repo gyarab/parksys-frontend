@@ -6,6 +6,7 @@ import { Dispatch } from "redux";
 import { CHANGE_OPENED_RULE_ASSIGNMENT } from "../../redux/modules/rulePageActionCreators";
 import { IStore } from "../../redux/IStore";
 import { ParkingRuleAssignmentDetails } from "./ParkingRuleAssignmentDetails";
+import { CloseAction } from "./CloseAction";
 
 export interface IDispatchToProps {
   changeOpenedRuleAssignment(id: string | null): void;
@@ -58,9 +59,11 @@ const ParkingRuleAssignment = ({
 }: IProps) => {
   modifyAssignment(assignment);
   const toggled = toggledId === assignment.id;
-  const toggleDetails = () => {
+  const toggleDetails = action => {
     changeOpenedRuleAssignment(assignment.id);
-    onNewOrDel();
+    if (action === CloseAction.DELETE || action === CloseAction.SAVE) {
+      onNewOrDel();
+    }
   };
   const extraStyle = collidingIds.has(assignment.id)
     ? { border: `2px solid ${Color.LIGHT_RED}` }

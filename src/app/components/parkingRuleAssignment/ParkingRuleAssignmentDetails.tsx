@@ -16,6 +16,7 @@ import { useParkingRuleMultiPicker } from "../pickers/ParkingRulePicker";
 import { useVehicleFilterMultiPicker } from "../pickers/VehicleFilterPicker";
 import SaveStatus from "../../constants/SaveStatus";
 import { useNumberInput } from "../pickers/NumberInput";
+import { CloseAction } from "./CloseAction";
 
 const styles = stylesheet({
   options: {
@@ -162,8 +163,8 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
   const [createEffect] = props.useCreateRuleAssignment();
   const [deleteEffect] = props.useDeleteRuleAssignment();
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(SaveStatus.NONE);
-  const close = () => {
-    props.close(isNew);
+  const close = (action: CloseAction) => {
+    props.close(action);
   };
 
   const save = () => {
@@ -191,7 +192,7 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
         } else {
           props.setCollidingRuleAssignments([]);
           setSaveStatus(SaveStatus.SUCCEEDED);
-          close();
+          close(isNew ? CloseAction.SAVE : CloseAction.UPDATE);
         }
       })
       .catch(err => {
@@ -208,7 +209,7 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
     }).then(({ data }) => {
       console.log("POST DELETE");
       props.setCollidingRuleAssignments([]);
-      close();
+      close(CloseAction.DELETE);
     });
   };
   return (
@@ -232,7 +233,7 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
           {saveStatus}
         </Button>
         <Button onClick={setOriginalValues}>Reset</Button>
-        <Button type="negative" onClick={close}>
+        <Button type="negative" onClick={() => close(CloseAction.NONE)}>
           Close
         </Button>
       </div>

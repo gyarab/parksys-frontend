@@ -5,6 +5,7 @@ import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS } from "../redux/modules/rulePageActionCreators";
 import { useParkingSessionPicker } from "../components/pickers/ParkingSessionPicker";
+import { useVehiclePagedPicker } from "../components/pickers/VehiclePicker";
 
 export interface IStateToProps {}
 
@@ -19,8 +20,14 @@ const styles = stylesheet({
 });
 
 const VehiclePage = (props: IProps): JSX.Element => {
-  const [render, ,] = useParkingSessionPicker();
-  return <div className={styles.vehiclePage}>{render}</div>;
+  const [sessionPicker, ,] = useParkingSessionPicker();
+  const [vehiclePicker, ,] = useVehiclePagedPicker();
+  return (
+    <div className={styles.vehiclePage}>
+      {sessionPicker}
+      {vehiclePicker}
+    </div>
+  );
 };
 
 const mapStateToProps = (state: IStore): IStateToProps => {
