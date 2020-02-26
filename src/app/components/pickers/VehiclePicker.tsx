@@ -7,7 +7,11 @@ import {
 } from "./GenericModelPicker";
 import { useGenericMultiPicker } from "./GenericModelMultiPicker";
 
-const renderModel = model => <>{model.licensePlate}</>;
+const renderModel = model => (
+  <>
+    {model.licensePlate} {model.numParkingSessions} sessions
+  </>
+);
 const arrayGetter = data => data.vehicleSearch.data;
 
 export const VehiclePicker = GenericModelPicker({

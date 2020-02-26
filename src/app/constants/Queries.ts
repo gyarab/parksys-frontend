@@ -58,6 +58,7 @@ export const VEHICLE_PICKER_SEARCH_QUERY = gql`
       data {
         id
         licensePlate
+        numParkingSessions
       }
     }
   }

@@ -19,18 +19,37 @@ export interface IDispatchToProps {
 export interface IProps extends IStateToProps, IDispatchToProps {}
 
 const styles = stylesheet({
-  vehiclePage: {}
+  vehiclePage: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)"
+  },
+  pickers: {}
 });
+
+const PickerContainer = ({ children, title }) => (
+  <div style={{ height: "20em", marginBottom: "4em" }}>
+    <h3>{title}</h3>
+    {children}
+  </div>
+);
 
 const VehiclePage = (props: IProps): JSX.Element => {
   const [sessionPicker, ,] = useParkingSessionPicker();
   return (
     <div className={styles.vehiclePage}>
-      {sessionPicker}
-      <VehiclePagedPicker
-        onSelect={props.setSimulationVehicle}
-        model={props.vehicle}
-      />
+      <div></div>
+      <div></div>
+      <div className={styles.pickers}>
+        <PickerContainer title="Parking Session">
+          {sessionPicker}
+        </PickerContainer>
+        <PickerContainer title="Vehicle">
+          <VehiclePagedPicker
+            onSelect={props.setSimulationVehicle}
+            model={props.vehicle}
+          />
+        </PickerContainer>
+      </div>
     </div>
   );
 };
