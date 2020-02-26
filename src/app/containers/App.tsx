@@ -23,6 +23,7 @@ import { UserPage } from "../pages/UserPage";
 import { StatisticsPage } from "../pages/StatisticsPage";
 import { UserManagementPage } from "../pages/UserManagementPage";
 import { ErrorBoundary } from "./ErrorBoundary";
+import { VehiclePage } from "../pages/VehiclePage";
 
 setupCss();
 
@@ -81,6 +82,12 @@ class App extends React.Component<IStateToProps> {
       page: UserManagementPage,
       props: {
         title: "User Management"
+      }
+    },
+    vehiclePage: {
+      page: VehiclePage,
+      props: {
+        title: "Vehicle Page"
       }
     }
   };

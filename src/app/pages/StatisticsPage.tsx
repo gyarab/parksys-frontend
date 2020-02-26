@@ -17,6 +17,7 @@ import {
 } from "../redux/modules/statsPageActionCreators";
 import { NumberInput } from "../components/pickers/NumberInput";
 import { Chart } from "react-google-charts";
+import { ParkingSessionPicker } from "../components/pickers/ParkingSessionPicker";
 
 export interface IStateToProps {
   selectedPeriod: IStatsPageState["selectedPeriod"];

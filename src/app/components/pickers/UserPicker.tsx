@@ -1,8 +1,6 @@
 import React from "react";
 import { stylesheet } from "typestyle";
 import {
-  GenericModelPicker,
-  useGenericPickerFromPicker,
   GenericModelListPicker,
   useGenericListPickerFromListPicker
 } from "./GenericModelPicker";
@@ -53,8 +51,3 @@ export const UserPicker = GenericModelListPicker({
 });
 
 export const useUserPicker = useGenericListPickerFromListPicker(UserPicker);
-
-// export const useUserPicker = useGenericPickerFromPicker(
-//   UserPicker,
-//   user => user.name
-// );

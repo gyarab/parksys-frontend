@@ -14,12 +14,10 @@ const classNames = stylesheet({
   }
 });
 
-export class BlankPage extends React.Component {
-  render(): JSX.Element {
-    return (
-      <div className={classNames.page}>
-        <p>This page is left intentionally blank.</p>
-      </div>
-    );
-  }
-}
+export const BlankPage = () => {
+  return (
+    <div className={classNames.page}>
+      <p>This page is left intentionally blank.</p>
+    </div>
+  );
+};

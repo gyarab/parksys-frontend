@@ -15,10 +15,11 @@ type RoutablePages =
   | "loginPage"
   | "devicesPage"
   | "userPage"
-  | "userMngmtPage";
+  | "userMngmtPage"
+  | "vehiclePage";
 interface PageRecord {
-  page: ComponentClass;
-  nav?: ComponentClass;
+  page: ComponentClass | (() => JSX.Element);
+  nav?: ComponentClass | (() => JSX.Element);
   layout?: ComponentClass<ILayoutProps>;
   props?: Partial<ILayoutProps>;
 }
@@ -54,7 +55,8 @@ const config: RouteConfig = {
   loginPage: { path: "/" },
   devicesPage: { path: "/devices" },
   userPage: { path: "/user" },
-  userMngmtPage: { path: "/users" }
+  userMngmtPage: { path: "/users" },
+  vehiclePage: { path: "/vehicles" }
 };
 
 export const routes = getRoutes(config);
@@ -67,5 +69,6 @@ export const navigate: RouteNavigate = {
   loginPage: () => getNavigateAction(routes.loginPage.name),
   devicesPage: () => getNavigateAction(routes.devicesPage.name),
   userPage: () => getNavigateAction(routes.userPage.name),
-  userMngmtPage: () => getNavigateAction(routes.userMngmtPage.name)
+  userMngmtPage: () => getNavigateAction(routes.userMngmtPage.name),
+  vehiclePage: () => getNavigateAction(routes.vehiclePage.name)
 };

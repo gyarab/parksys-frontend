@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { stylesheet } from "typestyle";
 import { useLazyQuery, useQuery } from "@apollo/react-hooks";
 import { Color } from "../../constants";
@@ -91,6 +91,10 @@ const styles = stylesheet({
         }
       }
     }
+  },
+  pagingControl: {
+    display: "grid",
+    gridTemplateColumns: "auto auto"
   }
 });
 
@@ -231,8 +235,21 @@ export const useGenericPicker = (
   return useGenericPickerFromPicker(PickerInstance, identifierFromModel);
 };
 
-interface IGListProps extends IGProps {
+interface IListInputProps {
+  disabled?: boolean;
+  onChange: (value) => void;
+  value: string;
+}
+
+interface IGListProps {
+  QUERY: any;
+  identifierToOptions: (identifier: string, page?: number) => any;
+  input?: (props: IListInputProps) => JSX.Element;
+  renderModel: (model: any) => JSX.Element;
+  arrayGetter: (data) => Array<any>;
   modelName?: string;
+  clearIdentifierOnSelect?: boolean;
+  paging?: boolean;
 }
 
 interface IListProps {
@@ -261,61 +278,87 @@ const ModelList = ({
   );
 };
 
-export const GenericModelListPicker = (gProps: IGListProps) => (
-  props: IListProps
-) => {
-  const disabled = props.disabled || false;
-  const [identifier, setIdentifier] = useState("");
-  const { loading, error, data } = useQuery(
-    gProps.QUERY,
-    gProps.identifierToOptions(identifier)
-  );
-  const onSelect = (model: any) => {
-    props.onSelect(model);
-    setIdentifier("");
-  };
-
-  return (
-    <div className={styles.modelListPicker}>
-      <div className="searchBox">
+export const GenericModelListPicker = (gProps: IGListProps) => {
+  const InputComponent = !gProps.input
+    ? ({ onChange, disabled, value }) => (
         <input
           placeholder="Search"
           type="text"
           disabled={disabled}
-          value={identifier}
-          onChange={e => setIdentifier(e.target.value)}
+          value={value}
+          onChange={onChange}
         />
-        <Button
-          disabled={disabled}
-          onClick={() => {
-            props.onSelect(null);
-          }}
-          type="negative"
-        >
-          X
-        </Button>
-        <div className="selectedModel">
-          {!!props.model ? (
-            gProps.renderModel(props.model)
-          ) : (
-            <span style={{ color: Color.GREY }}>
-              No {!gProps.modelName ? "model" : gProps.modelName} selected
-            </span>
-          )}
-        </div>
-      </div>
+      )
+    : gProps.input;
+  const clearIdentifierOnSelect =
+    typeof gProps.clearIdentifierOnSelect === "undefined"
+      ? true
+      : gProps.clearIdentifierOnSelect;
+  const paging = typeof gProps.paging === "undefined" ? true : gProps.paging;
+  return (props: IListProps) => {
+    const disabled = props.disabled || false;
+    const [identifier, setIdentifier] = useState("");
+    const [page, setPage] = useState(1);
+    const { loading, error, data } = useQuery(
+      gProps.QUERY,
+      gProps.identifierToOptions(identifier, page)
+    );
+    const onSelect = (model: any) => {
+      props.onSelect(model);
+      if (clearIdentifierOnSelect) {
+        setIdentifier("");
+      }
+    };
 
-      <div className="modelList">
-        <ModelList
-          loading={loading}
-          onSelect={onSelect}
-          data={data}
-          gProps={gProps}
-          error={error}
-        />
+    return (
+      <div className={styles.modelListPicker}>
+        <div className="searchBox">
+          <InputComponent
+            key={0}
+            value={identifier}
+            disabled={disabled}
+            onChange={e => setIdentifier(e.target.value)}
+          />
+          <Button
+            disabled={disabled}
+            onClick={() => {
+              props.onSelect(null);
+            }}
+            type="negative"
+          >
+            X
+          </Button>
+          <div className="selectedModel">
+            {!!props.model ? (
+              gProps.renderModel(props.model)
+            ) : (
+              <span style={{ color: Color.GREY }}>
+                No {!gProps.modelName ? "model" : gProps.modelName} selected
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="modelList">
+          <ModelList
+            loading={loading}
+            onSelect={onSelect}
+            data={data}
+            gProps={gProps}
+            error={error}
+          />
+        </div>
+        {paging ? (
+          <div className={styles.pagingControl}>
+            <button onClick={() => setPage(Math.max(1, page - 1))}>
+              {"<"}
+            </button>
+            <button onClick={() => setPage(page + 1)}>{">"}</button>
+          </div>
+        ) : null}
       </div>
-    </div>
-  );
+    );
+  };
 };
 
 export const useGenericListPickerFromListPicker = (

@@ -201,3 +201,34 @@ export const STATS_PAGE = {
     }
   `
 };
+
+// Parking Session
+export const PARKING_SESSIONS_PAGED_QUERY = gql`
+  query parkingSessionsPaged(
+    $page: PositiveInt
+    $limit: PositiveInt
+    $filter: DateFilterInput!
+  ) {
+    parkingSessionsFilter(
+      input: { dateFilter: $filter, page: $page, limit: $limit }
+    ) {
+      data {
+        id
+        vehicle {
+          id
+          licensePlate
+        }
+        checkOut {
+          time
+        }
+        checkIn {
+          time
+        }
+        active
+        finalFee
+      }
+      page
+      limit
+    }
+  }
+`;
