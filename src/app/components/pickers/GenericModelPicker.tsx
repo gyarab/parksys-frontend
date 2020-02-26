@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, ComponentClass } from "react";
 import { stylesheet } from "typestyle";
 import { useLazyQuery, useQuery } from "@apollo/react-hooks";
 import { Color } from "../../constants";
@@ -107,7 +107,7 @@ interface IProps {
 interface IGProps {
   QUERY: any;
   identifierToOptions: (identifier: string) => any;
-  renderModel: (model: any) => JSX.Element;
+  renderModel: (props: { model: any }) => JSX.Element;
   arrayGetter: (data) => Array<any>;
 }
 
@@ -245,7 +245,7 @@ interface IGListProps {
   QUERY: any;
   identifierToOptions: (identifier: string, page?: number) => any;
   input?: (props: IListInputProps) => JSX.Element;
-  renderModel: (model: any) => JSX.Element;
+  renderModel: ((props: { model: any }) => JSX.Element) | any;
   arrayGetter: (data) => Array<any>;
   modelName?: string;
   clearIdentifierOnSelect?: boolean;
