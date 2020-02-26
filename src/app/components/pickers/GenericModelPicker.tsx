@@ -258,20 +258,14 @@ interface IListProps {
   disabled?: boolean;
 }
 
-const ModelList = ({
-  loading,
-  error,
-  gProps: { arrayGetter, renderModel },
-  data,
-  onSelect
-}) => {
+const ModelList = ({ loading, error, renderModel, data, onSelect }) => {
   return loading ? (
     <span>Loading</span>
   ) : error ? (
     <span>{error.toString()}</span>
   ) : (
     <div className={styles.modelList}>
-      {arrayGetter(data).map(model => (
+      {data.map(model => (
         <div onClick={() => onSelect(model)}>{renderModel(model)}</div>
       ))}
     </div>
@@ -310,6 +304,7 @@ export const GenericModelListPicker = (gProps: IGListProps) => {
       }
     };
 
+    const arr = !!data ? gProps.arrayGetter(data) : [];
     return (
       <div className={styles.modelListPicker}>
         <div className="searchBox">
@@ -343,8 +338,8 @@ export const GenericModelListPicker = (gProps: IGListProps) => {
           <ModelList
             loading={loading}
             onSelect={onSelect}
-            data={data}
-            gProps={gProps}
+            data={arr}
+            renderModel={gProps.renderModel}
             error={error}
           />
         </div>
@@ -353,7 +348,9 @@ export const GenericModelListPicker = (gProps: IGListProps) => {
             <button onClick={() => setPage(Math.max(1, page - 1))}>
               {"<"}
             </button>
-            <button onClick={() => setPage(page + 1)}>{">"}</button>
+            <button onClick={() => arr.length > 0 && setPage(page + 1)}>
+              {">"}
+            </button>
           </div>
         ) : null}
       </div>
