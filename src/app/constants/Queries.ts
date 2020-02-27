@@ -59,6 +59,7 @@ export const VEHICLE_PICKER_SEARCH_QUERY = gql`
         id
         licensePlate
         numParkingSessions
+        totalPaidCents
       }
     }
   }
@@ -214,16 +215,16 @@ export const PARKING_SESSIONS_PAGED_QUERY = gql`
   query parkingSessionsPaged(
     $page: PositiveInt
     $limit: PositiveInt
-    $filter: DateFilterInput!
+    $filter: DateFilterInput
   ) {
-    parkingSessionsFilter(
-      input: { dateFilter: $filter, page: $page, limit: $limit }
-    ) {
+    parkingSessionsFilter(filter: $filter, page: $page, limit: $limit) {
       data {
         id
         vehicle {
           id
           licensePlate
+          numParkingSessions
+          totalPaidCents
         }
         checkOut {
           time
@@ -236,6 +237,33 @@ export const PARKING_SESSIONS_PAGED_QUERY = gql`
       }
       page
       limit
+    }
+  }
+`;
+
+export const VEHICLES_PARKING_SESSIONS_PAGED_QUERY = gql`
+  query vehiclesSessions(
+    $page: PositiveInt
+    $limit: PositiveInt
+    $licensePlate: String!
+    $filter: DateFilterInput
+  ) {
+    vehicle: vehicleSearch(search: { licensePlate: $licensePlate }) {
+      data {
+        parkingSessions(limit: $limit, page: $page, filter: $filter) {
+          data {
+            id
+            checkOut {
+              time
+            }
+            checkIn {
+              time
+            }
+            active
+            finalFee
+          }
+        }
+      }
     }
   }
 `;

@@ -4,7 +4,10 @@ import {
   GenericModelListPicker,
   useGenericListPickerFromListPicker
 } from "./GenericModelPicker";
-import { PARKING_SESSIONS_PAGED_QUERY } from "../../constants/Queries";
+import {
+  PARKING_SESSIONS_PAGED_QUERY,
+  VEHICLES_PARKING_SESSIONS_PAGED_QUERY
+} from "../../constants/Queries";
 import moment from "moment";
 import { Flag } from "../Flag";
 import { connect } from "react-redux";
@@ -33,13 +36,15 @@ interface Props {
 }
 
 const RenderSession = (props: Props) => {
-  console.log(props);
   const { model, setVehicle } = props;
   return (
     <div className={styles.session}>
       <p>
-        {dateToString(model.checkIn.time)} --{" "}
-        {model.active ? "" : dateToString(model.checkOut.time)}
+        <span>
+          {dateToString(model.checkIn.time)} --{" "}
+          {model.active ? "" : dateToString(model.checkOut.time)}
+        </span>
+        <span> {model.finalFee / 100}</span>
       </p>
       <p className="link">
         <a
@@ -48,9 +53,11 @@ const RenderSession = (props: Props) => {
             setVehicle(model.vehicle);
           }}
         >
-          <u>
-            <Flag text={model.vehicle.licensePlate} />
-          </u>
+          {!!model.vehicle ? (
+            <u>
+              <Flag text={model.vehicle.licensePlate} />
+            </u>
+          ) : null}
         </a>
       </p>
     </div>
@@ -67,46 +74,74 @@ const toDispatch = (dispatch: Dispatch) => ({
 
 const ConnectedRenderSession = connect(null, toDispatch)(RenderSession);
 
+const input = props => (
+  <input
+    type="date"
+    value={props.value}
+    onChange={props.onChange}
+    disabled={props.disabled}
+  />
+);
+const inputNeverEmpty = props =>
+  input({
+    ...props,
+    value: props.value || new Date().toISOString().slice(0, 10),
+    onChange: e => {
+      if (e.target.value === "") {
+        props.onChange({
+          target: { value: new Date().toISOString().slice(0, 10) }
+        });
+      } else {
+        props.onChange(e);
+      }
+    }
+  });
+
+const renderModel = model => <ConnectedRenderSession model={model} />;
+const identifierToOptions = (date, page) => {
+  const m = moment(date);
+  return {
+    variables: {
+      filter: m.isValid()
+        ? {
+            gte: m.startOf("day").toDate(),
+            lte: m.endOf("day").toDate()
+          }
+        : undefined,
+      page,
+      limit: 4
+    },
+    fetchPolicy: "no-cache"
+  };
+};
+
 export const ParkingSessionPicker = GenericModelListPicker({
   QUERY: PARKING_SESSIONS_PAGED_QUERY,
-  identifierToOptions: (date, page) => {
-    let m = moment(date);
-    if (!m.isValid()) m = moment();
-    return {
-      variables: {
-        filter: {
-          gte: m.startOf("day").toDate(),
-          lte: m.endOf("day").toDate()
-        },
-        page
-      },
-      fetchPolicy: "no-cache"
-    };
-  },
+  identifierToOptions,
   arrayGetter: data => {
     return data.parkingSessionsFilter.data;
   },
-  renderModel: model => <ConnectedRenderSession model={model} />,
+  renderModel,
   modelName: "session",
-  input: props => (
-    <input
-      type="date"
-      value={props.value || new Date().toISOString().slice(0, 10)}
-      onChange={e => {
-        if (e.target.value === "") {
-          props.onChange({
-            target: { value: new Date().toISOString().slice(0, 10) }
-          });
-        } else {
-          props.onChange(e);
-        }
-      }}
-      disabled={props.disabled}
-    />
-  ),
+  input: inputNeverEmpty,
   clearIdentifierOnSelect: false
 });
 
 export const useParkingSessionPicker = useGenericListPickerFromListPicker(
   ParkingSessionPicker
+);
+
+export const VehicleParkingSessionPicker = GenericModelListPicker({
+  QUERY: VEHICLES_PARKING_SESSIONS_PAGED_QUERY,
+  identifierToOptions,
+  arrayGetter: data => data.vehicle.data[0].parkingSessions.data,
+  renderModel,
+  modelName: "session",
+  input, // Can be empty
+  paging: true,
+  clearIdentifierOnSelect: false
+});
+
+export const useVehicleParkingSessionPicker = useGenericListPickerFromListPicker(
+  VehicleParkingSessionPicker
 );

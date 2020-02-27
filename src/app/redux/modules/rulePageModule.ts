@@ -17,6 +17,7 @@ export interface IRulePageStateSimulation {
   vehicle: {
     id: string;
     licensePlate?: string;
+    numParkingSessions: number;
   };
 }
 

@@ -256,6 +256,7 @@ interface IListProps {
   onSelect: (obj: any) => void;
   model: any;
   disabled?: boolean;
+  options?: any;
 }
 
 const ModelList = ({ loading, error, renderModel, data, onSelect }) => {
@@ -293,10 +294,17 @@ export const GenericModelListPicker = (gProps: IGListProps) => {
     const disabled = props.disabled || false;
     const [identifier, setIdentifier] = useState("");
     const [page, setPage] = useState(1);
-    const { loading, error, data } = useQuery(
-      gProps.QUERY,
-      gProps.identifierToOptions(identifier, page)
-    );
+    const options = {
+      ...gProps.identifierToOptions(identifier, page),
+      ...(props.options || {}),
+      variables: {
+        ...(gProps.identifierToOptions(identifier, page) || { variables: {} })
+          .variables,
+        ...(props.options || { variables: {} }).variables
+      }
+    };
+    console.log("rerenderrrr", options);
+    const { loading, error, data } = useQuery(gProps.QUERY, options);
     const onSelect = (model: any) => {
       props.onSelect(model);
       if (clearIdentifierOnSelect) {
@@ -312,7 +320,10 @@ export const GenericModelListPicker = (gProps: IGListProps) => {
             key={0}
             value={identifier}
             disabled={disabled}
-            onChange={e => setIdentifier(e.target.value)}
+            onChange={e => {
+              setPage(1);
+              setIdentifier(e.target.value);
+            }}
           />
           <Button
             disabled={disabled}
@@ -361,7 +372,11 @@ export const GenericModelListPicker = (gProps: IGListProps) => {
 export const useGenericListPickerFromListPicker = (
   PickerInstance: (props: IListProps) => JSX.Element
 ) => {
-  return (disabled: boolean = false, defaultModel: any | null = null) => {
+  return (
+    options = {},
+    disabled: boolean = false,
+    defaultModel: any | null = null
+  ) => {
     const [model, setModel] = useState<any | null>(defaultModel);
     const render = (
       <PickerInstance
@@ -370,6 +385,7 @@ export const useGenericListPickerFromListPicker = (
           setModel(model);
         }}
         disabled={disabled}
+        options={options}
       />
     );
     return [render, model, setModel];
