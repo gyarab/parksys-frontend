@@ -34,15 +34,16 @@ const RenderVehicleFilter = model => (
   </div>
 );
 
-export const VehicleFilterPicker = GenericModelListPicker({
+export const VehicleFilterPicker = GenericModelPicker({
   QUERY: VEHICLE_FILTER_PICKER_SEARCH_QUERY,
   arrayGetter: data => data.vehicleFilterSearch.data,
   renderModel: RenderVehicleFilter,
   identifierToOptions: name => ({ variables: { name } })
 });
 
-export const useVehicleFilterPicker = useGenericListPickerFromListPicker(
-  VehicleFilterPicker
+export const useVehicleFilterPicker = useGenericPickerFromPicker(
+  VehicleFilterPicker,
+  model => model.name
 );
 
 export const useVehicleFilterMultiPicker = useGenericMultiPicker({

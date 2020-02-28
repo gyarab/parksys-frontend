@@ -36,12 +36,15 @@ export const RULE_PAGE_RULE_SIMULATION_QUERY = gql`
       start: $start
       end: $end
     ) {
-      start
-      end
-      assignment {
-        id
-        priority
+      appliedRules {
+        start
+        end
+        assignment {
+          id
+          priority
+        }
       }
+      feeCents
     }
   }
 `;

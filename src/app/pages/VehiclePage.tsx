@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { stylesheet } from "typestyle";
 import { IStore } from "../redux/IStore";
 import { Dispatch } from "redux";
@@ -6,14 +6,10 @@ import { connect } from "react-redux";
 import { CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS } from "../redux/modules/rulePageActionCreators";
 import {
   useParkingSessionPicker,
-  useVehicleParkingSessionPicker,
   VehicleParkingSessionPicker
 } from "../components/pickers/ParkingSessionPicker";
 import { VehiclePagedPicker } from "../components/pickers/VehiclePicker";
 import { IRulePageStateSimulation } from "../redux/modules/rulePageModule";
-import { VEHICLES_PARKING_SESSIONS_PAGED_QUERY } from "../constants/Queries";
-import { useQuery } from "@apollo/react-hooks";
-import lodash from "lodash";
 
 export interface IStateToProps {
   vehicle: IRulePageStateSimulation["vehicle"] | null;

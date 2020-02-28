@@ -9,6 +9,7 @@ import { stylesheet } from "typestyle";
 import { VehiclePicker } from "../pickers/VehiclePicker";
 import { IRulePageStateSimulation } from "../../redux/modules/rulePageModule";
 import lodash from "lodash";
+import { Color } from "../../constants";
 
 export interface IStateToProps {
   ruleAssignmentSimulation: IRulePageStateSimulation;
@@ -18,12 +19,15 @@ export interface IDispatchToProps {
   changeSimulateRuleAssignmentsOptions: (value: object) => any;
 }
 
-export interface IProps extends IStateToProps, IDispatchToProps {}
+export interface IProps extends IStateToProps, IDispatchToProps {
+  feeCents?: number | null;
+}
 
 const styles = stylesheet({
   pickers: {
     display: "grid",
     gridTemplateColumns: "repeat(2, auto)",
+    gridTemplateRows: "auto",
     gridGap: "0.3em 0.4em",
     alignItems: "center"
   },
@@ -83,6 +87,16 @@ const ParkingRuleAssignmentSimulationOptions = (props: IProps) => {
           value={props.ruleAssignmentSimulation.end}
           onChange={end => props.changeSimulateRuleAssignmentsOptions({ end })}
         />
+        {props.feeCents !== null ? (
+          <>
+            <span style={{ color: Color.LIGHT_RED, fontWeight: "bold" }}>
+              Fee
+            </span>
+            <span style={{ color: Color.LIGHT_RED, fontWeight: "bold" }}>
+              {props.feeCents / 100}
+            </span>
+          </>
+        ) : null}
       </div>
     </div>
   );

@@ -102,14 +102,20 @@ const RulePage = (props: IProps) => {
             day={queryVariables.day}
             appliedData={
               !!dataSimul && shouldShowSimulation
-                ? dataSimul.simulateRuleAssignmentApplication
+                ? dataSimul.simulateRuleAssignmentApplication.appliedRules
                 : null
             }
             onNewOrDel={refetch}
           />
           <div className={styles.widgetContainer}>
             <OptionsWidget>
-              <ParkingRuleAssignmentSimulationOptions />
+              <ParkingRuleAssignmentSimulationOptions
+                feeCents={
+                  !!dataSimul && shouldShowSimulation
+                    ? dataSimul.simulateRuleAssignmentApplication.feeCents
+                    : null
+                }
+              />
             </OptionsWidget>
             <OptionsWidget>
               <VehicleFilterWidget />
