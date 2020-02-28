@@ -9,7 +9,6 @@ interface IRoute {
 }
 type RoutablePages =
   | "accountPage"
-  | "dashboardPage"
   | "statisticsPage"
   | "rulesPage"
   | "loginPage"
@@ -49,8 +48,7 @@ function getNavigateAction<T extends { [key: string]: any }>(
 
 const config: RouteConfig = {
   accountPage: { path: "/account" },
-  dashboardPage: { path: "/dashboard" },
-  statisticsPage: { path: "/statistics" },
+  statisticsPage: { path: "/stats" },
   rulesPage: { path: "/rules" },
   loginPage: { path: "/" },
   devicesPage: { path: "/devices" },
@@ -63,7 +61,6 @@ export const routes = getRoutes(config);
 
 export const navigate: RouteNavigate = {
   accountPage: () => getNavigateAction(routes.accountPage.name),
-  dashboardPage: () => getNavigateAction(routes.dashboardPage.name),
   statisticsPage: () => getNavigateAction(routes.statisticsPage.name),
   rulesPage: () => getNavigateAction(routes.rulesPage.name),
   loginPage: () => getNavigateAction(routes.loginPage.name),

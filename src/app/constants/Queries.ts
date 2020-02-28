@@ -72,6 +72,7 @@ export const RULE_PICKER_SEARCH_QUERY = gql`
   query searchParkingRules($name: String!) {
     parkingRuleSearch(search: { name: $name }) {
       data {
+        id
         ...ParkingRuleArgs
       }
     }
@@ -94,6 +95,7 @@ export const PARKING_RULE_SEARCH_QUERY = gql`
   query parkingRuleSearch($name: String!) {
     parkingRuleSearch(search: { name: $name }) {
       date {
+        id
         ...ParkingRuleArgs
       }
     }

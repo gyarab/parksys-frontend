@@ -64,7 +64,7 @@ export class UserSaga extends BaseSaga {
   public *onSuccessfulLogin(
     _: ReturnType<typeof userActions.loginUser.setFulfilled>
   ): IterableIterator<CallEffect | PutEffect<any>> {
-    yield put(navigate.dashboardPage());
+    yield put(navigate.statisticsPage());
   }
 
   protected *registerListeners(): IterableIterator<ForkEffect> {

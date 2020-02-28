@@ -129,6 +129,7 @@ export const RULE_PAGE_DELETE_VEHICLE_FILTER = gql`
 export const RULE_PAGE_UPDATE_PARKING_RULE = gql`
   mutation updateParkingRule($id: ID!, $input: ParkingRuleUpdateInput!) {
     updateParkingRule(id: $id, input: $input) {
+      id
       ...ParkingRuleArgs
     }
   }
@@ -138,6 +139,7 @@ export const RULE_PAGE_UPDATE_PARKING_RULE = gql`
 export const RULE_PAGE_CREATE_PARKING_RULE = gql`
   mutation createParkingRule($input: ParkingRuleCreateInput!) {
     createParkingRule(input: $input) {
+      id
       ...ParkingRuleArgs
     }
   }

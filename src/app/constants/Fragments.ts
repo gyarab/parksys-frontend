@@ -14,7 +14,6 @@ export const VEHICLE_FILTER_FRAGMENT = gql`
 
 export const PARKING_RULE_FRAGMENT = gql`
   fragment ParkingRuleArgs on ParkingRule {
-    id
     name
     __typename
     ... on ParkingRulePermitAccess {
@@ -43,6 +42,7 @@ export const PARKING_RULE_ASSIGNMENT_FRAGMENT = gql`
       action
     }
     rules {
+      id
       ...ParkingRuleArgs
     }
   }

@@ -47,9 +47,6 @@ class App extends React.Component<IStateToProps> {
     accountPage: {
       page: BlankPage
     },
-    dashboardPage: {
-      page: BlankPage
-    },
     statisticsPage: {
       page: StatisticsPage,
       props: {

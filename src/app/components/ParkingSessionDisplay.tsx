@@ -36,13 +36,15 @@ const dateDisplay = (
 };
 
 export const ParkingSessionDisplay = ({ session: { id } }) => {
-  const { data, loading } = useQuery(PARKING_SESSION_BY_ID_QUERY, {
+  const { data, loading, error } = useQuery(PARKING_SESSION_BY_ID_QUERY, {
     variables: {
       id
     }
   });
   if (loading || !data) {
     return <div>Loading</div>;
+  } else if (error) {
+    return <div>ERROR: {error}</div>;
   }
   const session = data.session;
   const [start, end] = dateDisplay(
