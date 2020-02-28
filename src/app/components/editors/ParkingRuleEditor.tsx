@@ -59,6 +59,7 @@ const styles = stylesheet({
     gridTemplateColumns: "repeat(4, 1fr)",
     gridColumnGap: "0.3em",
     marginBottom: "0.5em",
+    marginTop: "0.5em",
     $nest: {
       button: {
         maxHeight: "3em"
@@ -168,10 +169,10 @@ export const ParkingRuleEditor = ({ rule, del, save, saveStatus, isNew }) => {
           </>
         ) : null}
         <span>Name</span>
-        <Input
+        <input
           type="text"
           value={name}
-          onChange={e => setName(e.target["value"])}
+          onChange={event => setName(event.target.value)}
         />
         {/* Other options are based on the specific type */}
         {type === ParkingRuleTypes.ParkingRulePermitAccess ? (
@@ -272,6 +273,7 @@ const ParkingRuleWidget = (props: IProps) => {
           onSelect={rule => props.setSelectedParkingRule(rule)}
         />
       )}
+      <div style={{ marginBottom: "0.5em" }}></div>
       {!!props.parkingRule ? (
         <ParkingRuleEditor
           del={del}

@@ -61,6 +61,7 @@ const styles = stylesheet({
     gridTemplateColumns: "repeat(4, 1fr)",
     gridColumnGap: "0.3em",
     marginBottom: "0.5em",
+    marginTop: "0.5em",
     $nest: {
       button: {
         maxHeight: "3em"
@@ -91,10 +92,10 @@ export const VehicleFilterEditor = ({
         <span>Action</span>
         {actionPicker}
         <span>Name</span>
-        <Input
+        <input
           type="text"
           value={name}
-          onChange={e => setName(e.target["value"])}
+          onChange={event => setName(event.target.value)}
         />
         <span>Vehicles</span>
         {vehicleMultiPicker}
@@ -188,6 +189,7 @@ const VehicleFilterWidget = (props: IProps) => {
           onSelect={filter => props.setSelectedVehicleFilter(filter)}
         />
       )}
+      <div style={{ marginBottom: "0.5em" }}></div>
       {!!props.vehicleFilter ? (
         <VehicleFilterEditor
           del={del}
