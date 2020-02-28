@@ -1,5 +1,5 @@
 import React from "react";
-import { stylesheet } from "typestyle";
+import { stylesheet, classes } from "typestyle";
 import { Color } from "../../constants";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
@@ -42,6 +42,10 @@ const styles = stylesheet({
         position: "relative"
       }
     }
+  },
+  inactiveCell: {
+    backgroundColor: Color.LIGHT_GREY,
+    borderColor: Color.LIGHT_GREY
   }
 });
 
@@ -69,7 +73,13 @@ const ParkingRuleAssignment = ({
     ? { border: `2px solid ${Color.LIGHT_RED}` }
     : {};
   return (
-    <div className={styles.cell} style={extraStyle}>
+    <div
+      className={classes(
+        styles.cell,
+        !assignment.active ? styles.inactiveCell : null
+      )}
+      style={extraStyle}
+    >
       <div className={"cellBody"} onClick={toggleDetails}>
         <span>
           {assignment.rules.map(rule => rule.name).join(", ")} -{" "}

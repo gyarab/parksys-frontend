@@ -236,6 +236,8 @@ const ParkingRuleAssignmentRow = ({
     const p = -2.9 / 2 + 0.3;
     const top = 0.2;
     const h = 2.9 / 2 - top;
+
+    const borderColor = assignment.active ? Color.AQUAMARINE : Color.LIGHT_GREY;
     return (
       <React.Fragment key={i}>
         {continueLeft ? (
@@ -246,7 +248,7 @@ const ParkingRuleAssignmentRow = ({
             style={{
               borderTop: `${h}em solid transparent`,
               borderBottom: `${h}em solid transparent`,
-              borderRight: `${h}em solid ${Color.AQUAMARINE}`,
+              borderRight: `${h}em solid ${borderColor}`,
               top: `${top}em`,
               left: `${p}em`
             }}
@@ -260,7 +262,7 @@ const ParkingRuleAssignmentRow = ({
             style={{
               borderTop: `${h}em solid transparent`,
               borderBottom: `${h}em solid transparent`,
-              borderLeft: `${h}em solid ${Color.AQUAMARINE}`,
+              borderLeft: `${h}em solid ${borderColor}`,
               top: `${top}em`,
               right: `${p}em`,
               position: "absolute"
