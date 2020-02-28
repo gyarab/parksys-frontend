@@ -23,6 +23,8 @@ export const PARKING_RULE_FRAGMENT = gql`
     ... on ParkingRuleTimedFee {
       centsPerUnitTime
       unitTime
+      freeInUnitTime
+      roundingMethod
     }
   }
 `;

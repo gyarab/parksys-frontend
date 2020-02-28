@@ -72,18 +72,11 @@ export const RULE_PICKER_SEARCH_QUERY = gql`
   query searchParkingRules($name: String!) {
     parkingRuleSearch(search: { name: $name }) {
       data {
-        id
-        name
-        ... on ParkingRulePermitAccess {
-          permit
-        }
-        ... on ParkingRuleTimedFee {
-          centsPerUnitTime
-          unitTime
-        }
+        ...ParkingRuleArgs
       }
     }
   }
+  ${PARKING_RULE_FRAGMENT}
 `;
 
 export const VEHICLE_FILTER_PICKER_SEARCH_QUERY = gql`

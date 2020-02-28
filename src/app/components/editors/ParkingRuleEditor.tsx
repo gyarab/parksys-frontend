@@ -90,23 +90,42 @@ const ParkingRulePermitAccessSpecific = ({ typeSpecific, setTypeSpecific }) => {
 };
 
 const ParkingRuleTimedFeeSpecific = ({ typeSpecific, setTypeSpecific }) => {
-  const { unitTime, centsPerUnitTime } = typeSpecific;
+  const {
+    unitTime,
+    centsPerUnitTime,
+    freeInUnitTime,
+    roundingMethod
+  } = typeSpecific;
   const onChange = ({ name, value }) => {
     setTypeSpecific({ ...typeSpecific, [name]: value });
   };
   return (
     <>
-      <span>Time Unit</span>
+      <span>Time unit</span>
       <OptionPicker
         options={["HOUR", "MINUTE"]}
         selectedOption={unitTime}
         name="unitTime"
         onChange={onChange}
       />
-      <span>Cents Per Unit Time</span>
+      <span>Cents per {unitTime}</span>
       <NumberInput
-        value={centsPerUnitTime}
-        onChange={value => onChange({ value, name: "centsPerUnitTime" })}
+        value={centsPerUnitTime / 100}
+        onChange={value =>
+          onChange({ value: value * 100, name: "centsPerUnitTime" })
+        }
+      />
+      <span>Free {unitTime}S</span>
+      <NumberInput
+        value={freeInUnitTime}
+        onChange={value => onChange({ value, name: "freeInUnitTime" })}
+      />
+      <span>Rounding method</span>
+      <OptionPicker
+        name="roundingMethod"
+        options={["ROUND", "FLOOR", "CEIL"]}
+        selectedOption={roundingMethod || "ROUND"}
+        onChange={({ value, name }) => onChange({ value, name })}
       />
     </>
   );
@@ -120,15 +139,15 @@ const getTypeSpecific = rule => {
   return clone;
 };
 
-// TODO: Type specific fields
 export const ParkingRuleEditor = ({ rule, del, save, saveStatus, isNew }) => {
   const [name, setName] = useState(rule.name);
   const [type, setType] = useState(rule.__typename);
   const [typeSpecific, setTypeSpecific] = useState({
-    // TODO: Ugly but it works
-    ...getTypeSpecific(rule),
     unitTime: "HOUR",
-    permit: false
+    permit: false,
+    freeInUnitTime: 0,
+    roundingMethod: "ROUND",
+    ...getTypeSpecific(rule)
   });
   return (
     <div>

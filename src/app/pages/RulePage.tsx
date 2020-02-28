@@ -33,7 +33,7 @@ export interface IProps extends IStateToProps, IDispatchToProps {}
 
 const styles = stylesheet({
   optionsWidget: {
-    maxWidth: "21.2em",
+    maxWidth: "25em",
     border: `1px solid ${Color.LIGHT_GREY}`,
     marginTop: "1em",
     padding: "0.5em",
