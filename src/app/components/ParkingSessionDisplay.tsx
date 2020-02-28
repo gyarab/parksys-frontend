@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { stylesheet } from "typestyle";
 import { useQuery } from "@apollo/react-hooks";
 import { PARKING_SESSION_BY_ID_QUERY } from "../constants/Queries";
-import { Flag, FlagType } from "./Flag";
 import lodash from "lodash";
 import { VehicleLink } from "./VehicleLink";
+import { dateDisplay } from "../helpers/componentHelpers";
 
 const styles = stylesheet({
   sessionDisplay: {
@@ -17,23 +17,6 @@ const styles = stylesheet({
     }
   }
 });
-
-const dateDisplay = (
-  start: string | null,
-  end: string | null
-): [string, string] => {
-  if (start != null && end != null) {
-    const startPrefix = start.slice(0, 10);
-    const endPrefix = start.slice(0, 10);
-    if (startPrefix === endPrefix) {
-      return [start.slice(0, 16), end.slice(11, 16)];
-    }
-  } else if (start != null) {
-    return [start.slice(0, 16), end];
-  } else {
-    return [start, end.slice(0, 16)];
-  }
-};
 
 export const ParkingSessionDisplay = ({ session: { id } }) => {
   const { data, loading, error } = useQuery(PARKING_SESSION_BY_ID_QUERY, {
@@ -51,7 +34,6 @@ export const ParkingSessionDisplay = ({ session: { id } }) => {
     lodash.get(session, "checkIn.time"),
     lodash.get(session, "checkOut.time")
   );
-  console.log(session);
   return (
     <div className={styles.sessionDisplay}>
       <table>

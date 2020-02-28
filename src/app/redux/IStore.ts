@@ -6,6 +6,7 @@ import { IRulePageState } from "./modules/rulePageModule";
 import { IStatsPageState } from "./modules/statsPageModule";
 import { IUserMngmtPageState } from "./modules/userMngmtPageModule";
 import { IErrorsState } from "./modules/errorsModule";
+import { IVehiclePageState } from "./modules/vehiclePage";
 
 export interface IStore {
   router: RouterState;
@@ -16,4 +17,5 @@ export interface IStore {
   statsPage: IStatsPageState;
   userMngmtPage: IUserMngmtPageState;
   errors: IErrorsState;
+  vehiclePage: IVehiclePageState;
 }

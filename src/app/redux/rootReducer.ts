@@ -11,6 +11,7 @@ import { rulePageReducer } from "./modules/rulePageModule";
 import { statsPageReducer } from "./modules/statsPageModule";
 import { userMngmtReducer } from "./modules/userMngmtPageModule";
 import { errorsReducer } from "./modules/errorsModule";
+import { vehiclePageReducer } from "./modules/vehiclePage";
 
 const commonPersistenceOptions = {
   debug: appConfig.env !== "production" && !!process.env.BROWSER,
@@ -42,7 +43,8 @@ const rootReducer: Reducer<IStore> = combineReducers<IStore>({
   user: persistedUserReducer,
   statsPage: statsPageReducer,
   userMngmtPage: userMngmtReducer,
-  errors: errorsReducer
+  errors: errorsReducer,
+  vehiclePage: vehiclePageReducer
 });
 
 export default rootReducer;

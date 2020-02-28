@@ -9,11 +9,8 @@ import {
   VEHICLES_PARKING_SESSIONS_PAGED_QUERY
 } from "../../constants/Queries";
 import moment from "moment";
-import { Flag } from "../Flag";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
-import { CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS } from "../../redux/modules/rulePageActionCreators";
 import { VehicleLink } from "../VehicleLink";
+import { dateDisplay } from "../../helpers/componentHelpers";
 
 const styles = stylesheet({
   session: {
@@ -27,23 +24,21 @@ const styles = stylesheet({
   }
 });
 
-const dateToString = (date: string) =>
-  new Date(date).toISOString().slice(0, 16);
-
 const RenderSession = ({ model }) => {
+  const [start, end] = dateDisplay(
+    model.checkIn.time,
+    model.active ? "" : model.checkOut.time
+  );
   return (
     <div className={styles.session}>
       <p>
         <span>
-          {dateToString(model.checkIn.time)} --{" "}
-          {model.active ? "" : dateToString(model.checkOut.time)}
+          {start} -- {end}
         </span>
         <span> {model.finalFee / 100}</span>
       </p>
       <p className="link">
-        {!model.vehicle ? null : (
-          <VehicleLink vehicle={model.vehicle} />
-        )}
+        {!model.vehicle ? null : <VehicleLink vehicle={model.vehicle} />}
       </p>
     </div>
   );
@@ -100,7 +95,9 @@ export const ParkingSessionPicker = GenericModelListPicker({
   renderModel,
   modelName: "session",
   input: inputNeverEmpty,
-  clearIdentifierOnSelect: false
+  clearIdentifierOnSelect: false,
+  showSelection: false,
+  paging: true
 });
 
 export const useParkingSessionPicker = useGenericListPickerFromListPicker(
@@ -115,7 +112,8 @@ export const VehicleParkingSessionPicker = GenericModelListPicker({
   modelName: "session",
   input, // Can be empty
   paging: true,
-  clearIdentifierOnSelect: false
+  clearIdentifierOnSelect: false,
+  showSelection: false
 });
 
 export const useVehicleParkingSessionPicker = useGenericListPickerFromListPicker(

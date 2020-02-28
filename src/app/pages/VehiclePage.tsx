@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { stylesheet } from "typestyle";
 import { IStore } from "../redux/IStore";
 import { Dispatch } from "redux";
@@ -10,13 +10,17 @@ import { IRulePageStateSimulation } from "../redux/modules/rulePageModule";
 import { VehicleDisplay } from "../components/VehicleDisplay";
 import { ParkingSessionDisplay } from "../components/ParkingSessionDisplay";
 import { FlagType, Flag } from "../components/Flag";
+import { IVehiclePageState } from "../redux/modules/vehiclePage";
+import { SET_PARKING_SESSION } from "../redux/modules/vehiclePageActionCreators";
 
 export interface IStateToProps {
   vehicle: IRulePageStateSimulation["vehicle"] | null;
+  session: IVehiclePageState["session"] | null;
 }
 
 export interface IDispatchToProps {
   setSimulationVehicle: (vehicle: any) => void;
+  setParkingSession: (session: IVehiclePageState["session"]) => void;
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
@@ -50,14 +54,18 @@ const PickerContainer = ({ children, title }) => (
 
 const VehiclePage = (props: IProps): JSX.Element => {
   const [sessionPicker, session] = useParkingSessionPicker();
+  useEffect(() => {
+    if (!!session) props.setParkingSession(session);
+  }, [!!session ? session.id : null]);
+  console.log(props.session);
   return (
     <div className={styles.vehiclePage}>
       <PickerContainer title="Parking Session">
         <div>
-          {!session ? (
+          {!props.session ? (
             <Flag text="Select a Parking session" type={FlagType.NEGATIVE} />
           ) : (
-            <ParkingSessionDisplay session={session} />
+            <ParkingSessionDisplay session={props.session} />
           )}
         </div>
         {sessionPicker}
@@ -73,7 +81,10 @@ const VehiclePage = (props: IProps): JSX.Element => {
           {!props.vehicle ? (
             <Flag text="Select a Vehicle" type={FlagType.NEGATIVE} />
           ) : (
-            <VehicleDisplay vehicle={props.vehicle} />
+            <VehicleDisplay
+              vehicle={props.vehicle}
+              setParkingSession={props.setParkingSession}
+            />
           )}
         </div>
         <VehiclePagedPicker
@@ -87,7 +98,8 @@ const VehiclePage = (props: IProps): JSX.Element => {
 
 const mapStateToProps = (state: IStore): IStateToProps => {
   return {
-    vehicle: state.rulePage.ruleAssignmentSimulation.vehicle
+    vehicle: state.rulePage.ruleAssignmentSimulation.vehicle,
+    session: state.vehiclePage.session
   };
 };
 
@@ -97,6 +109,11 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
       dispatch({
         type: CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS,
         payload: { vehicle }
+      }),
+    setParkingSession: session =>
+      dispatch({
+        type: SET_PARKING_SESSION,
+        payload: session
       })
   };
 };

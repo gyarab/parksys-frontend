@@ -11,13 +11,18 @@ const styles = stylesheet({
   }
 });
 
-export const VehicleDisplay = ({ vehicle: vehicle_ }) => {
+export const VehicleDisplay = ({ vehicle: vehicle_, setParkingSession }) => {
   const { data, loading, error } = useQuery(VEHICLE_SESSIONS_BY_ID_QUERY, {
     variables: {
       id: vehicle_.id
     }
   });
-  const [session, setSession] = useState(null);
+  const [session, setSession_] = useState(null);
+  const setSession = session => {
+    console.log("SET FROM VEH");
+    setSession_(session);
+    setParkingSession(session);
+  };
 
   if (loading || !data) {
     return <div>Loading</div>;

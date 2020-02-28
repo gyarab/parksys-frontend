@@ -55,7 +55,7 @@ const styles = stylesheet({
     height: "100%",
     $nest: {
       ".searchBox": {
-        flex: "0 1 4em",
+        // flex: "0 1 4em",
         $nest: {
           button: {
             marginLeft: "0.3em"
@@ -252,6 +252,7 @@ interface IGListProps {
   modelName?: string;
   clearIdentifierOnSelect?: boolean;
   paging?: boolean;
+  showSelection?: boolean;
 }
 
 interface IListProps {
@@ -294,6 +295,8 @@ export const GenericModelListPicker = (gProps: IGListProps) => {
       ? true
       : gProps.clearIdentifierOnSelect;
   const paging = typeof gProps.paging === "undefined" ? false : gProps.paging;
+  const showSelection =
+    typeof gProps.showSelection === "undefined" ? true : gProps.showSelection;
   return (props: IListProps) => {
     const disabled = props.disabled || false;
     const [identifier, setIdentifier] = useState("");
@@ -337,15 +340,17 @@ export const GenericModelListPicker = (gProps: IGListProps) => {
           >
             X
           </Button>
-          <div className="selectedModel">
-            {!!props.model ? (
-              gProps.renderModel(props.model)
-            ) : (
-              <span style={{ color: Color.GREY }}>
-                No {!gProps.modelName ? "model" : gProps.modelName} selected
-              </span>
-            )}
-          </div>
+          {showSelection ? (
+            <div className="selectedModel">
+              {!!props.model ? (
+                gProps.renderModel(props.model)
+              ) : (
+                <span style={{ color: Color.GREY }}>
+                  No {!gProps.modelName ? "model" : gProps.modelName} selected
+                </span>
+              )}
+            </div>
+          ) : null}
         </div>
 
         <div className="modelList">
