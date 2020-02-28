@@ -13,6 +13,7 @@ import { Flag } from "../Flag";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS } from "../../redux/modules/rulePageActionCreators";
+import { VehicleLink } from "../VehicleLink";
 
 const styles = stylesheet({
   session: {
@@ -29,14 +30,7 @@ const styles = stylesheet({
 const dateToString = (date: string) =>
   new Date(date).toISOString().slice(0, 16);
 
-// Connect this
-interface Props {
-  model: any;
-  setVehicle: (vehicle: any) => void;
-}
-
-const RenderSession = (props: Props) => {
-  const { model, setVehicle } = props;
+const RenderSession = ({ model }) => {
   return (
     <div className={styles.session}>
       <p>
@@ -47,32 +41,13 @@ const RenderSession = (props: Props) => {
         <span> {model.finalFee / 100}</span>
       </p>
       <p className="link">
-        <a
-          onClick={e => {
-            e.stopPropagation();
-            setVehicle(model.vehicle);
-          }}
-        >
-          {!!model.vehicle ? (
-            <u>
-              <Flag text={model.vehicle.licensePlate} />
-            </u>
-          ) : null}
-        </a>
+        {!model.vehicle ? null : (
+          <VehicleLink vehicle={model.vehicle} />
+        )}
       </p>
     </div>
   );
 };
-
-const toDispatch = (dispatch: Dispatch) => ({
-  setVehicle: vehicle =>
-    dispatch({
-      type: CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS,
-      payload: { vehicle }
-    })
-});
-
-const ConnectedRenderSession = connect(null, toDispatch)(RenderSession);
 
 const input = props => (
   <input
@@ -97,7 +72,7 @@ const inputNeverEmpty = props =>
     }
   });
 
-const renderModel = model => <ConnectedRenderSession model={model} />;
+const renderModel = model => <RenderSession model={model} />;
 const identifierToOptions = (date, page) => {
   const m = moment(date);
   return {
@@ -112,6 +87,7 @@ const identifierToOptions = (date, page) => {
       limit: 4
     },
     fetchPolicy: "no-cache"
+    // pollInterval: 5000
   };
 };
 

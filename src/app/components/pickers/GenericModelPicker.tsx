@@ -303,7 +303,6 @@ export const GenericModelListPicker = (gProps: IGListProps) => {
         ...(props.options || { variables: {} }).variables
       }
     };
-    console.log("rerenderrrr", options);
     const { loading, error, data } = useQuery(gProps.QUERY, options);
     const onSelect = (model: any) => {
       props.onSelect(model);

@@ -219,8 +219,6 @@ export const PARKING_SESSIONS_PAGED_QUERY = gql`
         vehicle {
           id
           licensePlate
-          numParkingSessions
-          totalPaidCents
         }
         checkOut {
           time
@@ -258,6 +256,63 @@ export const VEHICLES_PARKING_SESSIONS_PAGED_QUERY = gql`
             active
             finalFee
           }
+        }
+      }
+    }
+  }
+`;
+
+export const PARKING_SESSION_BY_ID_QUERY = gql`
+  query parkingSessionById($id: ID!) {
+    session: parkingSession(id: $id) {
+      id
+      vehicle {
+        id
+        licensePlate
+      }
+      finalFee
+      checkIn {
+        time
+        image
+      }
+      checkOut {
+        time
+        image
+      }
+      appliedAssignments {
+        start
+        end
+        feeCents
+        rules {
+          ...ParkingRuleArgs
+        }
+      }
+    }
+  }
+  ${PARKING_RULE_FRAGMENT}
+`;
+
+export const VEHICLE_SESSIONS_BY_ID_QUERY = gql`
+  query vehicleById(
+    $id: ID!
+    $page: PositiveInt
+    $limit: PositiveInt
+    $filter: DateFilterInput
+  ) {
+    vehicle: vehicle(id: $id) {
+      numParkingSessions
+      totalPaidCents
+      parkingSessions(limit: $limit, page: $page, filter: $filter) {
+        data {
+          id
+          checkOut {
+            time
+          }
+          checkIn {
+            time
+          }
+          active
+          finalFee
         }
       }
     }
