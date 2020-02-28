@@ -60,7 +60,13 @@ const VehiclePage = (props: IProps): JSX.Element => {
   console.log(props.session);
   return (
     <div className={styles.vehiclePage}>
-      <PickerContainer title="Parking Session">
+      <PickerContainer
+        title={
+          !props.vehicle
+            ? "Parking Session"
+            : `Parking Session of ${props.vehicle.licensePlate}`
+        }
+      >
         <div>
           {!props.session ? (
             <Flag text="Select a Parking session" type={FlagType.NEGATIVE} />
