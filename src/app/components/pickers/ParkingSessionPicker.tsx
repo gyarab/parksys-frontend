@@ -79,7 +79,7 @@ const identifierToOptions = (date, page) => {
           }
         : undefined,
       page,
-      limit: 4
+      limit: 5
     },
     fetchPolicy: "no-cache"
     // pollInterval: 5000

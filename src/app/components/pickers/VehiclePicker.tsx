@@ -36,7 +36,7 @@ export const useVehicleMultiPicker = useGenericMultiPicker({
 export const VehiclePagedPicker = GenericModelListPicker({
   QUERY: VEHICLE_PICKER_SEARCH_QUERY,
   identifierToOptions: (identifier, page) => ({
-    variables: { licensePlate: identifier, page }
+    variables: { licensePlate: identifier, page, limit: 15 }
   }),
   renderModel,
   arrayGetter,

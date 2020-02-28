@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { stylesheet } from "typestyle";
 import { useQuery } from "@apollo/react-hooks";
 import { PARKING_SESSION_BY_ID_QUERY } from "../constants/Queries";

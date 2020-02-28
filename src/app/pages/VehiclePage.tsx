@@ -28,7 +28,8 @@ export interface IProps extends IStateToProps, IDispatchToProps {}
 const styles = stylesheet({
   vehiclePage: {
     display: "grid",
-    gridTemplateColumns: "1fr"
+    gridTemplateColumns: "8fr 2.5fr",
+    gridColumnGap: "2em"
   },
   row: {
     display: "grid",
@@ -42,6 +43,17 @@ const styles = stylesheet({
         borderTop: "1px solid red"
       }
     }
+  },
+  pickers: {
+    display: "grid",
+    gridTemplateColumns: "auto",
+    gridTemplateRows: "22em 25em",
+    gridRowGap: "4em"
+  },
+  body: {
+    display: "grid",
+    gridTemplateColumns: "auto",
+    gridTemplateRows: "25em 25em"
   }
 });
 
@@ -60,44 +72,62 @@ const VehiclePage = (props: IProps): JSX.Element => {
   console.log(props.session);
   return (
     <div className={styles.vehiclePage}>
-      <PickerContainer
+      <div className={styles.body}>
+        <div>
+          {!props.session ? (
+            <Flag text="Select a Parking session" type={FlagType.NEGATIVE} />
+          ) : (
+            <>
+              <h3>
+                {!props.vehicle
+                  ? "Parking Session"
+                  : `Parking Session of ${props.vehicle.licensePlate}`}
+              </h3>
+              <ParkingSessionDisplay session={props.session} />
+            </>
+          )}
+        </div>
+        <div>
+          {!props.vehicle ? (
+            <Flag text="Select a Vehicle" type={FlagType.NEGATIVE} />
+          ) : (
+            <>
+              <h3>
+                {!props.vehicle
+                  ? "Vehicle"
+                  : `Vehicle -- ${props.vehicle.licensePlate}`}
+              </h3>
+              <VehicleDisplay
+                vehicle={props.vehicle}
+                setParkingSession={props.setParkingSession}
+              />
+            </>
+          )}
+        </div>
+      </div>
+      <div className={styles.pickers}>
+        <div>
+          <h3>Parking Session Picker</h3>
+          {sessionPicker}
+        </div>
+        <div>
+          <h3>Vehicle Picker</h3>
+          <VehiclePagedPicker
+            onSelect={props.setSimulationVehicle}
+            model={props.vehicle}
+          />
+        </div>
+      </div>
+      {/* <PickerContainer
         title={
           !props.vehicle
             ? "Parking Session"
             : `Parking Session of ${props.vehicle.licensePlate}`
         }
-      >
-        <div>
-          {!props.session ? (
-            <Flag text="Select a Parking session" type={FlagType.NEGATIVE} />
-          ) : (
-            <ParkingSessionDisplay session={props.session} />
-          )}
-        </div>
-        {sessionPicker}
-      </PickerContainer>
+      ></PickerContainer>
       <PickerContainer
-        title={
-          !props.vehicle
-            ? "Vehicle"
-            : `Vehicle -- ${props.vehicle.licensePlate}`
-        }
-      >
-        <div>
-          {!props.vehicle ? (
-            <Flag text="Select a Vehicle" type={FlagType.NEGATIVE} />
-          ) : (
-            <VehicleDisplay
-              vehicle={props.vehicle}
-              setParkingSession={props.setParkingSession}
-            />
-          )}
-        </div>
-        <VehiclePagedPicker
-          onSelect={props.setSimulationVehicle}
-          model={props.vehicle}
-        />
-      </PickerContainer>
+        title=
+      ></PickerContainer> */}
     </div>
   );
 };
