@@ -25,6 +25,7 @@ import {
   DEVICE_PAGE_DELETE_DEVICE_MUTATION,
   DEVICE_PAGE_UPDATE_CONFIG_MUTATION
 } from "../constants/Mutations";
+import { ERRORS_SET_ERROR } from "../redux/modules/errorsActionCreators";
 
 const coloredStatus = (backgroundColor, textColor = Color.BLACK): any => {
   return {
@@ -63,6 +64,7 @@ export interface IDispatchToProps {
   useRegenerateActivationPassword: () => MutationTuple<any, { id: string }>;
   toggleExpand: (id: string, isExpanded: boolean) => void;
   useUpdateDeviceConfig: () => MutationTuple<any, { id: string; config: any }>;
+  setError: (err: null | string) => void;
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
@@ -184,6 +186,7 @@ const DevicesPage = (props: IProps): JSX.Element => {
             device={row.original}
             updateDevice={props.updateDevice}
             toggleExpand={props.toggleExpand}
+            setError={props.setError}
           />
         )}
       />
@@ -276,7 +279,9 @@ export const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
       `),
     toggleExpand: (id, isExpanded) =>
       dispatch(toggleDeviceExpand({ id, isExpanded })),
-    useUpdateDeviceConfig: () => useMutation(DEVICE_PAGE_UPDATE_CONFIG_MUTATION)
+    useUpdateDeviceConfig: () =>
+      useMutation(DEVICE_PAGE_UPDATE_CONFIG_MUTATION),
+    setError: err => dispatch({ type: ERRORS_SET_ERROR, payload: err })
   };
 };
 

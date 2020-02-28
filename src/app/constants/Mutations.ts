@@ -47,6 +47,9 @@ export const DEVICE_PAGE_UPDATE_CONFIG_MUTATION = gql`
       config {
         type
         capturing
+        minArea
+        resizeX
+        resizeY
       }
     }
   }

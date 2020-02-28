@@ -10,6 +10,7 @@ import { deviceReducer } from "./modules/devicesModule";
 import { rulePageReducer } from "./modules/rulePageModule";
 import { statsPageReducer } from "./modules/statsPageModule";
 import { userMngmtReducer } from "./modules/userMngmtPageModule";
+import { errorsReducer } from "./modules/errorsModule";
 
 const commonPersistenceOptions = {
   debug: appConfig.env !== "production" && !!process.env.BROWSER,
@@ -40,7 +41,8 @@ const rootReducer: Reducer<IStore> = combineReducers<IStore>({
   settings: persistedSettingsReducer,
   user: persistedUserReducer,
   statsPage: statsPageReducer,
-  userMngmtPage: userMngmtReducer
+  userMngmtPage: userMngmtReducer,
+  errors: errorsReducer
 });
 
 export default rootReducer;

@@ -39,6 +39,9 @@ export class DevicesSaga extends BaseSaga {
               config {
                 capturing
                 type
+                minArea
+                resizeX
+                resizeY
               }
             }
           }

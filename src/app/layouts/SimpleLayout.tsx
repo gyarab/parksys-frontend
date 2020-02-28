@@ -2,6 +2,9 @@ import React from "react";
 import { ILayoutProps, LayoutComponent } from "./Layout";
 import { stylesheet } from "typestyle";
 import { ErrorBoundary } from "../containers/ErrorBoundary";
+import { IStore } from "../redux/IStore";
+import { connect } from "react-redux";
+import { FlagType, Flag } from "../components/Flag";
 
 // Sidebar src: https://every-layout.dev/layouts/sidebar/
 const classNames = stylesheet({
@@ -49,8 +52,14 @@ const classNames = stylesheet({
   }
 });
 
-class SimpleLayout extends LayoutComponent {
-  constructor(props: ILayoutProps) {
+interface IStateToProps {
+  error: string | null;
+}
+
+interface IProps extends IStateToProps, ILayoutProps {}
+
+class SimpleLayout extends LayoutComponent<IProps> {
+  constructor(props: IProps) {
     super(props);
   }
   render(): JSX.Element {
@@ -61,7 +70,17 @@ class SimpleLayout extends LayoutComponent {
             {this.props.navigation}
           </div>
           <div className={classNames.mainContent}>
-            {!!this.props.title ? <h2>{this.props.title}</h2> : null}
+            <div>
+              {!!this.props.title ? (
+                <h2 style={{ display: "inline-block" }}>{this.props.title}</h2>
+              ) : null}
+              {!!this.props.error ? (
+                <Flag
+                  text={this.props.error["message"]}
+                  type={FlagType.NEGATIVE}
+                />
+              ) : null}
+            </div>
             <ErrorBoundary>{this.props.children}</ErrorBoundary>
             <div className="spacer"></div>
           </div>
@@ -71,4 +90,12 @@ class SimpleLayout extends LayoutComponent {
   }
 }
 
-export { SimpleLayout };
+const stateToProps = (state: Pick<IStore, "errors">): IStateToProps => {
+  return {
+    error: state.errors.pageError
+  };
+};
+
+const connected = connect(stateToProps, null)(SimpleLayout);
+
+export { connected as SimpleLayout, SimpleLayout as UnconnectedSimpleLayout };

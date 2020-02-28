@@ -126,8 +126,10 @@ const PopUp = ({
     <span>{error.toString()}</span>
   ) : (
     <div onMouseOver={onSelecting} onMouseLeave={onStopSelecting}>
-      {arrayGetter(data).map(model => (
-        <div onClick={() => onSelect(model)}>{renderModel(model)}</div>
+      {arrayGetter(data).map((model, i) => (
+        <div key={i} onClick={() => onSelect(model)}>
+          {renderModel(model)}
+        </div>
       ))}
     </div>
   );
@@ -266,8 +268,10 @@ const ModelList = ({ loading, error, renderModel, data, onSelect }) => {
     <span>{error.toString()}</span>
   ) : (
     <div className={styles.modelList}>
-      {data.map(model => (
-        <div onClick={() => onSelect(model)}>{renderModel(model)}</div>
+      {data.map((model, i) => (
+        <div key={i} onClick={() => onSelect(model)}>
+          {renderModel(model)}
+        </div>
       ))}
     </div>
   );

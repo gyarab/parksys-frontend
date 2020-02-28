@@ -4,6 +4,7 @@ import { Button } from "./Button";
 import { stylesheet } from "typestyle";
 import { TwoPicker } from "./pickers/TwoPicker";
 import SaveStatus from "../constants/SaveStatus";
+import { NumberInput } from "./pickers/NumberInput";
 
 const styles = stylesheet({
   pickers: {
@@ -38,7 +39,38 @@ const DeviceConfigEditor = ({ device, onSave, saveStatus }) => {
             setConfig({ ...config, capturing: capturingOption === "YES" })
           }
         />
+        <span>Minimal Area</span>
+        <NumberInput
+          value={config.minArea}
+          onChange={value =>
+            setConfig({
+              ...config,
+              minArea: Math.max(value, 0)
+            })
+          }
+        />
+        <span>Resize X</span>
+        <NumberInput
+          value={config.resizeX}
+          onChange={value =>
+            setConfig({
+              ...config,
+              resizeX: Math.max(value, 0)
+            })
+          }
+        />
+        <span>Resize Y</span>
+        <NumberInput
+          value={config.resizeY}
+          onChange={value =>
+            setConfig({
+              ...config,
+              resizeY: Math.max(value, 0)
+            })
+          }
+        />
       </div>
+      <div style={{ marginBottom: "1em" }}></div>
       <Button
         type="primary"
         onClick={() => onSave(config)}
@@ -57,7 +89,8 @@ const DeviceRowSubcomponent = ({
   updateConfigEffect,
   updateDevice,
   device,
-  toggleExpand
+  toggleExpand,
+  setError
 }) => {
   const [expiresAt, setExpiration] = useState(
     new Date(device.activationPasswordExpiresAt)
@@ -97,9 +130,10 @@ const DeviceRowSubcomponent = ({
         .then(response => response.blob())
         .then(blob => {
           setImageData(URL.createObjectURL(blob));
+          setError(null);
         })
         .catch(err => {
-          console.log(err);
+          setError(err);
         });
     }
     return () => {
@@ -127,6 +161,7 @@ const DeviceRowSubcomponent = ({
     setSaveStatus(SaveStatus.SAVING);
     updateConfigEffect({ variables: { id: device.id, config } })
       .then(result => {
+        setError(null);
         setSaveStatus(SaveStatus.SUCCEEDED);
         updateDevice(device.id, {
           ...device,
@@ -134,7 +169,7 @@ const DeviceRowSubcomponent = ({
         });
       })
       .catch(err => {
-        console.log(err);
+        setError(err);
         setSaveStatus(SaveStatus.FAILED);
       });
     toggleExpand(device.id, false);
