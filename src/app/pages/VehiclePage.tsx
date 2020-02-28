@@ -57,13 +57,6 @@ const styles = stylesheet({
   }
 });
 
-const PickerContainer = ({ children, title }) => (
-  <div>
-    <h3>{title}</h3>
-    <div className={styles.row}>{children}</div>
-  </div>
-);
-
 const VehiclePage = (props: IProps): JSX.Element => {
   const [sessionPicker, session] = useParkingSessionPicker();
   useEffect(() => {

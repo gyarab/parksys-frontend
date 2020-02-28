@@ -275,11 +275,11 @@ export const PARKING_SESSION_BY_ID_QUERY = gql`
       finalFee
       checkIn {
         time
-        image
+        imagePaths
       }
       checkOut {
         time
-        image
+        imagePaths
       }
       appliedAssignments {
         start
