@@ -47,13 +47,13 @@ const classNames = stylesheet({
   },
   timeIndicator: {
     position: "absolute",
-    borderRight: `2px solid ${Color.BLUE}`,
+    borderRight: `3px solid ${Color.BLUE}`,
     width: 0,
     top: 0
   },
   appliedRuleAssignment: {
     position: "absolute",
-    borderTop: `2px solid ${Color.LIGHT_RED}`,
+    borderTop: `4px solid ${Color.LIGHT_RED}`,
     height: 0
   },
   appliedRuleAssignmentConnector: {

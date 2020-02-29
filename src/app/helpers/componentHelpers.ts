@@ -10,14 +10,11 @@ export const dateDisplay = (
   start: string | null,
   end: string | null
 ): [string, string] => {
-  console.log(start, end);
-
   if (start != null && end != null) {
     const sDate = new Date(start);
     const eDate = new Date(end);
-    console.log(sDate, eDate);
     if (sDate.toLocaleDateString() === eDate.toLocaleDateString()) {
-      return [eDate.toLocaleString(), eDate.toLocaleTimeString()];
+      return [sDate.toLocaleString(), eDate.toLocaleTimeString()];
     }
   } else if (start != null) {
     return [new Date(start).toLocaleString(), end];

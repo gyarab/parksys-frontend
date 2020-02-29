@@ -229,7 +229,7 @@ const DevicesPage = (props: IProps): JSX.Element => {
             onChange={event => setName(event.target.value)}
           />
         </label>
-        <input type="submit" value="Create" />
+        <Button onClick={createDevice}>Create</Button>
       </form>
     </div>
   );

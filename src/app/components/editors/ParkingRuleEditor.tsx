@@ -147,6 +147,7 @@ export const ParkingRuleEditor = ({ rule, del, save, saveStatus, isNew }) => {
     unitTime: "HOUR",
     permit: false,
     freeInUnitTime: 0,
+    centsPerUnitTime: 0,
     roundingMethod: "ROUND",
     ...getTypeSpecific(rule)
   });

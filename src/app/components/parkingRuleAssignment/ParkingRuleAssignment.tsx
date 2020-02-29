@@ -83,6 +83,7 @@ const ParkingRuleAssignment = ({
       <div className={"cellBody"} onClick={toggleDetails}>
         <span>
           {assignment.rules.map(rule => rule.name).join(", ")} -{" "}
+          {assignment.vehicleFilterMode}{" "}
           {assignment.vehicleFilters.map(filter => filter.name).join(", ")}
         </span>
       </div>

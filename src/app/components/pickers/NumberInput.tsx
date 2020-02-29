@@ -5,7 +5,7 @@ const filterValue = newValue => {
   if (Number.isInteger(numberValue) && numberValue > 0) {
     return numberValue;
   } else if (newValue.length === 0) {
-    return "";
+    return 0;
   }
 };
 

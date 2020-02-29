@@ -167,7 +167,7 @@ export const ParkingSessionDisplay = ({ session: { id } }) => {
                   <td style={{ color: Color.LIGHT_GREY }}>{i + 1}</td>
                   <td>{start}</td>
                   <td>{end}</td>
-                  <td>{assignment.feeCents}</td>
+                  <td>{assignment.feeCents / 100}</td>
                   <td>{assignment.rules.length}</td>
                 </tr>
               );

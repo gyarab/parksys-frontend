@@ -9,7 +9,9 @@ import { useGenericMultiPicker } from "./GenericModelMultiPicker";
 
 const renderModel = model => (
   <>
-    {model.licensePlate} {model.numParkingSessions} sessions
+    <span>
+      {model.licensePlate} {model.numParkingSessions} sessions
+    </span>
   </>
 );
 const arrayGetter = data => data.vehicleSearch.data;
