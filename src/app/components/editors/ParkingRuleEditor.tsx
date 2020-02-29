@@ -109,7 +109,7 @@ const ParkingRuleTimedFeeSpecific = ({ typeSpecific, setTypeSpecific }) => {
         name="unitTime"
         onChange={onChange}
       />
-      <span>Cents per {unitTime}</span>
+      <span>Fee per {unitTime}</span>
       <NumberInput
         value={centsPerUnitTime / 100}
         onChange={value =>

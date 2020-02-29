@@ -108,19 +108,10 @@ const VehiclePage = (props: IProps): JSX.Element => {
           <VehiclePagedPicker
             onSelect={props.setSimulationVehicle}
             model={props.vehicle}
+            options={{ pollInterval: 5000 }}
           />
         </div>
       </div>
-      {/* <PickerContainer
-        title={
-          !props.vehicle
-            ? "Parking Session"
-            : `Parking Session of ${props.vehicle.licensePlate}`
-        }
-      ></PickerContainer>
-      <PickerContainer
-        title=
-      ></PickerContainer> */}
     </div>
   );
 };

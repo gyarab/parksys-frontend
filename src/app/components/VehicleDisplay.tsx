@@ -13,9 +13,8 @@ const styles = stylesheet({
 
 export const VehicleDisplay = ({ vehicle: vehicle_, setParkingSession }) => {
   const { data, loading, error } = useQuery(VEHICLE_SESSIONS_BY_ID_QUERY, {
-    variables: {
-      id: vehicle_.id
-    }
+    variables: { id: vehicle_.id },
+    pollInterval: 5000
   });
   const [session, setSession_] = useState(null);
   const setSession = session => {
@@ -57,7 +56,8 @@ export const VehicleDisplay = ({ vehicle: vehicle_, setParkingSession }) => {
         </h4>
         <VehicleParkingSessionPicker
           options={{
-            variables: { licensePlate: vehicle.licensePlate }
+            variables: { licensePlate: vehicle.licensePlate },
+            pollInterval: 5000
           }}
           model={session}
           onSelect={setSession}

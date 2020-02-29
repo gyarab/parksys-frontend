@@ -81,8 +81,8 @@ const identifierToOptions = (date, page) => {
       page,
       limit: 5
     },
-    fetchPolicy: "no-cache"
-    // pollInterval: 5000
+    fetchPolicy: "no-cache",
+    pollInterval: 5000
   };
 };
 
