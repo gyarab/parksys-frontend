@@ -10,15 +10,18 @@ export const dateDisplay = (
   start: string | null,
   end: string | null
 ): [string, string] => {
+  console.log(start, end);
+
   if (start != null && end != null) {
-    const startPrefix = start.slice(0, 10);
-    const endPrefix = start.slice(0, 10);
-    if (startPrefix === endPrefix) {
-      return [start.slice(0, 16), end.slice(11, 16)];
+    const sDate = new Date(start);
+    const eDate = new Date(end);
+    console.log(sDate, eDate);
+    if (sDate.toLocaleDateString() === eDate.toLocaleDateString()) {
+      return [eDate.toLocaleString(), eDate.toLocaleTimeString()];
     }
   } else if (start != null) {
-    return [start.slice(0, 16), end];
+    return [new Date(start).toLocaleString(), end];
   } else {
-    return [start, end.slice(0, 16)];
+    return [start, new Date(end).toLocaleString()];
   }
 };

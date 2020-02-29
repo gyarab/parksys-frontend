@@ -136,7 +136,7 @@ const DevicesPage = (props: IProps): JSX.Element => {
         Cell({ row }) {
           return row.original.activatedAt == null
             ? null
-            : row.original.activatedAt;
+            : new Date(row.original.activatedAt).toLocaleString();
         }
       },
       {
@@ -156,6 +156,7 @@ const DevicesPage = (props: IProps): JSX.Element => {
               <Button
                 // disabled={row.original.activated && !row.isExpanded}
                 onClick={detailsClick}
+                style={{ marginRight: "0.5em" }}
               >
                 Details
               </Button>
@@ -202,6 +203,7 @@ const DevicesPage = (props: IProps): JSX.Element => {
         <label>
           Activated
           <select
+            style={{ marginLeft: "0.4em", marginRight: "0.5em" }}
             value={String(activatedFilterDisplay)}
             onChange={event => setActivatedFilter(event.target.value)}
           >

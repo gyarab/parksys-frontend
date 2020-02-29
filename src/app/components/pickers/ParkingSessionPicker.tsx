@@ -1,5 +1,5 @@
 import React from "react";
-import { stylesheet } from "typestyle";
+import { stylesheet, classes } from "typestyle";
 import {
   GenericModelListPicker,
   useGenericListPickerFromListPicker
@@ -11,6 +11,7 @@ import {
 import moment from "moment";
 import { VehicleLink } from "../VehicleLink";
 import { dateDisplay } from "../../helpers/componentHelpers";
+import { Color } from "../../constants";
 
 const styles = stylesheet({
   session: {
@@ -21,21 +22,27 @@ const styles = stylesheet({
         marginBottom: "0.6em"
       }
     }
+  },
+  activeSession: {
+    fontWeight: "bold"
   }
 });
 
 const RenderSession = ({ model }) => {
   const [start, end] = dateDisplay(
     model.checkIn.time,
-    model.active ? "" : model.checkOut.time
+    model.active ? null : model.checkOut.time
   );
   return (
-    <div className={styles.session}>
+    <div
+      className={classes(styles.session, model.active && styles.activeSession)}
+    >
       <p>
+        <span>{model.finalFee / 100}, </span>
         <span>
-          {start} -- {end}
+          {start} --{" "}
+          {!end ? <span style={{ color: Color.GREY }}>still active</span> : end}
         </span>
-        <span> {model.finalFee / 100}</span>
       </p>
       <p className="link">
         {!model.vehicle ? null : <VehicleLink vehicle={model.vehicle} />}

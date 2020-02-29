@@ -28,7 +28,7 @@ export interface IProps extends IStateToProps, IDispatchToProps {}
 const styles = stylesheet({
   vehiclePage: {
     display: "grid",
-    gridTemplateColumns: "8fr 2.5fr",
+    gridTemplateColumns: "8fr 3fr",
     gridColumnGap: "2em"
   },
   row: {
@@ -62,7 +62,6 @@ const VehiclePage = (props: IProps): JSX.Element => {
   useEffect(() => {
     if (!!session) props.setParkingSession(session);
   }, [!!session ? session.id : null]);
-  console.log(props.session);
   return (
     <div className={styles.vehiclePage}>
       <div className={styles.body}>

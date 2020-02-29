@@ -320,3 +320,11 @@ export const VEHICLE_SESSIONS_BY_ID_QUERY = gql`
     }
   }
 `;
+
+export const LIVE_STATS_QUERY = gql`
+  query liveStats {
+    liveStats {
+      numActiveParkingSessions
+    }
+  }
+`;

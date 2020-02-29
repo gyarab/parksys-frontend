@@ -17,6 +17,7 @@ import {
 } from "../redux/modules/statsPageActionCreators";
 import { NumberInput } from "../components/pickers/NumberInput";
 import { Chart } from "react-google-charts";
+import { LiveStats } from "../components/LiveStats";
 
 export interface IStateToProps {
   selectedPeriod: IStatsPageState["selectedPeriod"];
@@ -312,93 +313,121 @@ const StatisticsPage = (props: IProps): JSX.Element => {
   // unless resized.
   const [calendarGraphW, setCalendarGraphW] = useState(0);
   useEffect(() => {
-    setCalendarGraphW(1);
+    setCalendarGraphW(5);
     setTimeout(() => setCalendarGraphW(0), 1);
   }, [props.graphPeriod, props.selectedPeriod]);
 
   return (
-    <div>
-      <div
-        className={styles.graphs}
-        style={{ width: `calc(auto - ${calendarGraphW}px)` }}
-      >
-        {props.graphPeriod === "days" ? (
-          graphMaker(
-            `Month: ${props.selectedPeriod.year}-${String(
-              props.selectedPeriod.month
-            ).padStart(2, "0")}`,
-            monthGraphData,
-            daysInMonth(props.selectedPeriod.year, props.selectedPeriod.month),
-            null
-          )
-        ) : props.graphPeriod === "months" ? (
-          graphMaker(
-            `Year: ${props.selectedPeriod.year}`,
-            yearGraphData,
-            12,
-            null
-          )
-        ) : props.graphPeriod === "hours" ? (
-          graphMaker(
-            `Day: ${props.selectedPeriod.year}-${String(
-              props.selectedPeriod.month
-            ).padStart(2, "0")}-${String(props.selectedPeriod.date).padStart(
-              2,
-              "0"
-            )}`,
-            dayGraphData,
-            24,
-            null
-          )
-        ) : (
-          <div className={styles.calGraphs}>
-            {calendarGraphMaker(`Revenue`, yearDayGraphData[0])}
-            {calendarGraphMaker(`Number of Sessions`, yearDayGraphData[1])}
-          </div>
-        )}
-      </div>
-      <label>
-        <span>Year</span>
-        <NumberInput
-          value={props.selectedPeriod.year}
-          onChange={year => {
-            props.setSelectedTime({ year, month: null, date: null });
-            props.setGraphTime("months");
-          }}
-        />
-        <Button onClick={() => props.setGraphTime("months")}>
-          Show Per Month Stats
-        </Button>
-        <Button onClick={() => props.setGraphTime("yearDays")}>
-          Show Per Day Stats
-        </Button>
-      </label>
-      <div className={styles.periodSelection}>
-        <div>
-          <h2>Month</h2>
-          {!!yearData ? (
-            <StatsTable
-              columns={monthsColumns}
-              shouldBeHighlighted={() => false}
-              data={yearData.yearStats.monthly}
-            />
-          ) : null}
-        </div>
-        <div>
-          <div>
-            <h2 style={{ display: "inline-block" }}>Day</h2>
-          </div>
-          {!!monthData &&
-          monthData.monthStats.year === props.selectedPeriod.year ? (
-            <StatsTable
-              columns={daysColumns}
-              shouldBeHighlighted={() => false}
-              data={monthData.monthStats.daily}
-            />
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "80% 20%",
+        alignItems: "start"
+      }}
+    >
+      <div>
+        <div
+          className={styles.graphs}
+          style={{ width: `calc(auto - ${calendarGraphW}px)` }}
+        >
+          {props.graphPeriod === "days" ? (
+            graphMaker(
+              `Month: ${props.selectedPeriod.year}-${String(
+                props.selectedPeriod.month
+              ).padStart(2, "0")}`,
+              monthGraphData,
+              daysInMonth(
+                props.selectedPeriod.year,
+                props.selectedPeriod.month
+              ),
+              null
+            )
+          ) : props.graphPeriod === "months" ? (
+            graphMaker(
+              `Year: ${props.selectedPeriod.year}`,
+              yearGraphData,
+              12,
+              null
+            )
+          ) : props.graphPeriod === "hours" ? (
+            graphMaker(
+              `Day: ${props.selectedPeriod.year}-${String(
+                props.selectedPeriod.month
+              ).padStart(2, "0")}-${String(props.selectedPeriod.date).padStart(
+                2,
+                "0"
+              )}`,
+              dayGraphData,
+              24,
+              null
+            )
+          ) : yearDayGraphData !== null ? (
+            <div
+              className={styles.calGraphs}
+              style={{ width: `calc(auto - ${calendarGraphW}px)` }}
+            >
+              {calendarGraphMaker(`Revenue`, yearDayGraphData[0])}
+              {calendarGraphMaker(`Number of Sessions`, yearDayGraphData[1])}
+            </div>
           ) : (
-            <div>Select month</div>
+            "Loading"
           )}
         </div>
+        <div
+          style={{
+            display: "grid",
+            gridColumnGap: "0.5em",
+            gridTemplateColumns: "auto 1fr 1fr 30%"
+          }}
+        >
+          <div>
+            <span>Year</span>
+            <NumberInput
+              value={props.selectedPeriod.year}
+              onChange={year => {
+                props.setSelectedTime({ year, month: null, date: null });
+                props.setGraphTime("months");
+              }}
+            />
+          </div>
+          <Button onClick={() => props.setGraphTime("months")}>
+            Show Per Month Stats
+          </Button>
+          <Button onClick={() => props.setGraphTime("yearDays")}>
+            Show Per Day Stats
+          </Button>
+        </div>
+        <div className={styles.periodSelection}>
+          <div>
+            <h2>Month</h2>
+            {!!yearData ? (
+              <StatsTable
+                columns={monthsColumns}
+                shouldBeHighlighted={() => false}
+                data={yearData.yearStats.monthly}
+              />
+            ) : null}
+          </div>
+          <div>
+            <div>
+              <h2 style={{ display: "inline-block" }}>Day</h2>
+            </div>
+            {!!monthData &&
+            monthData.monthStats.year === props.selectedPeriod.year ? (
+              <StatsTable
+                columns={daysColumns}
+                shouldBeHighlighted={() => false}
+                data={monthData.monthStats.daily}
+              />
+            ) : (
+              <div>Select month</div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <LiveStats />
       </div>
     </div>
   );
