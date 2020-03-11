@@ -69,6 +69,7 @@ export interface IDispatchToProps {
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
 
+const reloadIntervalSeconds = 15;
 const DevicesPage = (props: IProps): JSX.Element => {
   const activatedFilterOptions: [string, string, string] = [
     "true",
@@ -81,6 +82,8 @@ const DevicesPage = (props: IProps): JSX.Element => {
     setActivatedFilter
   ] = useTrueFalseUndefined(activatedFilterOptions);
 
+  const [lastReload, setLastReload] = useState(new Date());
+  const [now, setNow] = useState<Date>(new Date());
   const [name, setName] = useState("");
   const [createDeviceEffect] = props.useCreateDevice();
   const [deleteDeviceEffect] = props.useDeleteDevice();
@@ -90,12 +93,29 @@ const DevicesPage = (props: IProps): JSX.Element => {
 
   const fetchDevices = () => {
     props.fetchDevices({ activated: activateFilter });
+    setLastReload(new Date());
   };
   useEffect(() => {
     if (!props.devices.loaded) {
       fetchDevices();
     }
   }, [props.devices.loaded]);
+
+  const reloadDiff = (now.getTime() - lastReload.getTime()) / 1000;
+  console.log(reloadDiff);
+  if (reloadDiff >= reloadIntervalSeconds) {
+    fetchDevices();
+  }
+
+  useEffect(() => {
+    setNow(new Date());
+    const interval = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [props.devices.pending]);
 
   const createDevice = e => {
     e.preventDefault();
@@ -134,9 +154,35 @@ const DevicesPage = (props: IProps): JSX.Element => {
         Header: "Activated At",
         accessor: "activatedAt",
         Cell({ row }) {
-          return row.original.activatedAt == null
-            ? null
-            : new Date(row.original.activatedAt).toLocaleString();
+          return row.original.activatedAt == null ? (
+            <span style={{ color: Color.LIGHT_GREY }}>never</span>
+          ) : (
+            new Date(row.original.activatedAt).toLocaleString()
+          );
+        }
+      },
+      {
+        Header: "Last Contact",
+        accessor: "lastContact",
+        Cell({ row }) {
+          if (!row.original.lastContact)
+            return <span style={{ color: Color.LIGHT_GREY }}>never</span>;
+          const date = new Date(row.original.lastContact);
+          const diffLTMinute = lastReload.getTime() - 60000 <= date.getTime();
+          const minutesAgo = (lastReload.getTime() - date.getTime()) / 60000.0;
+
+          return (
+            <span
+              style={{
+                backgroundColor: diffLTMinute ? "" : Color.LIGHT_RED,
+                padding: "0.5em"
+              }}
+            >
+              {minutesAgo >= 60
+                ? date.toLocaleString()
+                : `${Math.round(10 * minutesAgo) / 10} mins ago`}
+            </span>
+          );
         }
       },
       {
@@ -168,7 +214,7 @@ const DevicesPage = (props: IProps): JSX.Element => {
         }
       }
     ],
-    []
+    [lastReload]
   );
 
   const [updateConfigEffect] = props.useUpdateDeviceConfig();
@@ -213,7 +259,7 @@ const DevicesPage = (props: IProps): JSX.Element => {
           </select>
         </label>
         <Button disabled={props.devices.pending} onClick={fetchDevices}>
-          Fetch Devices
+          {`Reload (in ${Math.round(reloadIntervalSeconds - reloadDiff)}s)`}
         </Button>
       </div>
 

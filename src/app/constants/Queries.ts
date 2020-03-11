@@ -6,6 +6,27 @@ import {
   USER_FRAGMENT
 } from "./Fragments";
 
+export const DEVICE_QUERY = gql`
+  query devices($name: String, $activated: Boolean) {
+    devices(filter: { name: $name, activated: $activated }) {
+      id
+      name
+      lastContact
+      activated
+      activatedAt
+      activationQrUrl
+      activationPasswordExpiresAt
+      config {
+        capturing
+        type
+        minArea
+        resizeX
+        resizeY
+      }
+    }
+  }
+`;
+
 export const RULE_PAGE_FETCH_PARKING_RULE_ASSIGNMENT_QUERY = gql`
   query parkingRuleAssignments(
     $startFilter: DateFilter

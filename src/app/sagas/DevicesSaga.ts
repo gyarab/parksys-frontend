@@ -14,6 +14,7 @@ import {
 } from "../redux/modules/devicesActionCreators";
 import gql from "graphql-tag";
 import { getType } from "typesafe-actions";
+import { DEVICE_QUERY } from "../constants/Queries";
 
 export class DevicesSaga extends BaseSaga {
   private client: any;
@@ -27,25 +28,7 @@ export class DevicesSaga extends BaseSaga {
   ): () => Promise<{ data: FetchDevicesFulfilled }> {
     return () =>
       this.client.query({
-        query: gql`
-          query devices($name: String, $activated: Boolean) {
-            devices(filter: { name: $name, activated: $activated }) {
-              id
-              name
-              activated
-              activatedAt
-              activationQrUrl
-              activationPasswordExpiresAt
-              config {
-                capturing
-                type
-                minArea
-                resizeX
-                resizeY
-              }
-            }
-          }
-        `,
+        query: DEVICE_QUERY,
         variables: filter,
         fetchPolicy: "no-cache"
       });

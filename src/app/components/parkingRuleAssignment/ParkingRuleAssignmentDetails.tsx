@@ -17,6 +17,7 @@ import { useVehicleFilterMultiPicker } from "../pickers/VehicleFilterPicker";
 import SaveStatus from "../../constants/SaveStatus";
 import { useNumberInput } from "../pickers/NumberInput";
 import { CloseAction } from "./CloseAction";
+import { ERRORS_SET_ERROR } from "../../redux/modules/errorsActionCreators";
 
 const styles = stylesheet({
   options: {
@@ -70,6 +71,7 @@ export interface IDispatchToProps {
   >;
   setCollidingRuleAssignments: (ids: Array<string>) => void;
   useDeleteRuleAssignment: () => MutationTuple<{}, { id: string }>;
+  setError: (err: null | string) => void;
 }
 
 export interface IProps extends IDispatchToProps {
@@ -164,6 +166,7 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
   const [deleteEffect] = props.useDeleteRuleAssignment();
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(SaveStatus.NONE);
   const close = (action: CloseAction) => {
+    props.setError(null);
     props.close(action);
   };
 
@@ -185,11 +188,13 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
     promise
       .then(({ data }) => {
         if (data.result.collisions) {
+          props.setError("There are collisions.");
           props.setCollidingRuleAssignments(
             data.result.collisions.map(collision => collision.id)
           );
           setSaveStatus(SaveStatus.FAILED);
         } else {
+          props.setError(null);
           props.setCollidingRuleAssignments([]);
           setSaveStatus(SaveStatus.SUCCEEDED);
           close(isNew ? CloseAction.SAVE : CloseAction.UPDATE);
@@ -198,19 +203,21 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
       .catch(err => {
         console.log(err);
         setSaveStatus(SaveStatus.FAILED);
+        props.setError(err);
       });
   };
   const del = () => {
-    console.log("PRE DELETE");
     deleteEffect({
       variables: {
         id: props.assignment.id
       }
-    }).then(({ data }) => {
-      console.log("POST DELETE");
-      props.setCollidingRuleAssignments([]);
-      close(CloseAction.DELETE);
-    });
+    })
+      .then(({ data }) => {
+        props.setError(null);
+        props.setCollidingRuleAssignments([]);
+        close(CloseAction.DELETE);
+      })
+      .catch(err => props.setError(err));
   };
   return (
     <div className={styles.details}>
@@ -269,7 +276,8 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
         payload: { collidingRuleAssignments: ids }
       }),
     useDeleteRuleAssignment: () =>
-      useMutation(RULE_PAGE_DELETE_RULE_ASSIGNMENT_MUTATION)
+      useMutation(RULE_PAGE_DELETE_RULE_ASSIGNMENT_MUTATION),
+    setError: err => dispatch({ type: ERRORS_SET_ERROR, payload: err })
   };
 };
 
