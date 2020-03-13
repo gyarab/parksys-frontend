@@ -16,6 +16,9 @@ const styles = stylesheet({
   positive: {
     backgroundColor: Color.LIGHT_BLUE
   },
+  warning: {
+    backgroundColor: Color.ORANGE
+  },
   none: {
     border: `1px solid ${Color.LIGHT_GREY}`
   }
@@ -40,6 +43,8 @@ const typeToClass = (status: FlagType) => {
       return styles.negative;
     case FlagType.POSITIVE:
       return styles.positive;
+    case FlagType.WARNING:
+      return styles.warning;
     default:
       return styles.none;
   }

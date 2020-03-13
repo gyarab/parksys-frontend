@@ -142,14 +142,12 @@ const UserPage = (props: IProps) => {
       }
     })
       .then(result => {
-        console.log(result);
         setSecurityMessage({
           status: FlagType.POSITIVE,
           message: "Password changed"
         });
       })
       .catch(error => {
-        console.log(error);
         setSecurityMessage({
           status: FlagType.NEGATIVE,
           message: "Error while changing password"

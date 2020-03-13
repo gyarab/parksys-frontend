@@ -17,7 +17,7 @@ import { useVehicleFilterMultiPicker } from "../pickers/VehicleFilterPicker";
 import SaveStatus from "../../constants/SaveStatus";
 import { useNumberInput } from "../pickers/NumberInput";
 import { CloseAction } from "./CloseAction";
-import { ERRORS_SET_ERROR } from "../../redux/modules/errorsActionCreators";
+import { ERRORS_SET_PAGE_ERROR } from "../../redux/modules/errorsActionCreators";
 
 const styles = stylesheet({
   options: {
@@ -174,7 +174,6 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
     // Do async work, then close
     if (Object.keys(newAssignment).length === 0) return;
     setSaveStatus(SaveStatus.SAVING);
-    console.log(isNew, newAssignment);
     const promise: Promise<any> = isNew
       ? createEffect({
           variables: { input: newAssignment }
@@ -188,7 +187,11 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
     promise
       .then(({ data }) => {
         if (data.result.collisions) {
-          props.setError("There are collisions.");
+          props.setError(
+            `There are collisions. Dates: ${data.result.collisions
+              .map(collision => collision.start.slice(0, 10))
+              .join()}`
+          );
           props.setCollidingRuleAssignments(
             data.result.collisions.map(collision => collision.id)
           );
@@ -277,7 +280,7 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
       }),
     useDeleteRuleAssignment: () =>
       useMutation(RULE_PAGE_DELETE_RULE_ASSIGNMENT_MUTATION),
-    setError: err => dispatch({ type: ERRORS_SET_ERROR, payload: err })
+    setError: err => dispatch({ type: ERRORS_SET_PAGE_ERROR, payload: err })
   };
 };
 

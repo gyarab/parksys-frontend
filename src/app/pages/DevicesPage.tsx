@@ -25,7 +25,7 @@ import {
   DEVICE_PAGE_DELETE_DEVICE_MUTATION,
   DEVICE_PAGE_UPDATE_CONFIG_MUTATION
 } from "../constants/Mutations";
-import { ERRORS_SET_ERROR } from "../redux/modules/errorsActionCreators";
+import { ERRORS_SET_PAGE_ERROR } from "../redux/modules/errorsActionCreators";
 
 const coloredStatus = (backgroundColor, textColor = Color.BLACK): any => {
   return {
@@ -219,11 +219,12 @@ const DevicesPage = (props: IProps): JSX.Element => {
 
   const [updateConfigEffect] = props.useUpdateDeviceConfig();
 
+  const weHaveDevices = props.devices.loaded && !!props.devices.devices;
   const table = (
     <>
       <DeviceTable
         columns={columns}
-        data={props.devices.loaded ? props.devices.devices : []}
+        data={weHaveDevices ? props.devices.devices : []}
         renderDeviceSubcomponent={({ row }) => (
           <DeviceRowSubcomponent
             regenerateActivationPasswordEffect={
@@ -237,7 +238,7 @@ const DevicesPage = (props: IProps): JSX.Element => {
           />
         )}
       />
-      {props.devices.loaded && props.devices.devices.length === 0 ? (
+      {weHaveDevices && props.devices.devices.length === 0 ? (
         <p>No Devices Found</p>
       ) : null}
     </>
@@ -329,7 +330,7 @@ export const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
       dispatch(toggleDeviceExpand({ id, isExpanded })),
     useUpdateDeviceConfig: () =>
       useMutation(DEVICE_PAGE_UPDATE_CONFIG_MUTATION),
-    setError: err => dispatch({ type: ERRORS_SET_ERROR, payload: err })
+    setError: err => dispatch({ type: ERRORS_SET_PAGE_ERROR, payload: err })
   };
 };
 

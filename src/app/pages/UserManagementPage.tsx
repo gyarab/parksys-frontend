@@ -95,7 +95,7 @@ const UserManagementPage = (props: IProps): JSX.Element => {
             deleteUser={deleteUser}
           />
         ) : (
-          <Flag text="Select user on the right" type={FlagType.NEGATIVE} />
+          <Flag text="Select user on the right" type={FlagType.WARNING} />
         )}
       </div>
       <div className={styles.rightPane}>

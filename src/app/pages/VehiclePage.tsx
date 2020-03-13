@@ -67,7 +67,7 @@ const VehiclePage = (props: IProps): JSX.Element => {
       <div className={styles.body}>
         <div>
           {!props.session ? (
-            <Flag text="Select a Parking session" type={FlagType.NEGATIVE} />
+            <Flag text="Select a Parking session" type={FlagType.WARNING} />
           ) : (
             <>
               <h3>
@@ -81,7 +81,7 @@ const VehiclePage = (props: IProps): JSX.Element => {
         </div>
         <div>
           {!props.vehicle ? (
-            <Flag text="Select a Vehicle" type={FlagType.NEGATIVE} />
+            <Flag text="Select a Vehicle" type={FlagType.WARNING} />
           ) : (
             <>
               <h3>

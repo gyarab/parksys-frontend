@@ -69,6 +69,7 @@ export const RULE_PAGE_UPDATE_RULE_ASSIGNMENT_MUTATION = gql`
       ... on ParkingRuleAssignmentResultError {
         collisions {
           id
+          start
         }
       }
     }
@@ -86,6 +87,7 @@ export const RULE_PAGE_CREATE_RULE_ASSIGNMENT_MUTATION = gql`
       ... on ParkingRuleAssignmentResultError {
         collisions {
           id
+          start
         }
       }
     }

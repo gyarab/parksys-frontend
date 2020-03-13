@@ -7,5 +7,6 @@ export enum Color {
   WHITE = "#ffffff",
   AQUAMARINE = "#659F99",
   LIGHT_BLUE = "#89B9C1",
-  LIGHT_RED = "#E6694D"
+  LIGHT_RED = "#E6694D",
+  ORANGE = "#feb546"
 }

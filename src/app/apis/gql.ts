@@ -9,26 +9,37 @@ import lodash from "lodash";
 import { IExtendedStore } from "../redux/configureStore";
 import { onError } from "apollo-link-error";
 import { config } from "../../../config";
+import {
+  ERRORS_SET_GRAPHQL_ERROR,
+  ERRORS_SET_NETWORK_ERROR
+} from "../redux/modules/errorsActionCreators";
 const introspectionQueryResultData = require("../../fragmentTypes.json");
-
-// Taken from: https://www.robinwieruch.de/react-redux-apollo-client-state-management-tutorial
-export const baseLink = new HttpLink({
-  uri: `${config.backendApi.root}${config.backendApi.graphql}`
-});
 
 export const createApolloClient = (store: IExtendedStore) => {
   // https://www.npmjs.com/package/apollo-link-error
   const errorLink = onError(({ graphQLErrors, networkError }) => {
-    if (graphQLErrors)
+    if (graphQLErrors) {
+      store.dispatch({
+        type: ERRORS_SET_GRAPHQL_ERROR,
+        payload: graphQLErrors
+      });
       graphQLErrors.map(({ message, locations, path }) =>
         console.log(
           `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
         )
       );
-    if (networkError) console.log(`[Network error]: ${networkError}`);
+    } else {
+      store.dispatch({ type: ERRORS_SET_GRAPHQL_ERROR, payload: null });
+    }
+    if (networkError) {
+      console.log(`[Network error]: ${networkError}`);
+      store.dispatch({ type: ERRORS_SET_NETWORK_ERROR, payload: networkError });
+    } else {
+      store.dispatch({ type: ERRORS_SET_NETWORK_ERROR, payload: null });
+    }
   });
 
-  // Taken from: https://medium.com/risan/set-authorization-header-with-apollo-client-e934e6517ccf
+  // https://medium.com/risan/set-authorization-header-with-apollo-client-e934e6517ccf
   const authLink = new ApolloLink((operation, forward) => {
     // Retrieve the authorization token from state.
     const token = lodash.get(store.getState(), "user.accessToken");
@@ -42,6 +53,11 @@ export const createApolloClient = (store: IExtendedStore) => {
 
     // Call the next link in the middleware chain.
     return forward(operation);
+  });
+
+  // https://www.robinwieruch.de/react-redux-apollo-client-state-management-tutorial
+  const baseLink = new HttpLink({
+    uri: `${config.backendApi.root}${config.backendApi.graphql}`
   });
 
   const fragmentMatcher = new IntrospectionFragmentMatcher({

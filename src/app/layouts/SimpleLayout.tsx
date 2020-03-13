@@ -5,6 +5,8 @@ import { ErrorBoundary } from "../containers/ErrorBoundary";
 import { IStore } from "../redux/IStore";
 import { connect } from "react-redux";
 import { FlagType, Flag } from "../components/Flag";
+import { IErrorsState } from "../redux/modules/errorsModule";
+import { string } from "prop-types";
 
 // Sidebar src: https://every-layout.dev/layouts/sidebar/
 const classNames = stylesheet({
@@ -52,9 +54,7 @@ const classNames = stylesheet({
   }
 });
 
-interface IStateToProps {
-  error: string | null;
-}
+interface IStateToProps extends IErrorsState {}
 
 interface IProps extends IStateToProps, ILayoutProps {}
 
@@ -63,6 +63,11 @@ class SimpleLayout extends LayoutComponent<IProps> {
     super(props);
   }
   render(): JSX.Element {
+    const errKeys: Array<keyof IErrorsState> = [
+      "networkError",
+      "graphQLErrors",
+      "pageError"
+    ];
     return (
       <div className={classNames.layout}>
         <div className={classNames.wrapper}>
@@ -74,12 +79,14 @@ class SimpleLayout extends LayoutComponent<IProps> {
               {!!this.props.title ? (
                 <h2 style={{ display: "inline-block" }}>{this.props.title}</h2>
               ) : null}
-              {!!this.props.error ? (
-                <Flag
-                  text={this.props.error["message"]}
-                  type={FlagType.NEGATIVE}
-                />
-              ) : null}
+              {errKeys.map(key =>
+                !this.props[key] ? null : (
+                  <Flag
+                    text={String(this.props[key])}
+                    type={FlagType.NEGATIVE}
+                  />
+                )
+              )}
             </div>
             <ErrorBoundary>{this.props.children}</ErrorBoundary>
             <div className="spacer"></div>
@@ -91,9 +98,7 @@ class SimpleLayout extends LayoutComponent<IProps> {
 }
 
 const stateToProps = (state: Pick<IStore, "errors">): IStateToProps => {
-  return {
-    error: state.errors.pageError
-  };
+  return { ...state.errors };
 };
 
 const connected = connect(stateToProps, null)(SimpleLayout);
