@@ -26,6 +26,7 @@ import {
   DEVICE_PAGE_UPDATE_CONFIG_MUTATION
 } from "../constants/Mutations";
 import { ERRORS_SET_PAGE_ERROR } from "../redux/modules/errorsActionCreators";
+import { Flag, FlagType } from "../components/Flag";
 
 const coloredStatus = (backgroundColor, textColor = Color.BLACK): any => {
   return {
@@ -139,14 +140,11 @@ const DevicesPage = (props: IProps): JSX.Element => {
             original: { activated }
           }
         }) {
-          const cls = activated
-            ? classNames.positiveStatus
-            : classNames.negativeStatus;
-          const text = activated ? "YES" : "NO";
           return (
-            <div className={cls}>
-              <span>{text}</span>
-            </div>
+            <Flag
+              text={activated ? "YES" : "NO"}
+              type={activated ? FlagType.POSITIVE : FlagType.NEGATIVE}
+            />
           );
         }
       },
