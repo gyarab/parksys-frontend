@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { stylesheet } from "typestyle";
 import { useLazyQuery } from "@apollo/react-hooks";
-import { Button } from "../Button";
+import { Button } from "../../Button";
 import { FetchPolicy } from "apollo-client";
 
 const styles = stylesheet({

@@ -1,10 +1,6 @@
 import React from "react";
 import { stylesheet, classes } from "typestyle";
 import {
-  GenericModelListPicker,
-  useGenericListPickerFromListPicker
-} from "./GenericModelPicker";
-import {
   PARKING_SESSIONS_PAGED_QUERY,
   VEHICLES_PARKING_SESSIONS_PAGED_QUERY
 } from "../../constants/Queries";
@@ -12,6 +8,10 @@ import moment from "moment";
 import { VehicleLink } from "../VehicleLink";
 import { dateDisplay } from "../../helpers/componentHelpers";
 import { Color } from "../../constants";
+import {
+  GenericModelListPicker,
+  useGenericListPickerFromListPicker
+} from "./generic/GenericModelListPicker";
 
 const styles = stylesheet({
   session: {
@@ -66,7 +66,8 @@ const inputNeverEmpty = props =>
     onChange: e => {
       if (e.target.value === "") {
         props.onChange({
-          target: { value: new Date().toISOString().slice(0, 10) }
+          // Use last value
+          target: { value: props.value }
         });
       } else {
         props.onChange(e);
@@ -88,8 +89,7 @@ const identifierToOptions = (date, page) => {
       page,
       limit: 5
     },
-    fetchPolicy: "no-cache",
-    pollInterval: 5000
+    fetchPolicy: "no-cache"
   };
 };
 
@@ -104,7 +104,8 @@ export const ParkingSessionPicker = GenericModelListPicker({
   input: inputNeverEmpty,
   clearIdentifierOnSelect: false,
   showSelection: false,
-  paging: true
+  paging: true,
+  refetchIntervalMs: 5000
 });
 
 export const useParkingSessionPicker = useGenericListPickerFromListPicker(
@@ -117,10 +118,11 @@ export const VehicleParkingSessionPicker = GenericModelListPicker({
   arrayGetter: data => data.vehicle.data[0].parkingSessions.data,
   renderModel,
   modelName: "session",
-  input, // Can be empty
+  input: inputNeverEmpty, // Can be empty
   paging: true,
   clearIdentifierOnSelect: false,
-  showSelection: false
+  showSelection: false,
+  refetchIntervalMs: 5000
 });
 
 export const useVehicleParkingSessionPicker = useGenericListPickerFromListPicker(

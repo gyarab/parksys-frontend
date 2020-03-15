@@ -12,6 +12,7 @@ import { ParkingSessionDisplay } from "../components/ParkingSessionDisplay";
 import { FlagType, Flag } from "../components/Flag";
 import { IVehiclePageState } from "../redux/modules/vehiclePage";
 import { SET_PARKING_SESSION } from "../redux/modules/vehiclePageActionCreators";
+import { BackgroundChange } from "../components/BackgroundChange";
 
 export interface IStateToProps {
   vehicle: IRulePageStateSimulation["vehicle"] | null;
@@ -69,14 +70,7 @@ const VehiclePage = (props: IProps): JSX.Element => {
           {!props.session ? (
             <Flag text="Select a Parking session" type={FlagType.WARNING} />
           ) : (
-            <>
-              <h3>
-                {!props.vehicle
-                  ? "Parking Session"
-                  : `Parking Session of ${props.vehicle.licensePlate}`}
-              </h3>
-              <ParkingSessionDisplay session={props.session} />
-            </>
+            <ParkingSessionDisplay session={props.session} />
           )}
         </div>
         <div>
@@ -84,11 +78,6 @@ const VehiclePage = (props: IProps): JSX.Element => {
             <Flag text="Select a Vehicle" type={FlagType.WARNING} />
           ) : (
             <>
-              <h3>
-                {!props.vehicle
-                  ? "Vehicle"
-                  : `Vehicle -- ${props.vehicle.licensePlate}`}
-              </h3>
               <VehicleDisplay
                 vehicle={props.vehicle}
                 setParkingSession={props.setParkingSession}
@@ -107,7 +96,6 @@ const VehiclePage = (props: IProps): JSX.Element => {
           <VehiclePagedPicker
             onSelect={props.setSimulationVehicle}
             model={props.vehicle}
-            options={{ pollInterval: 5000 }}
           />
         </div>
       </div>

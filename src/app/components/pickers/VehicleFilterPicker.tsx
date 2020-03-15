@@ -1,13 +1,11 @@
 import {
   useGenericPickerFromPicker,
-  GenericModelPicker,
-  GenericModelListPicker,
-  useGenericListPickerFromListPicker
-} from "./GenericModelPicker";
+  GenericModelPicker
+} from "./generic/GenericModelPicker";
 import React from "react";
 import { stylesheet } from "typestyle";
 import { VEHICLE_FILTER_PICKER_SEARCH_QUERY } from "../../constants/Queries";
-import { useGenericMultiPicker } from "./GenericModelMultiPicker";
+import { useGenericMultiPicker } from "./generic/GenericModelMultiPicker";
 import { Flag, FlagType } from "../Flag";
 
 const styles = stylesheet({

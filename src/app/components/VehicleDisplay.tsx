@@ -3,6 +3,7 @@ import { stylesheet } from "typestyle";
 import { VehicleParkingSessionPicker } from "./pickers/ParkingSessionPicker";
 import { VEHICLE_SESSIONS_BY_ID_QUERY } from "../constants/Queries";
 import { useQuery } from "@apollo/react-hooks";
+import { BackgroundChange } from "./BackgroundChange";
 
 const styles = stylesheet({
   vehicleDisplay: {
@@ -18,7 +19,6 @@ export const VehicleDisplay = ({ vehicle: vehicle_, setParkingSession }) => {
   });
   const [session, setSession_] = useState(null);
   const setSession = session => {
-    console.log("SET FROM VEH");
     setSession_(session);
     setParkingSession(session);
   };
@@ -33,36 +33,47 @@ export const VehicleDisplay = ({ vehicle: vehicle_, setParkingSession }) => {
     ...vehicle_
   };
   return (
-    <div className={styles.vehicleDisplay}>
-      <div>
-        <table>
-          <thead>
-            <tr>
-              <th># of Sessions</th>
-              <th>Total Fees</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{vehicle.numParkingSessions}</td>
-              <td>{vehicle.totalPaidCents / 100}</td>
-            </tr>
-          </tbody>
-        </table>
+    <>
+      <h3>{`Vehicle -- ${vehicle.licensePlate}`}</h3>
+      <div className={styles.vehicleDisplay}>
+        <div>
+          <table>
+            <thead>
+              <tr>
+                <th># of Sessions</th>
+                <th>Total Fees</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <BackgroundChange watched={vehicle.numParkingSessions}>
+                    {vehicle.numParkingSessions}
+                  </BackgroundChange>
+                </td>
+                <td>
+                  <BackgroundChange watched={vehicle.totalPaidCents}>
+                    {vehicle.totalPaidCents / 100}
+                  </BackgroundChange>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h4 style={{ marginTop: 0 }}>
+            Parking Sessions for {vehicle.licensePlate}
+          </h4>
+          <VehicleParkingSessionPicker
+            options={{
+              variables: { licensePlate: vehicle.licensePlate },
+              pollInterval: 5000
+            }}
+            model={session}
+            onSelect={setSession}
+          />
+        </div>
       </div>
-      <div>
-        <h4 style={{ marginTop: 0 }}>
-          Parking Sessions for {vehicle.licensePlate}
-        </h4>
-        <VehicleParkingSessionPicker
-          options={{
-            variables: { licensePlate: vehicle.licensePlate },
-            pollInterval: 5000
-          }}
-          model={session}
-          onSelect={setSession}
-        />
-      </div>
-    </div>
+    </>
   );
 };

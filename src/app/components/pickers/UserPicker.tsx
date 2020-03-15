@@ -1,11 +1,11 @@
 import React from "react";
 import { stylesheet } from "typestyle";
+import { USER_SEARCH_QUERY } from "../../constants/Queries";
+import { FlagType, Flag } from "../Flag";
 import {
   GenericModelListPicker,
   useGenericListPickerFromListPicker
-} from "./GenericModelPicker";
-import { USER_SEARCH_QUERY } from "../../constants/Queries";
-import { FlagType, Flag } from "../Flag";
+} from "./generic/GenericModelListPicker";
 
 const styles = stylesheet({
   userItem: {

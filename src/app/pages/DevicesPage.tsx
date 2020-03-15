@@ -27,6 +27,7 @@ import {
 } from "../constants/Mutations";
 import { ERRORS_SET_PAGE_ERROR } from "../redux/modules/errorsActionCreators";
 import { Flag, FlagType } from "../components/Flag";
+import { BackgroundChange } from "../components/BackgroundChange";
 
 const coloredStatus = (backgroundColor, textColor = Color.BLACK): any => {
   return {
@@ -103,7 +104,6 @@ const DevicesPage = (props: IProps): JSX.Element => {
   }, [props.devices.loaded]);
 
   const reloadDiff = (now.getTime() - lastReload.getTime()) / 1000;
-  console.log(reloadDiff);
   if (reloadDiff >= reloadIntervalSeconds) {
     fetchDevices();
   }

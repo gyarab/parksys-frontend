@@ -1,11 +1,11 @@
 import React from "react";
 import { VEHICLE_PICKER_SEARCH_QUERY } from "../../constants/Queries";
+import { GenericModelPicker } from "./generic/GenericModelPicker";
+import { useGenericMultiPicker } from "./generic/GenericModelMultiPicker";
 import {
-  GenericModelPicker,
   GenericModelListPicker,
   useGenericListPickerFromListPicker
-} from "./GenericModelPicker";
-import { useGenericMultiPicker } from "./GenericModelMultiPicker";
+} from "./generic/GenericModelListPicker";
 
 const renderModel = model => (
   <>
@@ -43,7 +43,8 @@ export const VehiclePagedPicker = GenericModelListPicker({
   renderModel,
   arrayGetter,
   clearIdentifierOnSelect: true,
-  paging: true
+  paging: true,
+  refetchIntervalMs: 5000
 });
 
 export const useVehiclePagedPicker = useGenericListPickerFromListPicker(

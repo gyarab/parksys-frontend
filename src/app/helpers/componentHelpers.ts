@@ -10,6 +10,7 @@ export const dateDisplay = (
   start: string | null,
   end: string | null
 ): [string, string] => {
+  console.log(start, end);
   if (start != null && end != null) {
     const sDate = new Date(start);
     const eDate = new Date(end);

@@ -1,6 +1,6 @@
 import { config } from "../../../config";
 
-export default async (path: string) => {
+export default (path: string): Promise<Response> => {
   const url = `${config.backendApi.root}${path}`;
   return fetch(url, {
     method: "GET",

@@ -3,6 +3,7 @@ import { useTable, useExpanded } from "react-table";
 import { stylesheet } from "typestyle";
 import { connect } from "react-redux";
 import { IStore } from "../redux/IStore";
+import { BackgroundChange } from "./BackgroundChange";
 
 const classNames = stylesheet({
   table: {

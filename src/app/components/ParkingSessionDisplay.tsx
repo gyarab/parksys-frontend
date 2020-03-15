@@ -7,6 +7,7 @@ import { VehicleLink } from "./VehicleLink";
 import { dateDisplay } from "../helpers/componentHelpers";
 import { Color } from "../constants";
 import imageGetter from "../helpers/imageGetter";
+import { BackgroundChange } from "./BackgroundChange";
 
 const styles = stylesheet({
   sessionDisplay: {
@@ -100,102 +101,72 @@ export const ParkingSessionDisplay = ({ session: { id } }) => {
     lodash.get(session, "checkIn.time"),
     lodash.get(session, "checkOut.time")
   );
-  console.log(session);
   return (
-    <div className={styles.sessionDisplay}>
-      <div>
-        <table>
-          <thead>
-            <tr>
-              <th>Start</th>
-              <th>End</th>
-              <th>Total</th>
-              <th>Vehicle</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <CaptureImage
-                  key={session.id}
-                  text={start}
-                  image={lodash.get(session, "checkIn.imagePaths.0", null)}
-                />
-              </td>
-              <td>
-                <CaptureImage
-                  key={session.id}
-                  text={end}
-                  image={lodash.get(session, "checkOut.imagePaths.0", null)}
-                />
-              </td>
-              <td>{session.finalFee / 100}</td>
-              <td>
-                <VehicleLink vehicle={session.vehicle} />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <h4 style={{ marginTop: 0 }}>Applied Rule Assignments</h4>
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Start</th>
-              <th>End</th>
-              <th>Subtotal</th>
-              <th># of rules</th>
-            </tr>
-          </thead>
-          <tbody>
-            {session.appliedAssignments.map((assignment, i) => {
-              const [start, end] = dateDisplay(
-                assignment.start,
-                assignment.end
-              );
-              return (
-                <tr
-                  key={`${i}:${highlightedAssignment}`}
-                  className={styles.assignmentRow}
-                  onMouseOver={() => setHighlightedAssignment(i)}
-                  onMouseLeave={() => setHighlightedAssignment(null)}
-                  style={{
-                    backgroundColor:
-                      highlightedAssignment === i ? HIGHLIGHT_COLOR : "default"
-                  }}
-                >
-                  <td style={{ color: Color.LIGHT_GREY }}>{i + 1}</td>
-                  <td>{start}</td>
-                  <td>{end}</td>
-                  <td>{assignment.feeCents / 100}</td>
-                  <td>{assignment.rules.length}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-      <div>
-        <h4>Applied Parking Rules</h4>
-        <table>
-          <thead>
-            <tr>
-              <th>A#</th>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Permit</th>
-              <th>Fee</th>
-              <th>T unit</th>
-              <th>Free units</th>
-              <th>Rounding</th>
-            </tr>
-          </thead>
-          <tbody>
-            {session.appliedAssignments.flatMap((assignment, i) => {
-              return assignment.rules.map((rule, j) => {
+    <>
+      <h3>{`Parking Session of ${session.vehicle.licensePlate}`}</h3>
+      <div className={styles.sessionDisplay}>
+        <div>
+          <table>
+            <thead>
+              <tr>
+                <th>Start</th>
+                <th>End</th>
+                <th>Total</th>
+                <th>Vehicle</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <BackgroundChange key={session.id} watched={start}>
+                    <CaptureImage
+                      key={session.id}
+                      text={start}
+                      image={lodash.get(session, "checkIn.imagePaths.0", null)}
+                    />
+                  </BackgroundChange>
+                </td>
+                <td>
+                  <BackgroundChange key={session.id} watched={end}>
+                    <CaptureImage
+                      key={session.id}
+                      text={end}
+                      image={lodash.get(session, "checkOut.imagePaths.0", null)}
+                    />
+                  </BackgroundChange>
+                </td>
+                <td>
+                  <BackgroundChange key={session.id} watched={session.finalFee}>
+                    {session.finalFee / 100}
+                  </BackgroundChange>
+                </td>
+                <td>
+                  <VehicleLink vehicle={session.vehicle} />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <h4 style={{ marginTop: 0 }}>Applied Rule Assignments</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Subtotal</th>
+                <th># of rules</th>
+              </tr>
+            </thead>
+            <tbody>
+              {session.appliedAssignments.map((assignment, i) => {
+                const [start, end] = dateDisplay(
+                  assignment.start,
+                  assignment.end
+                );
                 return (
                   <tr
-                    key={`${i}:${j}:${highlightedAssignment}`}
+                    key={`${i}:${highlightedAssignment}`}
+                    className={styles.assignmentRow}
                     onMouseOver={() => setHighlightedAssignment(i)}
                     onMouseLeave={() => setHighlightedAssignment(null)}
                     style={{
@@ -206,42 +177,84 @@ export const ParkingSessionDisplay = ({ session: { id } }) => {
                     }}
                   >
                     <td style={{ color: Color.LIGHT_GREY }}>{i + 1}</td>
-                    <td>{rule.name}</td>
-                    <td>{rule.__typename.replace("ParkingRule", "")}</td>
-                    <td>
-                      {rule.__typename === "ParkingRulePermitAccess"
-                        ? rule.permit
-                          ? "yes"
-                          : "no"
-                        : "-"}
-                    </td>
-                    <td>
-                      {rule.__typename === "ParkingRuleTimedFee"
-                        ? rule.centsPerUnitTime / 100
-                        : "-"}
-                    </td>
-                    <td>
-                      {rule.__typename === "ParkingRuleTimedFee"
-                        ? rule.unitTime.slice(0, 1)
-                        : "-"}
-                    </td>
-                    <td>
-                      {rule.__typename === "ParkingRuleTimedFee"
-                        ? rule.freeInUnitTime
-                        : "-"}
-                    </td>
-                    <td>
-                      {rule.__typename === "ParkingRuleTimedFee"
-                        ? rule.roundingMethod
-                        : "-"}
-                    </td>
+                    <td>{start}</td>
+                    <td>{end}</td>
+                    <td>{assignment.feeCents / 100}</td>
+                    <td>{assignment.rules.length}</td>
                   </tr>
                 );
-              });
-            })}
-          </tbody>
-        </table>
+              })}
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h4>Applied Parking Rules</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>A#</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Permit</th>
+                <th>Fee</th>
+                <th>T unit</th>
+                <th>Free units</th>
+                <th>Rounding</th>
+              </tr>
+            </thead>
+            <tbody>
+              {session.appliedAssignments.flatMap((assignment, i) => {
+                return assignment.rules.map((rule, j) => {
+                  return (
+                    <tr
+                      key={`${i}:${j}:${highlightedAssignment}`}
+                      onMouseOver={() => setHighlightedAssignment(i)}
+                      onMouseLeave={() => setHighlightedAssignment(null)}
+                      style={{
+                        backgroundColor:
+                          highlightedAssignment === i
+                            ? HIGHLIGHT_COLOR
+                            : "default"
+                      }}
+                    >
+                      <td style={{ color: Color.LIGHT_GREY }}>{i + 1}</td>
+                      <td>{rule.name}</td>
+                      <td>{rule.__typename.replace("ParkingRule", "")}</td>
+                      <td>
+                        {rule.__typename === "ParkingRulePermitAccess"
+                          ? rule.permit
+                            ? "yes"
+                            : "no"
+                          : "-"}
+                      </td>
+                      <td>
+                        {rule.__typename === "ParkingRuleTimedFee"
+                          ? rule.centsPerUnitTime / 100
+                          : "-"}
+                      </td>
+                      <td>
+                        {rule.__typename === "ParkingRuleTimedFee"
+                          ? rule.unitTime.slice(0, 1)
+                          : "-"}
+                      </td>
+                      <td>
+                        {rule.__typename === "ParkingRuleTimedFee"
+                          ? rule.freeInUnitTime
+                          : "-"}
+                      </td>
+                      <td>
+                        {rule.__typename === "ParkingRuleTimedFee"
+                          ? rule.roundingMethod
+                          : "-"}
+                      </td>
+                    </tr>
+                  );
+                });
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </>
   );
 };

@@ -1,10 +1,10 @@
 import {
   useGenericPickerFromPicker,
   GenericModelPicker
-} from "./GenericModelPicker";
+} from "./generic/GenericModelPicker";
 import React from "react";
 import { RULE_PICKER_SEARCH_QUERY } from "../../constants/Queries";
-import { useGenericMultiPicker } from "./GenericModelMultiPicker";
+import { useGenericMultiPicker } from "./generic/GenericModelMultiPicker";
 import { ParkingRule } from "../ParkingRule";
 
 const QUERY = RULE_PICKER_SEARCH_QUERY;
