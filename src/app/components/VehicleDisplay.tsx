@@ -35,7 +35,7 @@ export const VehicleDisplay = ({ vehicle: vehicle_, setParkingSession }) => {
   return (
     <>
       <h3>{`Vehicle -- ${vehicle.licensePlate}`}</h3>
-      <div className={styles.vehicleDisplay}>
+      <div key={vehicle.licensePlate} className={styles.vehicleDisplay}>
         <div>
           <table>
             <thead>
