@@ -16,6 +16,7 @@ import {
 const introspectionQueryResultData = require("../../fragmentTypes.json");
 
 export const createApolloClient = (store: IExtendedStore) => {
+  // TODO: ON NOT ERROR CLEAR
   // https://www.npmjs.com/package/apollo-link-error
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
@@ -32,8 +33,15 @@ export const createApolloClient = (store: IExtendedStore) => {
       store.dispatch({ type: ERRORS_SET_GRAPHQL_ERROR, payload: null });
     }
     if (networkError) {
-      console.log(`[Network error]: ${networkError}`);
-      store.dispatch({ type: ERRORS_SET_NETWORK_ERROR, payload: networkError });
+      let nError: any = networkError;
+      if (
+        String(networkError) ===
+        "TypeError: NetworkError when attempting to fetch resource."
+      ) {
+        nError = "Backend is unreachable.";
+      }
+      console.log(`[Network error]: ${nError}`);
+      store.dispatch({ type: ERRORS_SET_NETWORK_ERROR, payload: nError });
     } else {
       store.dispatch({ type: ERRORS_SET_NETWORK_ERROR, payload: null });
     }

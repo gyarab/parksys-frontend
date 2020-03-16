@@ -1,15 +1,16 @@
 import React from "react";
 import { OptionPicker } from "../pickers/OptionPicker";
+import { IRulePageState } from "../../redux/modules/rulePageModule";
 
 export interface IValues {
   day?: string;
   vehicleFilterMode?: string;
+  range?: "DAY" | "MONTH";
 }
 
 export interface IProps {
-  onChange: (values: IValues) => void;
-  values?: IValues;
-  initialValues?: (values: IValues) => void;
+  onChange: (values: IRulePageState["queryVariables"]) => void;
+  values?: IRulePageState["queryVariables"];
 }
 
 export const ParkingRuleAssignmentFilter = (props: IProps) => {
@@ -23,28 +24,35 @@ export const ParkingRuleAssignmentFilter = (props: IProps) => {
     }
     props.onChange(newValues);
   };
-  const onSelectorModeChange = ({ value, name }) => {
+  const onOptionPickerChange = ({ value, name }) => {
     onChange({ target: { value, name } });
   };
   console.log(props.values);
   return (
     <div>
       <label>
-        Vehicle Selector Mode
-        <OptionPicker
-          name="vehicleFilterMode"
-          options={["ALL", "NONE", "<any>"]}
-          selectedOption={props.values.vehicleFilterMode || "<any>"}
-          onChange={onSelectorModeChange}
+        Day
+        <input
+          type="date"
+          name="date"
+          value={props.values.date}
+          onChange={e => {
+            if (e.target.value === "") return;
+            onChange(e);
+          }}
         />
       </label>
       <label>
         Day
-        <input
-          type="date"
-          name="day"
-          value={props.values.day.slice(0, 10)}
-          onChange={onChange}
+        <OptionPicker
+          name="range"
+          options={["DAY", "MONTH"]}
+          selectedOption={
+            !!props.values.range ? props.values.range.toUpperCase() : "DAY"
+          }
+          onChange={({ value, name }) =>
+            onOptionPickerChange({ name, value: value.toLowerCase() })
+          }
         />
       </label>
     </div>

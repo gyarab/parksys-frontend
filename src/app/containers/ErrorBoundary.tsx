@@ -1,4 +1,5 @@
 import React from "react";
+import { Color } from "../constants/Color";
 
 interface State {
   hasError: boolean;
@@ -27,8 +28,8 @@ export class ErrorBoundary extends React.Component<{}, State> {
     return (
       <div
         style={{
-          color: "crimson",
-          backgroundColor: "salmon",
+          color: "black",
+          backgroundColor: Color.LIGHT_RED,
           padding: "2em",
           width: "auto"
         }}

@@ -10,23 +10,30 @@ import { ParkingRuleAssignmentFilter } from "../components/parkingRuleAssignment
 import { ParkingRuleAssignmentDay } from "../components/parkingRuleAssignment/ParkingRuleAssignmentDay";
 import moment from "moment";
 import { IStore } from "../redux/IStore";
-import { SET_SELECTED_DAY } from "../redux/modules/rulePageActionCreators";
+import {
+  SET_QUERY_VARS,
+  SetQueryVars
+} from "../redux/modules/rulePageActionCreators";
 import { ParkingRuleAssignmentSimulationOptions } from "../components/parkingRuleAssignment/ParkingRuleAssignmentSimulationOptions";
 import { stylesheet } from "typestyle";
-import { IRulePageStateSimulation } from "../redux/modules/rulePageModule";
+import {
+  IRulePageStateSimulation,
+  IRulePageState
+} from "../redux/modules/rulePageModule";
 import { VehicleFilterWidget } from "../components/editors/VehicleFilterEditor";
 import { ParkingRuleWidget } from "../components/editors/ParkingRuleEditor";
 import { Color } from "../constants";
+import { ParkingRuleAssignmentMonth } from "../components/parkingRuleAssignment/ParkingRuleAssignmentMonth";
 
 export interface IStateToProps {
-  selectedDay: string;
+  queryVariables: IRulePageState["queryVariables"];
   ruleAssignmentSimulation: IRulePageStateSimulation;
 }
 
 export interface IDispatchToProps {
-  useFetchRules: (filter?: any) => any;
+  useFetchRules: (args: any) => any;
   useRuleSimulation: () => any;
-  setSelectedDay: (newDay: string) => any;
+  setQueryVariables: (newDay: SetQueryVars["payload"]) => any;
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
@@ -54,16 +61,10 @@ const OptionsWidget = (props: { children: any }) => {
 };
 
 const RulePage = (props: IProps) => {
-  const [queryVariables, setQueryVariables] = useState<any>({
-    day: props.selectedDay
-  });
-  // Always get .day from props
-  if (queryVariables.day !== props.selectedDay) {
-    setQueryVariables({ ...queryVariables, day: props.selectedDay });
-  }
-
   const [loadSimulation, { data: dataSimul }] = props.useRuleSimulation();
-  const { loading, error, data, refetch } = props.useFetchRules(queryVariables);
+  const { loading, error, data, refetch } = props.useFetchRules(
+    props.queryVariables
+  );
 
   const shouldShowSimulation =
     props.ruleAssignmentSimulation.on &&
@@ -84,11 +85,11 @@ const RulePage = (props: IProps) => {
     <div>
       <ParkingRuleAssignmentFilter
         onChange={values => {
-          props.setSelectedDay(values.day);
-          setQueryVariables(values);
+          console.log(values);
+          props.setQueryVariables(values);
           refetch();
         }}
-        values={queryVariables}
+        values={props.queryVariables}
       />
       <hr />
       {loading ? (
@@ -97,16 +98,27 @@ const RulePage = (props: IProps) => {
         <p>ERROR: {error.toString()}</p>
       ) : (
         <div>
-          <ParkingRuleAssignmentDay
-            data={data.parkingRuleAssignments}
-            day={queryVariables.day}
-            appliedData={
-              !!dataSimul && shouldShowSimulation
-                ? dataSimul.simulateRuleAssignmentApplication.appliedRules
-                : null
-            }
-            onNewOrDel={refetch}
-          />
+          {props.queryVariables.range === "month" ? (
+            <ParkingRuleAssignmentMonth
+              date={props.queryVariables.date}
+              data={data.parkingRuleAssignments}
+              setSelectedDay={day => {
+                props.setQueryVariables({ date: day, range: "day" });
+                refetch();
+              }}
+            />
+          ) : (
+            <ParkingRuleAssignmentDay
+              data={data.parkingRuleAssignments}
+              day={props.queryVariables.date}
+              appliedData={
+                !!dataSimul && shouldShowSimulation
+                  ? dataSimul.simulateRuleAssignmentApplication.appliedRules
+                  : null
+              }
+              onNewOrDel={refetch}
+            />
+          )}
           <div className={styles.widgetContainer}>
             <OptionsWidget>
               <ParkingRuleAssignmentSimulationOptions
@@ -132,7 +144,7 @@ const RulePage = (props: IProps) => {
 
 const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
   return {
-    selectedDay: state.rulePage.selectedDay,
+    queryVariables: state.rulePage.queryVariables,
     ruleAssignmentSimulation: state.rulePage.ruleAssignmentSimulation
   };
 };
@@ -140,24 +152,26 @@ const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
 const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
     useFetchRules: filter => {
+      const { range, date } = filter;
       const filter2 = { ...filter };
-      delete filter2["day"];
+      delete filter2["date"];
+      delete filter2["range"];
       filter2.endFilter = {
-        gte: moment(filter.day)
-          .startOf("day")
+        gte: moment(date)
+          .startOf(range)
           .toString()
       };
       filter2.startFilter = {
-        lte: moment(filter.day)
-          .endOf("day")
+        lte: moment(date)
+          .endOf(range)
           .toString()
       };
       return useQuery(RULE_PAGE_FETCH_PARKING_RULE_ASSIGNMENT_QUERY, {
         variables: filter2 || {}
       });
     },
-    setSelectedDay: newDay =>
-      dispatch({ type: SET_SELECTED_DAY, payload: { day: newDay } }),
+    setQueryVariables: newVars =>
+      dispatch({ type: SET_QUERY_VARS, payload: newVars }),
     useRuleSimulation: () => {
       return useLazyQuery(RULE_PAGE_RULE_SIMULATION_QUERY, {
         fetchPolicy: "no-cache"

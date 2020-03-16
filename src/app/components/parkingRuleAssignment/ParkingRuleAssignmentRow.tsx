@@ -6,7 +6,7 @@ import { calculateLeftRightFromTime } from "./ParkingRuleAssignmentDay";
 import { Color } from "../../constants";
 import { Dispatch } from "redux";
 import {
-  SET_SELECTED_DAY,
+  SET_QUERY_VARS,
   ChangeOpenedNewRuleAssignment,
   CHANGE_OPENED_NEW_RULE_ASSIGNMENT
 } from "../../redux/modules/rulePageActionCreators";
@@ -302,7 +302,7 @@ const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
 const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
     setSelectedDay: newDay =>
-      dispatch({ type: SET_SELECTED_DAY, payload: { day: newDay } }),
+      dispatch({ type: SET_QUERY_VARS, payload: { day: newDay } }),
     setOpenedNewRuleAssignment: payload =>
       dispatch({ type: CHANGE_OPENED_NEW_RULE_ASSIGNMENT, payload })
   };

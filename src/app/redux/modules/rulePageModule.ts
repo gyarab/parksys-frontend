@@ -1,7 +1,7 @@
 import {
   RulePageActionTypes,
   CHANGE_OPENED_RULE_ASSIGNMENT,
-  SET_SELECTED_DAY,
+  SET_QUERY_VARS,
   SET_COLLIDING_RULE_ASSIGNMENTS,
   CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS,
   CHANGE_OPENED_NEW_RULE_ASSIGNMENT,
@@ -22,7 +22,10 @@ export interface IRulePageStateSimulation {
 }
 
 export interface IRulePageState {
-  selectedDay: string;
+  queryVariables: {
+    date: string;
+    range: "day" | "month";
+  };
   openedRuleAssignment: {
     id: string | null;
     new?: {
@@ -52,7 +55,10 @@ export interface IRulePageState {
 
 const defaultSelectedDay = () => new Date().toISOString().slice(0, 10);
 export const initialState: IRulePageState = {
-  selectedDay: defaultSelectedDay(),
+  queryVariables: {
+    date: defaultSelectedDay(),
+    range: "day"
+  },
   openedRuleAssignment: {
     id: null,
     new: null
@@ -98,12 +104,13 @@ export function rulePageReducer(
           new: action.payload
         }
       };
-    case SET_SELECTED_DAY:
+    case SET_QUERY_VARS:
       return {
         ...state,
-        selectedDay: !action.payload.day
-          ? defaultSelectedDay()
-          : action.payload.day
+        queryVariables: {
+          ...state.queryVariables,
+          ...action.payload
+        }
       };
     case SET_COLLIDING_RULE_ASSIGNMENTS:
       return {

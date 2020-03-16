@@ -12,13 +12,10 @@ export interface ChangeOpenedRuleAssignment {
   };
 }
 
-export const SET_SELECTED_DAY = "RULE_PAGE/SET_SELECTED_DAY";
-export interface SetSelectedDay {
-  type: typeof SET_SELECTED_DAY;
-  payload: {
-    // If null, today is set
-    day: string | null;
-  };
+export const SET_QUERY_VARS = "RULE_PAGE/SET_QUERY_VARS";
+export interface SetQueryVars {
+  type: typeof SET_QUERY_VARS;
+  payload: Partial<IRulePageState["queryVariables"]>;
 }
 
 export const SET_COLLIDING_RULE_ASSIGNMENTS =
@@ -58,7 +55,7 @@ export interface SetParkingRule {
 
 export type RulePageActionTypes =
   | ChangeOpenedRuleAssignment
-  | SetSelectedDay
+  | SetQueryVars
   | SetCollidingRuleAssignments
   | ChangeSimulateRuleAssignmentsOptions
   | ChangeOpenedNewRuleAssignment
