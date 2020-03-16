@@ -2,14 +2,17 @@ import React, { useMemo, useState } from "react";
 import moment from "moment";
 import { stylesheet } from "typestyle";
 import { Color } from "../../constants";
+import { ParkingRuleAssignmentDetails } from "./ParkingRuleAssignmentDetails";
 
 interface IProps {
   date: string;
   setSelectedDay: (day) => void;
+  setAssignment: (id: any) => void;
+  assignment: any;
   data: any;
 }
 
-const h = "5em";
+const h = "9em";
 const Cell = ({
   children,
   onClick
@@ -63,6 +66,12 @@ const styles = stylesheet({
     display: "grid",
     gridTemplateColumns: "1fr",
     gridTemplateRows: `auto auto`
+  },
+  monthDisplay: {
+    display: "grid",
+    gridTemplateRows: "1fr",
+    gridTemplateColumns: "1fr 1fr",
+    gridColumnGap: "1em"
   }
 });
 
@@ -71,7 +80,8 @@ const ParkingAssignmentCalendarCell = ({
   dayEnd,
   assignments,
   highlighted,
-  setHighlighted
+  setHighlighted,
+  setSelected
 }) => {
   return (
     <>
@@ -80,7 +90,7 @@ const ParkingAssignmentCalendarCell = ({
           if (assignment.id === highlighted) {
             return "red";
           } else if (assignment.active) {
-            return "black";
+            return Color.AQUAMARINE;
           } else {
             return Color.LIGHT_GREY;
           }
@@ -93,14 +103,19 @@ const ParkingAssignmentCalendarCell = ({
         const right = Math.max(0, dayEnd.getTime() - assignment._end.getTime());
         return (
           <div
+            key={assignment.id}
             style={{
-              borderTop: `7px solid ${color}`,
+              borderTop: `1em solid ${color}`,
               marginBottom: "3px",
               marginLeft: `calc(${(100 * left) / max}%)`,
               marginRight: `calc(${(100 * right) / max}%)`
             }}
             onMouseOver={() => setHighlighted(assignment.id)}
             onMouseLeave={() => setHighlighted(null)}
+            onClick={e => {
+              e.stopPropagation();
+              setSelected(assignment.id);
+            }}
           ></div>
         );
       })}
@@ -109,7 +124,6 @@ const ParkingAssignmentCalendarCell = ({
 };
 
 export const ParkingRuleAssignmentMonth = (props: IProps) => {
-  console.log(props.data);
   const date = moment(props.date);
   const monthStart = moment(props.date).startOf("month");
   const end = moment(props.date).endOf("month");
@@ -143,68 +157,81 @@ export const ParkingRuleAssignmentMonth = (props: IProps) => {
   const endOffset = weekdayToOffsetEnd[end.weekday()];
   const daysInMonth = date.daysInMonth();
   return (
-    <div className={styles.calendarDisplay}>
-      <div className={styles.header}>
-        {days.map((day, i) => (
-          <div style={{ position: "absolute", left: `calc((100%/7)*${i})` }}>
-            {day.slice(0, 3)}
-          </div>
-        ))}
-      </div>
-      <div className={styles.calendar}>
-        {new Array(daysInMonth + startOffset + endOffset)
-          .fill(0)
-          .map((_, i) => {
-            const dayStartM = monthStart
-              .clone()
-              .add(i - startOffset, "days")
-              .startOf("day");
-            const dayEnd = dayStartM
-              .clone()
-              .endOf("day")
-              .toDate();
-            const dayStart: Date = dayStartM.toDate();
-            const onClick = () => {
-              props.setSelectedDay(
-                monthStart
-                  .clone()
-                  .add(i - startOffset + 1, "days")
-                  .toDate()
-                  .toISOString()
-                  .slice(0, 10)
+    <div className={styles.monthDisplay}>
+      <div className={styles.calendarDisplay}>
+        <div className={styles.header}>
+          {days.map((day, i) => (
+            <div style={{ position: "absolute", left: `calc((100%/7)*${i})` }}>
+              {day.slice(0, 3)}
+            </div>
+          ))}
+        </div>
+        <div className={styles.calendar}>
+          {new Array(daysInMonth + startOffset + endOffset)
+            .fill(0)
+            .map((_, i) => {
+              const dayStartM = monthStart
+                .clone()
+                .add(i - startOffset, "days")
+                .startOf("day");
+              const dayEnd = dayStartM
+                .clone()
+                .endOf("day")
+                .toDate();
+              const dayStart: Date = dayStartM.toDate();
+              const onClick = () => {
+                props.setSelectedDay(
+                  monthStart
+                    .clone()
+                    .add(i - startOffset + 1, "days")
+                    .toDate()
+                    .toISOString()
+                    .slice(0, 10)
+                );
+              };
+              const assignments = sortedAssignments.filter(
+                ({ _start, _end }) =>
+                  _start.getTime() <= dayEnd.getTime() &&
+                  _end.getTime() >= dayStart.getTime()
               );
-            };
-            const assignments = sortedAssignments.filter(
-              ({ _start, _end }) =>
-                _start.getTime() <= dayEnd.getTime() &&
-                _end.getTime() >= dayStart.getTime()
-            );
-            const isPrevMonth = i < startOffset;
-            const isNextMonth = i >= daysInMonth + startOffset;
-            const isOtherMonth = isPrevMonth || isNextMonth;
-            return (
-              <Cell onClick={onClick}>
-                <span
-                  style={{
-                    color: Color.GREY,
-                    width: "100%",
-                    margin: "auto",
-                    opacity: isOtherMonth ? 0.3 : 1,
-                    fontWeight: 900
-                  }}
-                >
-                  {dayStart.getDate()}
-                </span>
-                <ParkingAssignmentCalendarCell
-                  dayStart={dayStart}
-                  dayEnd={dayEnd}
-                  assignments={assignments}
-                  highlighted={highlighted}
-                  setHighlighted={setHighlighted}
-                />
-              </Cell>
-            );
-          })}
+              const isPrevMonth = i < startOffset;
+              const isNextMonth = i >= daysInMonth + startOffset;
+              const isOtherMonth = isPrevMonth || isNextMonth;
+              return (
+                <Cell onClick={onClick}>
+                  <span
+                    style={{
+                      color: Color.GREY,
+                      width: "100%",
+                      margin: "auto",
+                      opacity: isOtherMonth ? 0.3 : 1,
+                      fontWeight: 900
+                    }}
+                  >
+                    {dayStart.getDate()}
+                  </span>
+                  <ParkingAssignmentCalendarCell
+                    dayStart={dayStart}
+                    dayEnd={dayEnd}
+                    assignments={assignments}
+                    highlighted={highlighted}
+                    setHighlighted={setHighlighted}
+                    setSelected={props.setAssignment}
+                  />
+                </Cell>
+              );
+            })}
+        </div>
+      </div>
+      <div style={{ position: "relative", height: "100%" }}>
+        {!props.assignment || !props.assignment.id ? null : (
+          <ParkingRuleAssignmentDetails
+            assignment={props.data.find(
+              assignment => assignment.id === props.assignment.id
+            )}
+            close={() => null}
+          />
+        )}
       </div>
     </div>
   );

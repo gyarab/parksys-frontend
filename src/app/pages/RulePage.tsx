@@ -12,7 +12,8 @@ import moment from "moment";
 import { IStore } from "../redux/IStore";
 import {
   SET_QUERY_VARS,
-  SetQueryVars
+  SetQueryVars,
+  CHANGE_OPENED_RULE_ASSIGNMENT
 } from "../redux/modules/rulePageActionCreators";
 import { ParkingRuleAssignmentSimulationOptions } from "../components/parkingRuleAssignment/ParkingRuleAssignmentSimulationOptions";
 import { stylesheet } from "typestyle";
@@ -28,12 +29,14 @@ import { ParkingRuleAssignmentMonth } from "../components/parkingRuleAssignment/
 export interface IStateToProps {
   queryVariables: IRulePageState["queryVariables"];
   ruleAssignmentSimulation: IRulePageStateSimulation;
+  selectedAssignment: IRulePageState["openedRuleAssignment"];
 }
 
 export interface IDispatchToProps {
   useFetchRules: (args: any) => any;
   useRuleSimulation: () => any;
   setQueryVariables: (newDay: SetQueryVars["payload"]) => any;
+  setAssignment: (id: any) => void;
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
@@ -106,6 +109,8 @@ const RulePage = (props: IProps) => {
                 props.setQueryVariables({ date: day, range: "day" });
                 refetch();
               }}
+              setAssignment={props.setAssignment}
+              assignment={props.selectedAssignment}
             />
           ) : (
             <ParkingRuleAssignmentDay
@@ -119,23 +124,25 @@ const RulePage = (props: IProps) => {
               onNewOrDel={refetch}
             />
           )}
-          <div className={styles.widgetContainer}>
-            <OptionsWidget>
-              <ParkingRuleAssignmentSimulationOptions
-                feeCents={
-                  !!dataSimul && shouldShowSimulation
-                    ? dataSimul.simulateRuleAssignmentApplication.feeCents
-                    : null
-                }
-              />
-            </OptionsWidget>
-            <OptionsWidget>
-              <VehicleFilterWidget />
-            </OptionsWidget>
-            <OptionsWidget>
-              <ParkingRuleWidget />
-            </OptionsWidget>
-          </div>
+          {props.queryVariables.range === "month" ? null : (
+            <div className={styles.widgetContainer}>
+              <OptionsWidget>
+                <ParkingRuleAssignmentSimulationOptions
+                  feeCents={
+                    !!dataSimul && shouldShowSimulation
+                      ? dataSimul.simulateRuleAssignmentApplication.feeCents
+                      : null
+                  }
+                />
+              </OptionsWidget>
+              <OptionsWidget>
+                <VehicleFilterWidget />
+              </OptionsWidget>
+              <OptionsWidget>
+                <ParkingRuleWidget />
+              </OptionsWidget>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -145,7 +152,8 @@ const RulePage = (props: IProps) => {
 const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
   return {
     queryVariables: state.rulePage.queryVariables,
-    ruleAssignmentSimulation: state.rulePage.ruleAssignmentSimulation
+    ruleAssignmentSimulation: state.rulePage.ruleAssignmentSimulation,
+    selectedAssignment: state.rulePage.openedRuleAssignment
   };
 };
 
@@ -177,7 +185,9 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
       return useLazyQuery(RULE_PAGE_RULE_SIMULATION_QUERY, {
         fetchPolicy: "no-cache"
       });
-    }
+    },
+    setAssignment: id =>
+      dispatch({ type: CHANGE_OPENED_RULE_ASSIGNMENT, payload: { id } })
   };
 };
 

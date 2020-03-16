@@ -1,6 +1,7 @@
 import React from "react";
 import { OptionPicker } from "../pickers/OptionPicker";
 import { IRulePageState } from "../../redux/modules/rulePageModule";
+import { TwoPicker } from "../pickers/TwoPicker";
 
 export interface IValues {
   day?: string;
