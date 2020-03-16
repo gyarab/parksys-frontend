@@ -164,16 +164,32 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
       const filter2 = { ...filter };
       delete filter2["date"];
       delete filter2["range"];
-      filter2.endFilter = {
-        gte: moment(date)
-          .startOf(range)
-          .toString()
-      };
-      filter2.startFilter = {
-        lte: moment(date)
-          .endOf(range)
-          .toString()
-      };
+
+      if (range === "month") {
+        filter2.endFilter = {
+          gte: moment(date)
+            .startOf(range)
+            .subtract(7, "days")
+            .toString()
+        };
+        filter2.startFilter = {
+          lte: moment(date)
+            .endOf(range)
+            .add(7, "days")
+            .toString()
+        };
+      } else {
+        filter2.endFilter = {
+          gte: moment(date)
+            .startOf(range)
+            .toString()
+        };
+        filter2.startFilter = {
+          lte: moment(date)
+            .endOf(range)
+            .toString()
+        };
+      }
       return useQuery(RULE_PAGE_FETCH_PARKING_RULE_ASSIGNMENT_QUERY, {
         variables: filter2 || {},
         fetchPolicy: "cache-and-network"

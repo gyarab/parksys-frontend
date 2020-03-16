@@ -107,8 +107,15 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
     vehicleFilters: props.assignment.vehicleFilters.map(filter => filter.id)
   };
   const [isNew] = useState(props.isNew || false);
-  const [startPicker, start, setStart] = useDatePicker(props.assignment.start);
-  const [endPicker, end, setEnd] = useDatePicker(props.assignment.end);
+
+  console.log(props.assignment);
+  console.log(props.assignment.start, props.assignment.end);
+  const [startPicker, start, setStart] = useDatePicker(
+    new Date(props.assignment.start)
+  );
+  const [endPicker, end, setEnd] = useDatePicker(
+    new Date(props.assignment.end)
+  );
   const [
     filterModePicker,
     { textValue: filterMode },

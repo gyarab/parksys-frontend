@@ -226,6 +226,7 @@ export const ParkingRuleAssignmentMonth = (props: IProps) => {
       <div style={{ position: "relative", height: "100%" }}>
         {!props.assignment || !props.assignment.id ? null : (
           <ParkingRuleAssignmentDetails
+            key={props.assignment.id}
             assignment={props.data.find(
               assignment => assignment.id === props.assignment.id
             )}
