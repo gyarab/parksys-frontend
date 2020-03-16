@@ -87,7 +87,7 @@ const ParkingAssignmentCalendarCell = ({
     <>
       {assignments.map(assignment => {
         const color = (() => {
-          if (assignment.id === highlighted) {
+          if (highlighted.includes(assignment.id)) {
             return "red";
           } else if (assignment.active) {
             return Color.AQUAMARINE;
@@ -214,7 +214,7 @@ export const ParkingRuleAssignmentMonth = (props: IProps) => {
                     dayStart={dayStart}
                     dayEnd={dayEnd}
                     assignments={assignments}
-                    highlighted={highlighted}
+                    highlighted={[highlighted, props.assignment.id]}
                     setHighlighted={setHighlighted}
                     setSelected={props.setAssignment}
                   />
@@ -230,7 +230,7 @@ export const ParkingRuleAssignmentMonth = (props: IProps) => {
             assignment={props.data.find(
               assignment => assignment.id === props.assignment.id
             )}
-            close={() => null}
+            close={() => props.setAssignment(null)}
           />
         )}
       </div>

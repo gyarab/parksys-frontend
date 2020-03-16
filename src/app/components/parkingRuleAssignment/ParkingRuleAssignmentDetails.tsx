@@ -108,8 +108,6 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
   };
   const [isNew] = useState(props.isNew || false);
 
-  console.log(props.assignment);
-  console.log(props.assignment.start, props.assignment.end);
   const [startPicker, start, setStart] = useDatePicker(
     new Date(props.assignment.start)
   );
@@ -138,8 +136,8 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
   ] = useTwoPicker("NO", "YES", props.assignment.active);
 
   const setOriginalValues = () => {
-    setStart(props.assignment.start);
-    setEnd(props.assignment.end);
+    setStart(new Date(props.assignment.start));
+    setEnd(new Date(props.assignment.end));
     setFilterMode(props.assignment.vehicleFilterMode);
     setPriority(props.assignment.priority);
     setRules(new Array(...props.assignment.rules));

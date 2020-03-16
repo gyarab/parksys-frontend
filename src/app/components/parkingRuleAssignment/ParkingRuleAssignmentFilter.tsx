@@ -28,7 +28,6 @@ export const ParkingRuleAssignmentFilter = (props: IProps) => {
   const onOptionPickerChange = ({ value, name }) => {
     onChange({ target: { value, name } });
   };
-  console.log(props.values);
   return (
     <div>
       <label>
