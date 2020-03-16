@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import moment from "moment";
 import { stylesheet } from "typestyle";
 import { Color } from "../../constants";
@@ -66,8 +66,46 @@ const styles = stylesheet({
   }
 });
 
-const CellPadding = (n: number) => {
-  return new Array(n).fill(0).map((_, i) => <Cell />);
+const ParkingAssignmentCalendarCell = ({
+  dayStart,
+  dayEnd,
+  assignments,
+  highlighted,
+  setHighlighted
+}) => {
+  return (
+    <>
+      {assignments.map(assignment => {
+        const color = (() => {
+          if (assignment.id === highlighted) {
+            return "red";
+          } else if (assignment.active) {
+            return "black";
+          } else {
+            return Color.LIGHT_GREY;
+          }
+        })();
+        const max = 24 * 3600 * 1000;
+        const left = Math.max(
+          0,
+          assignment._start.getTime() - dayStart.getTime()
+        );
+        const right = Math.max(0, dayEnd.getTime() - assignment._end.getTime());
+        return (
+          <div
+            style={{
+              borderTop: `7px solid ${color}`,
+              marginBottom: "3px",
+              marginLeft: `calc(${(100 * left) / max}%)`,
+              marginRight: `calc(${(100 * right) / max}%)`
+            }}
+            onMouseOver={() => setHighlighted(assignment.id)}
+            onMouseLeave={() => setHighlighted(null)}
+          ></div>
+        );
+      })}
+    </>
+  );
 };
 
 export const ParkingRuleAssignmentMonth = (props: IProps) => {
@@ -75,6 +113,7 @@ export const ParkingRuleAssignmentMonth = (props: IProps) => {
   const date = moment(props.date);
   const monthStart = moment(props.date).startOf("month");
   const end = moment(props.date).endOf("month");
+  const [highlighted, setHighlighted] = useState(null);
 
   // Sort by active (first) and by length
   const sortedAssignments = useMemo(
@@ -91,10 +130,10 @@ export const ParkingRuleAssignmentMonth = (props: IProps) => {
           };
         })
         .sort((a, b) => {
+          if (a._length - b._length < 0) return 1;
+          if (a._length - b._length > 0) return -1;
           if (a.active && !b.active) return -1;
           if (!a.active && b.active) return 1;
-          if (a._length - b._length < 0) return -1;
-          if (a._length - b._length > 0) return -1;
           return 0;
         }),
     [props.data]
@@ -156,26 +195,13 @@ export const ParkingRuleAssignmentMonth = (props: IProps) => {
                 >
                   {dayStart.getDate()}
                 </span>
-                {assignments.map(assignment => {
-                  const color = assignment.active ? "black" : Color.LIGHT_GREY;
-                  const max = 24 * 3600 * 1000;
-                  const length = Math.min(max, assignment._length);
-                  const left = Math.max(
-                    0,
-                    assignment._start.getTime() - dayStart.getTime()
-                  );
-                  console.log(length);
-                  return (
-                    <div
-                      style={{
-                        borderTop: `5px solid ${color}`,
-                        marginBottom: "3px",
-                        marginLeft: `calc(${(100 * left) / max}%)`,
-                        width: `calc(${(100 * length) / max}%)`
-                      }}
-                    ></div>
-                  );
-                })}
+                <ParkingAssignmentCalendarCell
+                  dayStart={dayStart}
+                  dayEnd={dayEnd}
+                  assignments={assignments}
+                  highlighted={highlighted}
+                  setHighlighted={setHighlighted}
+                />
               </Cell>
             );
           })}

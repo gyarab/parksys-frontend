@@ -167,7 +167,8 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
           .toString()
       };
       return useQuery(RULE_PAGE_FETCH_PARKING_RULE_ASSIGNMENT_QUERY, {
-        variables: filter2 || {}
+        variables: filter2 || {},
+        fetchPolicy: "cache-and-network"
       });
     },
     setQueryVariables: newVars =>
