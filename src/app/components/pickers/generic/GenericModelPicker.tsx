@@ -41,6 +41,10 @@ export const styles = stylesheet({
         }
       }
     }
+  },
+  emptyOrLoading: {
+    color: "#999",
+    padding: "0.5em"
   }
 });
 
@@ -66,10 +70,13 @@ const PopUp = ({
   onStopSelecting,
   onSelect
 }) => {
-  return loading ? (
-    <span>Loading</span>
-  ) : error ? (
-    <span>{error.toString()}</span>
+  console.log(data);
+  return error ? (
+    <p>{error.toString()}</p>
+  ) : !data ? (
+    <div className={styles.emptyOrLoading}>Loading</div>
+  ) : arrayGetter(data).length === 0 ? (
+    <div className={styles.emptyOrLoading}>Empty</div>
   ) : (
     <div onMouseOver={onSelecting} onMouseLeave={onStopSelecting}>
       {arrayGetter(data).map((model, i) => (

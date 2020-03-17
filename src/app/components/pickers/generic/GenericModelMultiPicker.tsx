@@ -71,7 +71,7 @@ const styles = stylesheet({
     marginLeft: "auto",
     marginRight: "auto"
   },
-  empty: {
+  emptyOrLoading: {
     color: "#999"
   }
 });
@@ -106,12 +106,12 @@ const PopUpBody = ({
   itemRender,
   onAdd
 }) => {
-  return loading ? (
-    <p>Loading</p>
-  ) : error ? (
+  return error ? (
     <span>{error.toString()}</span>
   ) : notSelectedSet.size === 0 ? (
-    <p className={styles.empty}>Empty</p>
+    <p className={styles.emptyOrLoading}>Empty</p>
+  ) : !data ? (
+    <div className={styles.emptyOrLoading}>Loading</div>
   ) : (
     arrayGetter(data)
       .filter(model => notSelectedSet.has(modelToIdentifier(model)))
@@ -232,7 +232,7 @@ export const GenericModelMultiPicker = <T extends unknown = any>(
           )
         )}
         {props.models.length === 0 ? (
-          <span className={styles.empty}>Empty</span>
+          <span className={styles.emptyOrLoading}>Empty</span>
         ) : null}
       </div>
       <div className="controls">

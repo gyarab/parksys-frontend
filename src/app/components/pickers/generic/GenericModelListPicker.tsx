@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "../../Button";
 import { Color } from "../../../constants";
-import { stylesheet } from "typestyle";
+import { stylesheet, classes } from "typestyle";
 import { useQuery } from "@apollo/react-hooks";
 
 const styles = stylesheet({
@@ -53,6 +53,9 @@ const styles = stylesheet({
         }
       }
     }
+  },
+  empty: {
+    color: "#999"
   }
 });
 
@@ -85,10 +88,12 @@ interface IListProps {
 }
 
 const ModelList = ({ loading, error, renderModel, data, onSelect }) => {
-  return loading ? (
-    <span>Loading</span>
-  ) : error ? (
-    <span>{error.toString()}</span>
+  return error ? (
+    <p>{error.toString()}</p>
+  ) : !data ? (
+    <div>Loading </div>
+  ) : data.length === 0 ? (
+    <div className={classes(styles.empty, styles.modelList)}>Empty</div>
   ) : (
     <div className={styles.modelList}>
       {data.map((model, i) => (

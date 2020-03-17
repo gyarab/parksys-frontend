@@ -95,11 +95,9 @@ const RulePage = (props: IProps) => {
         values={props.queryVariables}
       />
       <hr />
-      {loading ? (
-        <p>Loading</p>
-      ) : error ? (
+      {error ? (
         <p>ERROR: {error.toString()}</p>
-      ) : (
+      ) : !data ? null : (
         <div>
           {props.queryVariables.range === "month" ? (
             <ParkingRuleAssignmentMonth
