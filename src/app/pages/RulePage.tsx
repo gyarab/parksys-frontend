@@ -102,7 +102,7 @@ const RulePage = (props: IProps) => {
           {props.queryVariables.range === "month" ? (
             <ParkingRuleAssignmentMonth
               date={props.queryVariables.date}
-              data={data.parkingRuleAssignments}
+              data={loading ? [] : data.parkingRuleAssignments}
               setSelectedDay={day => {
                 props.setQueryVariables({ date: day, range: "day" });
                 refetch();
@@ -112,7 +112,7 @@ const RulePage = (props: IProps) => {
             />
           ) : (
             <ParkingRuleAssignmentDay
-              data={data.parkingRuleAssignments}
+              data={loading ? [] : data.parkingRuleAssignments}
               day={props.queryVariables.date}
               appliedData={
                 !!dataSimul && shouldShowSimulation
