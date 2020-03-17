@@ -88,8 +88,8 @@ const RulePage = (props: IProps) => {
     <div>
       <ParkingRuleAssignmentFilter
         onChange={values => {
-          console.log(values);
           props.setQueryVariables(values);
+          props.setAssignment(null);
           refetch();
         }}
         values={props.queryVariables}
@@ -105,6 +105,7 @@ const RulePage = (props: IProps) => {
               data={loading ? [] : data.parkingRuleAssignments}
               setSelectedDay={day => {
                 props.setQueryVariables({ date: day, range: "day" });
+                props.setAssignment(null);
                 refetch();
               }}
               setAssignment={props.setAssignment}

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import moment from "moment";
-import { stylesheet } from "typestyle";
+import { stylesheet, classes } from "typestyle";
 import { Color } from "../../constants";
 import { ParkingRuleAssignmentDetails } from "./ParkingRuleAssignmentDetails";
 
@@ -13,24 +13,6 @@ interface IProps {
 }
 
 const h = "9em";
-const Cell = ({
-  children,
-  onClick
-}: {
-  children?: any;
-  onClick?: () => void;
-}) => (
-  <div
-    style={{
-      border: "1px solid #ccc",
-      width: h,
-      cursor: !onClick ? "default" : "pointer"
-    }}
-    onClick={() => (!onClick ? null : onClick())}
-  >
-    {children}
-  </div>
-);
 
 // 0 sunday
 // 1 monday
@@ -72,8 +54,45 @@ const styles = stylesheet({
     gridTemplateRows: "1fr",
     gridTemplateColumns: "1fr 1fr",
     gridColumnGap: "1em"
+  },
+  calendarCell: {
+    border: "1px solid #ccc",
+    width: h,
+    paddingTop: "0.3em"
+  },
+  hoverableCell: {
+    $nest: {
+      "&:hover": {
+        boxShadow: "0 0 10px #999"
+      }
+    }
   }
 });
+
+const Cell = ({
+  children,
+  onClick,
+  canBeHighlighted
+}: {
+  children?: any;
+  onClick?: () => void;
+  canBeHighlighted: boolean;
+}) => {
+  return (
+    <div
+      className={classes(
+        styles.calendarCell,
+        canBeHighlighted ? styles.hoverableCell : null
+      )}
+      style={{
+        cursor: !onClick ? "default" : "pointer"
+      }}
+      onClick={() => (!onClick ? null : onClick())}
+    >
+      {children}
+    </div>
+  );
+};
 
 const ParkingAssignmentCalendarCell = ({
   dayStart,
@@ -88,7 +107,7 @@ const ParkingAssignmentCalendarCell = ({
       {assignments.map(assignment => {
         const color = (() => {
           if (highlighted.includes(assignment.id)) {
-            return "red";
+            return Color.BLUE;
           } else if (assignment.active) {
             return Color.AQUAMARINE;
           } else {
@@ -110,7 +129,10 @@ const ParkingAssignmentCalendarCell = ({
               marginLeft: `calc(${(100 * left) / max}%)`,
               marginRight: `calc(${(100 * right) / max}%)`
             }}
-            onMouseOver={() => setHighlighted(assignment.id)}
+            onMouseOver={e => {
+              e.stopPropagation();
+              setHighlighted(assignment.id);
+            }}
             onMouseLeave={() => setHighlighted(null)}
             onClick={e => {
               e.stopPropagation();
@@ -143,13 +165,7 @@ export const ParkingRuleAssignmentMonth = (props: IProps) => {
             _length: end.getTime() - start.getTime()
           };
         })
-        .sort((a, b) => {
-          if (a._length - b._length < 0) return 1;
-          if (a._length - b._length > 0) return -1;
-          if (a.active && !b.active) return -1;
-          if (!a.active && b.active) return 1;
-          return 0;
-        }),
+        .sort((a, b) => b._length - a._length),
     [props.data]
   );
 
@@ -198,14 +214,15 @@ export const ParkingRuleAssignmentMonth = (props: IProps) => {
               const isNextMonth = i >= daysInMonth + startOffset;
               const isOtherMonth = isPrevMonth || isNextMonth;
               return (
-                <Cell onClick={onClick}>
+                <Cell onClick={onClick} canBeHighlighted={highlighted === null}>
                   <span
                     style={{
                       color: Color.GREY,
                       width: "100%",
                       margin: "auto",
                       opacity: isOtherMonth ? 0.3 : 1,
-                      fontWeight: 900
+                      fontWeight: 900,
+                      paddingLeft: "0.3em"
                     }}
                   >
                     {dayStart.getDate()}
@@ -224,7 +241,10 @@ export const ParkingRuleAssignmentMonth = (props: IProps) => {
         </div>
       </div>
       <div style={{ position: "relative", height: "100%" }}>
-        {!props.assignment || !props.assignment.id ? null : (
+        {!props.assignment ||
+        !props.assignment.id ||
+        !props.data ||
+        props.data.length === 0 ? null : (
           <ParkingRuleAssignmentDetails
             key={props.assignment.id}
             assignment={props.data.find(
