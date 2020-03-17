@@ -11,12 +11,8 @@ export const styles = stylesheet({
     gridTemplateColumns: "repeat(2, auto)",
     $nest: {
       input: {
-        float: "right"
-      },
-      button: {
-        width: "3em",
-        textAlign: "center",
-        paddingLeft: 0
+        float: "right",
+        marginRight: "0.7em"
       }
     }
   },
@@ -88,7 +84,8 @@ const PopUp = ({
 export const GenericModelPicker = (gProps: IGProps) => (props: IProps) => {
   const disabled = props.disabled || false;
   const [loadGql, { data, loading, called, error }] = useLazyQuery(
-    gProps.QUERY
+    gProps.QUERY,
+    { fetchPolicy: "cache-and-network" }
   );
   // This value differs from props.licensePlate when the input is focused
   const [identifier, setIdentifier] = useState("");
@@ -140,8 +137,9 @@ export const GenericModelPicker = (gProps: IGProps) => (props: IProps) => {
           props.onSelect(null);
         }}
         type="negative"
+        small={true}
       >
-        X
+        Clear
       </Button>
       {focused || selecting ? (
         <div className={styles.belowInput}>

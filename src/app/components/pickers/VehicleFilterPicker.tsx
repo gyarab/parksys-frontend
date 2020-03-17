@@ -8,20 +8,6 @@ import { VEHICLE_FILTER_PICKER_SEARCH_QUERY } from "../../constants/Queries";
 import { useGenericMultiPicker } from "./generic/GenericModelMultiPicker";
 import { Flag, FlagType } from "../Flag";
 
-const styles = stylesheet({
-  filterItem: {
-    display: "grid",
-    gridTemplateColumns: "auto auto",
-    gridColumnGap: "0.5em"
-  },
-  name: {
-    display: "block",
-    padding: "5px",
-    marginTop: "5px",
-    marginBottom: "5px"
-  }
-});
-
 const RenderVehicleFilter = model => (
   <div>
     <Flag

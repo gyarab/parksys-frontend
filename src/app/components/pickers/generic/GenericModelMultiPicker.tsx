@@ -18,6 +18,7 @@ const styles = stylesheet({
       ".controls": {
         display: "grid",
         gridTemplateRows: "repeat(2, auto)",
+        gridRowGap: "0.3em",
         marginLeft: "0.4em",
         paddingLeft: "0.4em",
         borderLeft: "2px solid #ccc"
@@ -52,7 +53,7 @@ const styles = stylesheet({
     paddingBottom: "0",
     $nest: {
       "&+&": {
-        // borderTop: "1px solid #ccc"
+        marginTop: "0.4em"
       }
     }
   },
@@ -117,7 +118,9 @@ const PopUpBody = ({
       .map(model =>
         itemRender(
           renderModel(model),
-          <button onClick={() => onAdd(model)}>+</button>
+          <Button onClick={() => onAdd(model)} small={true}>
+            +
+          </Button>
         )
       )
   );
@@ -208,15 +211,7 @@ export const GenericModelMultiPicker = <T extends unknown = any>(
     return (
       <div style={{ display: "grid" }} className={styles.item}>
         <div>{item}</div>
-        {action}
-      </div>
-    );
-  };
-  const summaryItem = (item: JSX.Element, action?: JSX.Element) => {
-    return (
-      <div style={{ display: "grid" }} className={styles.item}>
-        {item}
-        {action}
+        <div style={{ marginTop: "-0.6em" }}>{action}</div>
       </div>
     );
   };
@@ -225,9 +220,15 @@ export const GenericModelMultiPicker = <T extends unknown = any>(
     <div className={styles.multiModelPicker}>
       <div className="selectedModels">
         {props.models.map((model, i) =>
-          summaryItem(
+          itemRender(
             gProps.renderModel(model),
-            <button onClick={() => onRemove(i, model)}>x</button>
+            <Button
+              onClick={() => onRemove(i, model)}
+              type={"negative"}
+              small={true}
+            >
+              x
+            </Button>
           )
         )}
         {props.models.length === 0 ? (

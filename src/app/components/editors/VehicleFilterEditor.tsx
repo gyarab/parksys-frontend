@@ -23,6 +23,7 @@ import {
   RULE_PAGE_DELETE_VEHICLE_FILTER,
   RULE_PAGE_CREATE_VEHICLE_FILTER
 } from "../../constants/Mutations";
+import { styles } from "./common";
 
 export interface IStateToProps {
   vehicleFilter: IRulePageState["selectedVehicleFilter"];
@@ -36,39 +37,6 @@ export interface IDispatchToProps {
 }
 
 export interface IProps extends IStateToProps, IDispatchToProps {}
-
-const styles = stylesheet({
-  pickers: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, auto)",
-    gridGap: "0.3em 0.4em",
-    alignItems: "center"
-  },
-  header: {
-    marginBottom: "0.5em",
-    display: "grid",
-    gridTemplateColumns: "2fr 3fr",
-    alignItems: "center",
-    justifyItems: "right",
-    $nest: {
-      div: {
-        maxHeight: "2em"
-      }
-    }
-  },
-  controls: {
-    display: "grid",
-    gridTemplateColumns: "repeat(4, 1fr)",
-    gridColumnGap: "0.3em",
-    marginBottom: "0.5em",
-    marginTop: "0.5em",
-    $nest: {
-      button: {
-        maxHeight: "3em"
-      }
-    }
-  }
-});
 
 export const VehicleFilterEditor = ({
   filter,

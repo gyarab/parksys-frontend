@@ -245,7 +245,7 @@ const DevicesPage = (props: IProps): JSX.Element => {
   return (
     <div>
       <div>
-        <label>
+        {/* <label>
           Activated
           <select
             style={{ marginLeft: "0.4em", marginRight: "0.5em" }}
@@ -256,7 +256,7 @@ const DevicesPage = (props: IProps): JSX.Element => {
               <option key={i}>{opt}</option>
             ))}
           </select>
-        </label>
+        </label> */}
         <Button disabled={props.devices.pending} onClick={fetchDevices}>
           {`Reload (in ${Math.round(reloadIntervalSeconds - reloadDiff)}s)`}
         </Button>
@@ -266,8 +266,8 @@ const DevicesPage = (props: IProps): JSX.Element => {
       {table}
       <hr />
       <form onSubmit={createDevice}>
-        <label>
-          Name
+        <label style={{ marginRight: "1em" }}>
+          <span style={{ marginRight: "1em" }}>Name</span>
           <input
             type="text"
             value={name}

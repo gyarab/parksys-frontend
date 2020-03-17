@@ -8,7 +8,8 @@ const classNames = stylesheet({
     padding: "10px 25px",
     border: "none",
     cursor: "pointer",
-    borderRadius: "4px"
+    borderRadius: "4px",
+    textAlign: "center"
   },
   disabled: {
     backgroundColor: Color.LIGHT_GREY,
@@ -30,6 +31,9 @@ const classNames = stylesheet({
   positive: {
     backgroundColor: Color.AQUAMARINE,
     color: Color.BLACK
+  },
+  small: {
+    padding: "10px 12px"
   }
 });
 
@@ -37,6 +41,7 @@ export type TButtonType = "primary" | "secondary" | "negative" | "positive";
 
 interface IProps extends React.HTMLProps<HTMLButtonElement> {
   type?: TButtonType;
+  small?: boolean;
 }
 
 export class Button extends React.Component<IProps> {
@@ -51,7 +56,8 @@ export class Button extends React.Component<IProps> {
         className={classes(
           classNames.button,
           disabled ? classNames.disabled : classNames[type],
-          className
+          className,
+          !!this.props.small ? classNames.small : null
         )}
         disabled={disabled}
         {...rest}

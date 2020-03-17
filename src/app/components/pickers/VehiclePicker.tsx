@@ -6,13 +6,14 @@ import {
   GenericModelListPicker,
   useGenericListPickerFromListPicker
 } from "./generic/GenericModelListPicker";
+import { Flag } from "../Flag";
 
 const renderModel = model => (
-  <>
+  <div>
     <span>
-      {model.licensePlate} {model.numParkingSessions} sessions
+      <Flag text={model.licensePlate} /> {model.numParkingSessions} sessions
     </span>
-  </>
+  </div>
 );
 const arrayGetter = data => data.vehicleSearch.data;
 
