@@ -70,7 +70,6 @@ const PopUp = ({
   onStopSelecting,
   onSelect
 }) => {
-  console.log(data);
   return error ? (
     <p>{error.toString()}</p>
   ) : !data ? (
@@ -142,6 +141,7 @@ export const GenericModelPicker = (gProps: IGProps) => (props: IProps) => {
         disabled={disabled}
         onClick={() => {
           props.onSelect(null);
+          setIdentifier("");
         }}
         type="negative"
         small={true}

@@ -68,6 +68,10 @@ const classNames = stylesheet({
     $nest: {
       "&:last-child": {
         borderRight: 0
+      },
+      // TODO: Fix new PRA
+      "&:hover": {
+        boxShadow: "0 0 10px #999"
       }
     }
   },

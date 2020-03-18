@@ -88,15 +88,14 @@ export const VehicleFilterEditor = ({
 
 const VehicleFilterWidget = (props: IProps) => {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(SaveStatus.NONE);
-  const [isNew, setIsNew] = useState<boolean>(false);
   const [updateEffect] = props.useUpdateVehicleFilter();
   const [deleteEffect] = props.useDeleteVehicleFilter();
   const [createEffect] = props.useCreateVehicleFilter();
+  const isNew = props.vehicleFilter !== null && props.vehicleFilter.id === null;
 
   const onSuccess = ({ data, errors }) => {
     setSaveStatus(SaveStatus.NONE);
     props.setSelectedVehicleFilter(null);
-    setIsNew(false);
   };
   const onFailed = err => {
     setSaveStatus(SaveStatus.FAILED);
@@ -134,14 +133,7 @@ const VehicleFilterWidget = (props: IProps) => {
       });
     }
     setSaveStatus(SaveStatus.NONE);
-    setIsNew(!isNew);
   };
-
-  useEffect(() => {
-    if (!!props.vehicleFilter && !!props.vehicleFilter.id) {
-      setIsNew(false);
-    }
-  }, [props.vehicleFilter]);
 
   return (
     <div>

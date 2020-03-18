@@ -174,15 +174,14 @@ export const ParkingRuleEditor = ({ rule, del, save, saveStatus, isNew }) => {
 
 const ParkingRuleWidget = (props: IProps) => {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(SaveStatus.NONE);
-  const [isNew, setIsNew] = useState<boolean>(false);
   const [updateEffect] = props.useUpdateParkingRule();
   const [deleteEffect] = props.useDeleteParkingRule();
   const [createEffect] = props.useCreateParkingRule();
+  const isNew = props.parkingRule !== null && props.parkingRule.id === null;
 
   const onSuccess = ({ data, errors }) => {
     setSaveStatus(SaveStatus.NONE);
     props.setSelectedParkingRule(null);
-    setIsNew(false);
   };
   const onFailed = err => {
     setSaveStatus(SaveStatus.FAILED);
@@ -219,14 +218,7 @@ const ParkingRuleWidget = (props: IProps) => {
       });
     }
     setSaveStatus(SaveStatus.NONE);
-    setIsNew(!isNew);
   };
-
-  useEffect(() => {
-    if (!!props.parkingRule && !!props.parkingRule.id) {
-      setIsNew(false);
-    }
-  }, [props.parkingRule]);
 
   return (
     <div>
