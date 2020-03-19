@@ -11,6 +11,7 @@ import {
 } from "../../redux/modules/rulePageActionCreators";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
+import { CloseAction } from "./CloseAction";
 
 interface IStateToProps {
   selectedDays: IRulePageState["selectedDays"];
@@ -26,6 +27,7 @@ interface IProps extends IStateToProps, IDispatchToProps {
   setAssignment: (id: any) => void;
   assignment: any;
   data: any;
+  onNewOrDel: () => void;
 }
 
 const h = "8.5em";
@@ -370,7 +372,15 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
             assignment={props.data.find(
               assignment => assignment.id === props.assignment.id
             )}
-            close={() => props.setAssignment(null)}
+            close={action => {
+              props.setAssignment(null);
+              if (
+                action === CloseAction.DELETE ||
+                action === CloseAction.SAVE
+              ) {
+                props.onNewOrDel();
+              }
+            }}
           />
         )}
       </div>

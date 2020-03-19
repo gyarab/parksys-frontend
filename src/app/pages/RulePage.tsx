@@ -110,6 +110,7 @@ const RulePage = (props: IProps) => {
               }}
               setAssignment={props.setAssignment}
               assignment={props.selectedAssignment}
+              onNewOrDel={refetch}
             />
           ) : (
             <ParkingRuleAssignmentDay
