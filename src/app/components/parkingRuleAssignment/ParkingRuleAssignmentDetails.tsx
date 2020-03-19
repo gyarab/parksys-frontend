@@ -25,6 +25,7 @@ const styles = stylesheet({
     gridTemplateColumns: "repeat(2, auto)",
     gridGap: "0.3em 0.4em",
     alignItems: "center",
+    marginBottom: "0.5em",
     $nest: {
       ".twoPickerContainer": {
         marginRight: "0.65em",
@@ -40,7 +41,6 @@ const styles = stylesheet({
     display: "grid",
     gridTemplateColumns: "repeat(4, 1fr)",
     gridColumnGap: "0.3em",
-    marginBottom: "0.5em",
     $nest: {
       button: {
         maxHeight: "3em"
@@ -229,6 +229,22 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
   };
   return (
     <div className={styles.details}>
+      <div className={styles.options}>
+        <span>Active</span>
+        {activePicker}
+        <span>Start</span>
+        {startPicker}
+        <span>End</span>
+        {endPicker}
+        <span>Priority</span>
+        <div>{priorityInput}</div>
+        <span>Filter Mode</span>
+        <div className="twoPickerContainer">{filterModePicker}</div>
+        <span>Filters</span>
+        {filtersPicker}
+        <span>Rules</span>
+        {rulesPicker}
+      </div>
       <div className={styles.controls}>
         <Button
           disabled={isNew || saveStatus === SaveStatus.SAVING}
@@ -251,22 +267,6 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
         <Button type="negative" onClick={() => close(CloseAction.NONE)}>
           Close
         </Button>
-      </div>
-      <div className={styles.options}>
-        <span>Active</span>
-        {activePicker}
-        <span>Start</span>
-        {startPicker}
-        <span>End</span>
-        {endPicker}
-        <span>Priority</span>
-        <div>{priorityInput}</div>
-        <span>Filter Mode</span>
-        <div className="twoPickerContainer">{filterModePicker}</div>
-        <span>Filters</span>
-        {filtersPicker}
-        <span>Rules</span>
-        {rulesPicker}
       </div>
     </div>
   );

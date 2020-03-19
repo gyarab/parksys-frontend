@@ -59,7 +59,7 @@ const defaultSelectedDay = () => new Date().toISOString().slice(0, 10);
 export const initialState: IRulePageState = {
   queryVariables: {
     date: defaultSelectedDay(),
-    range: "day"
+    range: "month"
   },
   openedRuleAssignment: {
     id: null,

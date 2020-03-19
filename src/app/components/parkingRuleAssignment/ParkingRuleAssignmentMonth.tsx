@@ -224,7 +224,7 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
   const end = moment(props.date).endOf("month");
   const [highlighted, setHighlighted] = useState(null);
 
-  // Sort by active (first) and by length
+  // Sort by length
   const sortedAssignments = useMemo(
     () =>
       props.data
@@ -259,6 +259,7 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
   const startOffset = weekdayToOffsetStart[monthStart.weekday()];
   const endOffset = weekdayToOffsetEnd[end.weekday()];
   const daysInMonth = date.daysInMonth();
+  const now = new Date();
   return (
     <div className={styles.monthDisplay}>
       <div className={styles.calendarDisplay}>
@@ -302,6 +303,9 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
               const isOtherMonth = isPrevMonth || isNextMonth;
               const selected =
                 props.selectedDays[dayStart.getTime()] === dayEnd.getTime();
+              const isToday =
+                dayStart.getTime() <= now.getTime() &&
+                now.getTime() <= dayEnd.getTime();
               return (
                 <Cell
                   onClick={onClick}
@@ -316,7 +320,10 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
                         margin: "auto",
                         opacity: isOtherMonth ? 0.3 : 1,
                         fontWeight: 900,
-                        paddingLeft: "0.3em"
+                        marginLeft: "0.2em",
+                        borderRadius: "1em",
+                        padding: "0.2em",
+                        backgroundColor: isToday ? Color.LIGHT_BLUE : null
                       }}
                     >
                       {dayStart.getDate()}
