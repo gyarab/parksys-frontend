@@ -88,7 +88,12 @@ const styles = stylesheet({
   },
   selectedCell: {
     boxShadow: `0 0 10px ${Color.BLUE}`,
-    borderColor: Color.BLUE
+    borderColor: Color.BLUE,
+    $nest: {
+      "&:hover": {
+        boxShadow: `0 0 10px ${Color.BLUE}`
+      }
+    }
   }
 });
 
@@ -171,29 +176,6 @@ const ParkingAssignmentCalendarCell = ({
   );
 };
 
-const dateSame = (a: Date, b: Date): boolean => {
-  const ret = a.getTime() === b.getTime();
-  return ret;
-};
-
-const findCellSelectedDayIndex = (
-  selected: IProps["selectedDays"],
-  start: Date,
-  end: Date
-) =>
-  selected.findIndex(
-    ([sStart, sEnd]) => dateSame(start, sStart) && dateSame(end, sEnd)
-  );
-
-const isCellSelected = (
-  selected: IProps["selectedDays"],
-  start: Date,
-  end: Date
-) => {
-  const ret = findCellSelectedDayIndex(selected, start, end);
-  return ret !== -1;
-};
-
 const cellSelectorStyles = stylesheet({
   cellSelector: {
     border: `2px solid ${Color.LIGHT_GREY}`,
@@ -261,16 +243,16 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
   );
 
   const onCellSelect = (start: Date, end: Date) => {
-    const originalLength = props.selectedDays.length;
-    const newDays = props.selectedDays.filter(
-      ([sStart, sEnd]) => !dateSame(start, sStart) || !dateSame(end, sEnd)
-    );
-    if (newDays.length === originalLength) {
-      // Add
-      props.setSelectedDays([...props.selectedDays, [start, end]]);
+    if (props.selectedDays[start.getTime()] === end.getTime()) {
+      // Remove
+      delete props.selectedDays[start.getTime()];
+      props.setSelectedDays({ ...props.selectedDays });
     } else {
-      // Removed
-      props.setSelectedDays(newDays);
+      // Add
+      props.setSelectedDays({
+        ...props.selectedDays,
+        [start.getTime()]: end.getTime()
+      });
     }
   };
 
@@ -318,11 +300,8 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
               const isPrevMonth = i < startOffset;
               const isNextMonth = i >= daysInMonth + startOffset;
               const isOtherMonth = isPrevMonth || isNextMonth;
-              const selected = isCellSelected(
-                props.selectedDays,
-                dayStart,
-                dayEnd
-              );
+              const selected =
+                props.selectedDays[dayStart.getTime()] === dayEnd.getTime();
               return (
                 <Cell
                   onClick={onClick}

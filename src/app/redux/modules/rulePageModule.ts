@@ -52,7 +52,7 @@ export interface IRulePageState {
     centsPerUnitTime?: number;
     unitTime?: string;
   };
-  selectedDays: Array<[Date, Date]>;
+  selectedDays: { [startTimestamp: number]: number };
 }
 
 const defaultSelectedDay = () => new Date().toISOString().slice(0, 10);
@@ -80,7 +80,7 @@ export const initialState: IRulePageState = {
   },
   selectedVehicleFilter: null,
   selectedParkingRule: null,
-  selectedDays: []
+  selectedDays: {}
 };
 
 export function rulePageReducer(
@@ -153,7 +153,7 @@ export function rulePageReducer(
     case SET_SELECTED_DAYS:
       return {
         ...state,
-        selectedDays: action.payload || []
+        selectedDays: action.payload || {}
       };
     default:
       return state;
