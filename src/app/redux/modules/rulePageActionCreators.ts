@@ -53,6 +53,12 @@ export interface SetParkingRule {
   payload: Partial<IRulePageState["selectedParkingRule"]>;
 }
 
+export const SET_SELECTED_DAYS = "RULE_PAGE/SET_SELECTED_DAYS";
+export interface SetSelectedDays {
+  type: typeof SET_SELECTED_DAYS;
+  payload: IRulePageState["selectedDays"] | null;
+}
+
 export type RulePageActionTypes =
   | ChangeOpenedRuleAssignment
   | SetQueryVars
@@ -60,4 +66,5 @@ export type RulePageActionTypes =
   | ChangeSimulateRuleAssignmentsOptions
   | ChangeOpenedNewRuleAssignment
   | SetVehicleFilter
-  | SetParkingRule;
+  | SetParkingRule
+  | SetSelectedDays;

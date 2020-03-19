@@ -6,7 +6,8 @@ import {
   CHANGE_SIMULATE_RULES_ASSIGNMENTS_OPTIONS,
   CHANGE_OPENED_NEW_RULE_ASSIGNMENT,
   SET_VEHICLE_FILTER,
-  SET_PARKING_RULE
+  SET_PARKING_RULE,
+  SET_SELECTED_DAYS
 } from "./rulePageActionCreators";
 import moment = require("moment");
 
@@ -51,6 +52,7 @@ export interface IRulePageState {
     centsPerUnitTime?: number;
     unitTime?: string;
   };
+  selectedDays: Array<[Date, Date]>;
 }
 
 const defaultSelectedDay = () => new Date().toISOString().slice(0, 10);
@@ -77,7 +79,8 @@ export const initialState: IRulePageState = {
     vehicle: null
   },
   selectedVehicleFilter: null,
-  selectedParkingRule: null
+  selectedParkingRule: null,
+  selectedDays: []
 };
 
 export function rulePageReducer(
@@ -146,6 +149,11 @@ export function rulePageReducer(
               ...action.payload
             }
           : null
+      };
+    case SET_SELECTED_DAYS:
+      return {
+        ...state,
+        selectedDays: action.payload || []
       };
     default:
       return state;

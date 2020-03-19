@@ -3,8 +3,24 @@ import moment from "moment";
 import { stylesheet, classes } from "typestyle";
 import { Color } from "../../constants";
 import { ParkingRuleAssignmentDetails } from "./ParkingRuleAssignmentDetails";
+import { IStore } from "../../redux/IStore";
+import { IRulePageState } from "../../redux/modules/rulePageModule";
+import {
+  SetSelectedDays,
+  SET_SELECTED_DAYS
+} from "../../redux/modules/rulePageActionCreators";
+import { Dispatch } from "redux";
+import { connect } from "react-redux";
 
-interface IProps {
+interface IStateToProps {
+  selectedDays: IRulePageState["selectedDays"];
+}
+
+interface IDispatchToProps {
+  setSelectedDays: (days: SetSelectedDays["payload"]) => void;
+}
+
+interface IProps extends IStateToProps, IDispatchToProps {
   date: string;
   setSelectedDay: (day) => void;
   setAssignment: (id: any) => void;
@@ -12,7 +28,7 @@ interface IProps {
   data: any;
 }
 
-const h = "9em";
+const h = "8.5em";
 
 // 0 sunday
 // 1 monday
@@ -58,7 +74,8 @@ const styles = stylesheet({
   calendarCell: {
     border: "1px solid #ccc",
     width: h,
-    paddingTop: "0.3em"
+    paddingTop: "0.3em",
+    transition: "0.1s all ease-out"
   },
   hoverableCell: {
     $nest: {
@@ -66,23 +83,30 @@ const styles = stylesheet({
         boxShadow: "0 0 10px #999"
       }
     }
+  },
+  selectedCell: {
+    boxShadow: `0 0 10px ${Color.BLUE}`,
+    borderColor: Color.BLUE
   }
 });
 
 const Cell = ({
   children,
   onClick,
-  canBeHighlighted
+  canBeHighlighted,
+  selected
 }: {
   children?: any;
   onClick?: () => void;
   canBeHighlighted: boolean;
+  selected: boolean;
 }) => {
   return (
     <div
       className={classes(
         styles.calendarCell,
-        canBeHighlighted ? styles.hoverableCell : null
+        canBeHighlighted ? styles.hoverableCell : null,
+        selected ? styles.selectedCell : null
       )}
       style={{
         cursor: !onClick ? "default" : "pointer"
@@ -99,8 +123,8 @@ const ParkingAssignmentCalendarCell = ({
   dayEnd,
   assignments,
   highlighted,
-  setHighlighted,
-  setSelected
+  setHighlightedAssignment,
+  setSelectedAssignment
 }) => {
   return (
     <>
@@ -131,12 +155,12 @@ const ParkingAssignmentCalendarCell = ({
             }}
             onMouseOver={e => {
               e.stopPropagation();
-              setHighlighted(assignment.id);
+              setHighlightedAssignment(assignment.id);
             }}
-            onMouseLeave={() => setHighlighted(null)}
+            onMouseLeave={() => setHighlightedAssignment(null)}
             onClick={e => {
               e.stopPropagation();
-              setSelected(assignment.id);
+              setSelectedAssignment(assignment.id);
             }}
           ></div>
         );
@@ -145,7 +169,72 @@ const ParkingAssignmentCalendarCell = ({
   );
 };
 
-export const ParkingRuleAssignmentMonth = (props: IProps) => {
+const dateSame = (a: Date, b: Date): boolean => {
+  const ret = a.getTime() === b.getTime();
+  return ret;
+};
+
+const findCellSelectedDayIndex = (
+  selected: IProps["selectedDays"],
+  start: Date,
+  end: Date
+) =>
+  selected.findIndex(
+    ([sStart, sEnd]) => dateSame(start, sStart) && dateSame(end, sEnd)
+  );
+
+const isCellSelected = (
+  selected: IProps["selectedDays"],
+  start: Date,
+  end: Date
+) => {
+  const ret = findCellSelectedDayIndex(selected, start, end);
+  return ret !== -1;
+};
+
+const cellSelectorStyles = stylesheet({
+  cellSelector: {
+    border: `2px solid ${Color.LIGHT_GREY}`,
+    borderRadius: "2px",
+    marginRight: "0.3em",
+    float: "right",
+    width: "1.2em",
+    height: "1.2em",
+    transition: "0.2s all ease-out",
+    $nest: {
+      "&:hover": {
+        border: `3px solid ${Color.BLUE}`
+      }
+    }
+  },
+  selectedCellSelector: {
+    borderColor: Color.BLUE,
+    backgroundColor: Color.BLUE,
+    $nest: {
+      "&:hover": {
+        border: `3px solid ${Color.LIGHT_RED}`,
+        backgroundColor: "transparent"
+      }
+    }
+  }
+});
+
+const CellSelector = ({ dayStart, dayEnd, selected, select }) => {
+  return (
+    <div
+      className={classes(
+        cellSelectorStyles.cellSelector,
+        selected ? cellSelectorStyles.selectedCellSelector : null
+      )}
+      onClick={e => {
+        e.stopPropagation();
+        select(dayStart, dayEnd);
+      }}
+    ></div>
+  );
+};
+
+const ParkingRuleAssignmentMonth = (props: IProps) => {
   const date = moment(props.date);
   const monthStart = moment(props.date).startOf("month");
   const end = moment(props.date).endOf("month");
@@ -168,6 +257,20 @@ export const ParkingRuleAssignmentMonth = (props: IProps) => {
         .sort((a, b) => b._length - a._length),
     [props.data]
   );
+
+  const onCellSelect = (start: Date, end: Date) => {
+    const originalLength = props.selectedDays.length;
+    const newDays = props.selectedDays.filter(
+      ([sStart, sEnd]) => !dateSame(start, sStart) || !dateSame(end, sEnd)
+    );
+    if (newDays.length === originalLength) {
+      // Add
+      props.setSelectedDays([...props.selectedDays, [start, end]]);
+    } else {
+      // Removed
+      props.setSelectedDays(newDays);
+    }
+  };
 
   const startOffset = weekdayToOffsetStart[monthStart.weekday()];
   const endOffset = weekdayToOffsetEnd[end.weekday()];
@@ -213,27 +316,44 @@ export const ParkingRuleAssignmentMonth = (props: IProps) => {
               const isPrevMonth = i < startOffset;
               const isNextMonth = i >= daysInMonth + startOffset;
               const isOtherMonth = isPrevMonth || isNextMonth;
+              const selected = isCellSelected(
+                props.selectedDays,
+                dayStart,
+                dayEnd
+              );
               return (
-                <Cell onClick={onClick} canBeHighlighted={highlighted === null}>
-                  <span
-                    style={{
-                      color: Color.GREY,
-                      width: "100%",
-                      margin: "auto",
-                      opacity: isOtherMonth ? 0.3 : 1,
-                      fontWeight: 900,
-                      paddingLeft: "0.3em"
-                    }}
-                  >
-                    {dayStart.getDate()}
-                  </span>
+                <Cell
+                  onClick={onClick}
+                  canBeHighlighted={highlighted === null}
+                  selected={selected}
+                >
+                  <div style={{ marginBottom: "0.2em" }}>
+                    <span
+                      style={{
+                        color: Color.GREY,
+                        width: "100%",
+                        margin: "auto",
+                        opacity: isOtherMonth ? 0.3 : 1,
+                        fontWeight: 900,
+                        paddingLeft: "0.3em"
+                      }}
+                    >
+                      {dayStart.getDate()}
+                    </span>
+                    <CellSelector
+                      dayStart={dayStart}
+                      dayEnd={dayEnd}
+                      selected={selected}
+                      select={onCellSelect}
+                    />
+                  </div>
                   <ParkingAssignmentCalendarCell
                     dayStart={dayStart}
                     dayEnd={dayEnd}
                     assignments={assignments}
                     highlighted={[highlighted, props.assignment.id]}
-                    setHighlighted={setHighlighted}
-                    setSelected={props.setAssignment}
+                    setHighlightedAssignment={setHighlighted}
+                    setSelectedAssignment={props.setAssignment}
                   />
                 </Cell>
               );
@@ -256,4 +376,27 @@ export const ParkingRuleAssignmentMonth = (props: IProps) => {
       </div>
     </div>
   );
+};
+
+const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
+  return {
+    selectedDays: state.rulePage.selectedDays
+  };
+};
+
+const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
+  return {
+    setSelectedDays: days =>
+      dispatch({ type: SET_SELECTED_DAYS, payload: days })
+  };
+};
+
+const connected = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ParkingRuleAssignmentMonth);
+
+export {
+  connected as ParkingRuleAssignmentMonth,
+  ParkingRuleAssignmentMonth as UnconnectedParkingRuleAssignmentMonth
 };
