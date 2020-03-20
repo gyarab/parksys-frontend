@@ -12,6 +12,9 @@ import {
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { CloseAction } from "./CloseAction";
+import { ParkingRuleAssignmentCopyPanel } from "./ParkingRuleAssignmentCopyPanel";
+import { Flag, FlagType } from "../Flag";
+import { ParkingRuleAssignmentMultiDelete } from "./ParkingRuleAssignmentMultiDelete";
 
 interface IStateToProps {
   selectedDays: IRulePageState["selectedDays"];
@@ -104,6 +107,12 @@ const styles = stylesheet({
         boxShadow: `0 0 10px ${Color.BLUE}`
       }
     }
+  },
+  sidePanel: {
+    display: "grid",
+    gridTemplateColumns: "1fr",
+    gridTemplateRows: "10fr 9fr",
+    gridRowGap: "0.5em"
   }
 });
 
@@ -270,6 +279,7 @@ const isCellSelected = (
   if (selectorMode == "continuous") {
     let min: number = Number.POSITIVE_INFINITY;
     let max: number = Number.NEGATIVE_INFINITY;
+    // O(2)
     Object.keys(selectedDays).forEach(sStart => {
       const sEnd = selectedDays[sStart];
       min = Math.min(Number(sStart), min);
@@ -406,27 +416,38 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
         </div>
         <div className={styles.calendar}>{renderedCells}</div>
       </div>
-      <div style={{ position: "relative", height: "100%" }}>
-        {!props.assignment ||
-        !props.assignment.id ||
-        !props.data ||
-        props.data.length === 0 ? null : (
-          <ParkingRuleAssignmentDetails
-            key={props.assignment.id}
-            assignment={props.data.find(
-              assignment => assignment.id === props.assignment.id
-            )}
-            close={action => {
-              props.setAssignment(null);
-              if (
-                action === CloseAction.DELETE ||
-                action === CloseAction.SAVE
-              ) {
-                props.onNewOrDel();
-              }
-            }}
-          />
-        )}
+      <div className={styles.sidePanel}>
+        <div style={{ position: "relative", height: "100%" }}>
+          {!props.assignment ||
+          !props.assignment.id ||
+          !props.data ||
+          props.data.length === 0 ? (
+            <div style={{ marginTop: "2em" }}>
+              <Flag text={"Select a Rule Assignment"} type={FlagType.WARNING} />
+            </div>
+          ) : (
+            <ParkingRuleAssignmentDetails
+              key={props.assignment.id}
+              assignment={props.data.find(
+                assignment => assignment.id === props.assignment.id
+              )}
+              close={action => {
+                props.setAssignment(null);
+                if (
+                  action === CloseAction.DELETE ||
+                  action === CloseAction.SAVE
+                ) {
+                  props.onNewOrDel();
+                }
+              }}
+            />
+          )}
+        </div>
+        <div>
+          <h3>Quick Actions</h3>
+          <ParkingRuleAssignmentCopyPanel refetch={props.onNewOrDel} />
+          <ParkingRuleAssignmentMultiDelete refetch={props.onNewOrDel} />
+        </div>
       </div>
     </div>
   );

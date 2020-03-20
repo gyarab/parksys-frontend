@@ -77,6 +77,36 @@ export const RULE_PAGE_UPDATE_RULE_ASSIGNMENT_MUTATION = gql`
   ${PARKING_RULE_ASSIGNMENT_FRAGMENT}
 `;
 
+export const RULE_PAGE_COPY_RULE_ASSIGNMENTS_MUTATION = gql`
+  mutation duplicateParkingRuleAssignments(
+    $start: DateTime!
+    $end: DateTime!
+    $targetStarts: [DateTime!]!
+  ) {
+    duplicateParkingRuleAssignments(
+      start: $start
+      end: $end
+      targetStarts: $targetStarts
+    ) {
+      id
+      rules {
+        id
+        name
+      }
+      start
+      end
+      active
+      priority
+    }
+  }
+`;
+
+export const RULE_PAGE_DELETE_RULE_ASSIGNMENTS_MUTATION = gql`
+  mutation deleteParkingRuleAssignments($start: DateTime!, $end: DateTime!) {
+    deleteParkingRuleAssignments(start: $start, end: $end)
+  }
+`;
+
 export const RULE_PAGE_CREATE_RULE_ASSIGNMENT_MUTATION = gql`
   mutation createRuleAssignment($input: ParkingRuleAssignmentCreateInput!) {
     result: createParkingRuleAssignment(input: $input) {

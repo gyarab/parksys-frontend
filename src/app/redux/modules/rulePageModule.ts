@@ -55,7 +55,7 @@ export interface IRulePageState {
     unitTime?: string;
   };
   selectedDays: { [startTimestamp: number]: number };
-  daySelectorMode: "continuous" | "separate";
+  daySelectorMode: "continuous" | "separate" | "none";
 }
 
 const defaultSelectedDay = () => new Date().toISOString().slice(0, 10);
@@ -93,7 +93,7 @@ const setSelectedDays = (
 ): IRulePageState["selectedDays"] => {
   if (action.payload === null) {
     // Clear
-    return {};
+    return initialState.selectedDays;
   }
   const [start, end] = action.payload;
   // Copy
@@ -184,10 +184,14 @@ export function rulePageReducer(
         selectedDays: setSelectedDays(state, action)
       };
     case SET_DAY_SELECTOR_MODE:
-      return {
-        ...state,
-        daySelectorMode: action.payload
-      };
+      // Clear selectedDays when mode changes
+      if (state.daySelectorMode !== action.payload) {
+        return {
+          ...state,
+          daySelectorMode: action.payload,
+          selectedDays: initialState.selectedDays
+        };
+      }
     default:
       return state;
   }
