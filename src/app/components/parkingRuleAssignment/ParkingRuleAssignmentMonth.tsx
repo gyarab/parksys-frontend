@@ -6,8 +6,8 @@ import { ParkingRuleAssignmentDetails } from "./ParkingRuleAssignmentDetails";
 import { IStore } from "../../redux/IStore";
 import { IRulePageState } from "../../redux/modules/rulePageModule";
 import {
-  SetSelectedDays,
-  SET_SELECTED_DAYS
+  SetSelectedDay,
+  SET_SELECTED_DAY
 } from "../../redux/modules/rulePageActionCreators";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
@@ -15,10 +15,11 @@ import { CloseAction } from "./CloseAction";
 
 interface IStateToProps {
   selectedDays: IRulePageState["selectedDays"];
+  daySelectorMode: IRulePageState["daySelectorMode"];
 }
 
 interface IDispatchToProps {
-  setSelectedDays: (days: SetSelectedDays["payload"]) => void;
+  setSelectedDays: (days: SetSelectedDay["payload"]) => void;
 }
 
 interface IProps extends IStateToProps, IDispatchToProps {
@@ -86,7 +87,16 @@ const styles = stylesheet({
       }
     }
   },
-  selectedCell: {
+  selectedCellExact: {
+    boxShadow: `0 0 10px ${Color.ORANGE}`,
+    borderColor: Color.ORANGE,
+    $nest: {
+      "&:hover": {
+        boxShadow: `0 0 10px ${Color.ORANGE}`
+      }
+    }
+  },
+  selectedCellRange: {
     boxShadow: `0 0 10px ${Color.BLUE}`,
     borderColor: Color.BLUE,
     $nest: {
@@ -101,19 +111,29 @@ const Cell = ({
   children,
   onClick,
   canBeHighlighted,
-  selected
+  selectMode
 }: {
   children?: any;
   onClick?: () => void;
   canBeHighlighted: boolean;
-  selected: boolean;
+  selectMode: CellSelectMode;
 }) => {
+  const selectedClass = ((): string | null => {
+    switch (selectMode) {
+      case "exact":
+        return styles.selectedCellExact;
+      case "range":
+        return styles.selectedCellRange;
+      default:
+        return null;
+    }
+  })();
   return (
     <div
       className={classes(
         styles.calendarCell,
         canBeHighlighted ? styles.hoverableCell : null,
-        selected ? styles.selectedCell : null
+        selectedClass
       )}
       style={{
         cursor: !onClick ? "default" : "pointer"
@@ -191,31 +211,75 @@ const cellSelectorStyles = stylesheet({
       }
     }
   },
-  selectedCellSelector: {
-    borderColor: Color.BLUE,
-    backgroundColor: Color.BLUE,
+  selectedCellSelectorExact: {
+    borderColor: Color.ORANGE,
+    backgroundColor: Color.ORANGE,
     $nest: {
       "&:hover": {
         border: `3px solid ${Color.LIGHT_RED}`,
         backgroundColor: "transparent"
       }
     }
+  },
+  // Don't change appearance on hover
+  selectedCellSelectorRange: {
+    borderColor: Color.BLUE,
+    backgroundColor: Color.BLUE,
+    $nest: {
+      "&:hover": {
+        border: `3px solid ${Color.BLUE}`,
+        backgroundColor: Color.BLUE
+      }
+    }
   }
 });
 
-const CellSelector = ({ dayStart, dayEnd, selected, select }) => {
+const CellSelector = ({ dayStart, dayEnd, selectMode, select }) => {
+  const selectedClass = ((): string | null => {
+    switch (selectMode) {
+      case "exact":
+        return cellSelectorStyles.selectedCellSelectorExact;
+      case "range":
+        return cellSelectorStyles.selectedCellSelectorRange;
+      default:
+        return null;
+    }
+  })();
   return (
     <div
-      className={classes(
-        cellSelectorStyles.cellSelector,
-        selected ? cellSelectorStyles.selectedCellSelector : null
-      )}
+      className={classes(cellSelectorStyles.cellSelector, selectedClass)}
       onClick={e => {
         e.stopPropagation();
-        select(dayStart, dayEnd);
+        select([dayStart, dayEnd]);
       }}
     ></div>
   );
+};
+
+type CellSelectMode = "exact" | "range" | "none";
+
+const isCellSelected = (
+  start: Date,
+  end: Date,
+  selectorMode: IProps["daySelectorMode"],
+  selectedDays: IProps["selectedDays"]
+): CellSelectMode => {
+  if (selectedDays[start.getTime()] === end.getTime()) {
+    return "exact";
+  }
+  if (selectorMode == "continuous") {
+    let min: number = Number.POSITIVE_INFINITY;
+    let max: number = Number.NEGATIVE_INFINITY;
+    Object.keys(selectedDays).forEach(sStart => {
+      const sEnd = selectedDays[sStart];
+      min = Math.min(Number(sStart), min);
+      max = Math.max(sEnd, max);
+    });
+    if (min <= start.getTime() && end.getTime() <= max) {
+      return "range";
+    }
+  }
+  return "none";
 };
 
 const ParkingRuleAssignmentMonth = (props: IProps) => {
@@ -241,20 +305,6 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
         .sort((a, b) => b._length - a._length),
     [props.data]
   );
-
-  const onCellSelect = (start: Date, end: Date) => {
-    if (props.selectedDays[start.getTime()] === end.getTime()) {
-      // Remove
-      delete props.selectedDays[start.getTime()];
-      props.setSelectedDays({ ...props.selectedDays });
-    } else {
-      // Add
-      props.setSelectedDays({
-        ...props.selectedDays,
-        [start.getTime()]: end.getTime()
-      });
-    }
-  };
 
   const startOffset = weekdayToOffsetStart[monthStart.weekday()];
   const endOffset = weekdayToOffsetEnd[end.weekday()];
@@ -290,16 +340,21 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
       const isPrevMonth = i < startOffset;
       const isNextMonth = i >= daysInMonth + startOffset;
       const isOtherMonth = isPrevMonth || isNextMonth;
-      const selected =
-        props.selectedDays[dayStart.getTime()] === dayEnd.getTime();
+      const selectMode = isCellSelected(
+        dayStart,
+        dayEnd,
+        props.daySelectorMode,
+        props.selectedDays
+      );
       const isToday =
         dayStart.getTime() <= now.getTime() &&
         now.getTime() <= dayEnd.getTime();
       return (
         <Cell
+          key={dayStart.toISOString()}
           onClick={onClick}
           canBeHighlighted={highlighted === null}
-          selected={selected}
+          selectMode={selectMode}
         >
           <div style={{ marginBottom: "0.2em" }}>
             <span
@@ -317,12 +372,16 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
             >
               {dayStart.getDate()}
             </span>
-            <CellSelector
-              dayStart={dayStart}
-              dayEnd={dayEnd}
-              selected={selected}
-              select={onCellSelect}
-            />
+            {selectMode === "none" &&
+            props.daySelectorMode === "continuous" &&
+            Object.keys(props.selectedDays).length === 2 ? null : (
+              <CellSelector
+                dayStart={dayStart}
+                dayEnd={dayEnd}
+                select={props.setSelectedDays}
+                selectMode={selectMode}
+              />
+            )}
           </div>
           <ParkingAssignmentCalendarCell
             dayStart={dayStart}
@@ -375,14 +434,14 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
 
 const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
   return {
-    selectedDays: state.rulePage.selectedDays
+    selectedDays: state.rulePage.selectedDays,
+    daySelectorMode: state.rulePage.daySelectorMode
   };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
-    setSelectedDays: days =>
-      dispatch({ type: SET_SELECTED_DAYS, payload: days })
+    setSelectedDays: days => dispatch({ type: SET_SELECTED_DAY, payload: days })
   };
 };
 

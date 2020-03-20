@@ -189,6 +189,7 @@ const ParkingRuleAssignmentRow = ({
       const end = new Date(start.getTime() + 3600 * 1000); // +1 hour
       details = (
         <div
+          key={i}
           style={{
             position: "relative",
             zIndex: maxPriority + 3

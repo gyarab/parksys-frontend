@@ -7,7 +7,9 @@ import {
   CHANGE_OPENED_NEW_RULE_ASSIGNMENT,
   SET_VEHICLE_FILTER,
   SET_PARKING_RULE,
-  SET_SELECTED_DAYS
+  SET_SELECTED_DAY,
+  SetSelectedDay,
+  SET_DAY_SELECTOR_MODE
 } from "./rulePageActionCreators";
 import moment = require("moment");
 
@@ -53,6 +55,7 @@ export interface IRulePageState {
     unitTime?: string;
   };
   selectedDays: { [startTimestamp: number]: number };
+  daySelectorMode: "continuous" | "separate";
 }
 
 const defaultSelectedDay = () => new Date().toISOString().slice(0, 10);
@@ -80,7 +83,32 @@ export const initialState: IRulePageState = {
   },
   selectedVehicleFilter: null,
   selectedParkingRule: null,
-  selectedDays: {}
+  selectedDays: {},
+  daySelectorMode: "continuous"
+};
+
+const setSelectedDays = (
+  state: IRulePageState,
+  action: SetSelectedDay
+): IRulePageState["selectedDays"] => {
+  if (action.payload === null) {
+    // Clear
+    return {};
+  }
+  const [start, end] = action.payload;
+  // Copy
+  const selectedDays = { ...state.selectedDays };
+  if (state.selectedDays[start.getTime()] === end.getTime()) {
+    // Remove
+    delete selectedDays[start.getTime()];
+  } else if (
+    state.daySelectorMode === "separate" ||
+    (state.daySelectorMode === "continuous" &&
+      Object.keys(selectedDays).length < 2)
+  ) {
+    selectedDays[start.getTime()] = end.getTime();
+  }
+  return selectedDays;
 };
 
 export function rulePageReducer(
@@ -150,10 +178,15 @@ export function rulePageReducer(
             }
           : null
       };
-    case SET_SELECTED_DAYS:
+    case SET_SELECTED_DAY:
       return {
         ...state,
-        selectedDays: action.payload || {}
+        selectedDays: setSelectedDays(state, action)
+      };
+    case SET_DAY_SELECTOR_MODE:
+      return {
+        ...state,
+        daySelectorMode: action.payload
       };
     default:
       return state;
