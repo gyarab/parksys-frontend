@@ -260,6 +260,81 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
   const endOffset = weekdayToOffsetEnd[end.weekday()];
   const daysInMonth = date.daysInMonth();
   const now = new Date();
+  const renderedCells = new Array(daysInMonth + startOffset + endOffset)
+    .fill(0)
+    .map((_, i) => {
+      const dayStartM = monthStart
+        .clone()
+        .add(i - startOffset, "days")
+        .startOf("day");
+      const dayEnd = dayStartM
+        .clone()
+        .endOf("day")
+        .toDate();
+      const dayStart: Date = dayStartM.toDate();
+      const onClick = () => {
+        props.setSelectedDay(
+          monthStart
+            .clone()
+            .add(i - startOffset + 1, "days")
+            .toDate()
+            .toISOString()
+            .slice(0, 10)
+        );
+      };
+      const assignments = sortedAssignments.filter(
+        ({ _start, _end }) =>
+          _start.getTime() <= dayEnd.getTime() &&
+          _end.getTime() >= dayStart.getTime()
+      );
+      const isPrevMonth = i < startOffset;
+      const isNextMonth = i >= daysInMonth + startOffset;
+      const isOtherMonth = isPrevMonth || isNextMonth;
+      const selected =
+        props.selectedDays[dayStart.getTime()] === dayEnd.getTime();
+      const isToday =
+        dayStart.getTime() <= now.getTime() &&
+        now.getTime() <= dayEnd.getTime();
+      return (
+        <Cell
+          onClick={onClick}
+          canBeHighlighted={highlighted === null}
+          selected={selected}
+        >
+          <div style={{ marginBottom: "0.2em" }}>
+            <span
+              style={{
+                color: Color.GREY,
+                width: "100%",
+                margin: "auto",
+                opacity: isOtherMonth ? 0.3 : 1,
+                fontWeight: 900,
+                marginLeft: "0.2em",
+                borderRadius: "1em",
+                padding: "0.2em",
+                backgroundColor: isToday ? Color.LIGHT_BLUE : null
+              }}
+            >
+              {dayStart.getDate()}
+            </span>
+            <CellSelector
+              dayStart={dayStart}
+              dayEnd={dayEnd}
+              selected={selected}
+              select={onCellSelect}
+            />
+          </div>
+          <ParkingAssignmentCalendarCell
+            dayStart={dayStart}
+            dayEnd={dayEnd}
+            assignments={assignments}
+            highlighted={[highlighted, props.assignment.id]}
+            setHighlightedAssignment={setHighlighted}
+            setSelectedAssignment={props.setAssignment}
+          />
+        </Cell>
+      );
+    });
   return (
     <div className={styles.monthDisplay}>
       <div className={styles.calendarDisplay}>
@@ -270,83 +345,7 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
             </div>
           ))}
         </div>
-        <div className={styles.calendar}>
-          {new Array(daysInMonth + startOffset + endOffset)
-            .fill(0)
-            .map((_, i) => {
-              const dayStartM = monthStart
-                .clone()
-                .add(i - startOffset, "days")
-                .startOf("day");
-              const dayEnd = dayStartM
-                .clone()
-                .endOf("day")
-                .toDate();
-              const dayStart: Date = dayStartM.toDate();
-              const onClick = () => {
-                props.setSelectedDay(
-                  monthStart
-                    .clone()
-                    .add(i - startOffset + 1, "days")
-                    .toDate()
-                    .toISOString()
-                    .slice(0, 10)
-                );
-              };
-              const assignments = sortedAssignments.filter(
-                ({ _start, _end }) =>
-                  _start.getTime() <= dayEnd.getTime() &&
-                  _end.getTime() >= dayStart.getTime()
-              );
-              const isPrevMonth = i < startOffset;
-              const isNextMonth = i >= daysInMonth + startOffset;
-              const isOtherMonth = isPrevMonth || isNextMonth;
-              const selected =
-                props.selectedDays[dayStart.getTime()] === dayEnd.getTime();
-              const isToday =
-                dayStart.getTime() <= now.getTime() &&
-                now.getTime() <= dayEnd.getTime();
-              return (
-                <Cell
-                  onClick={onClick}
-                  canBeHighlighted={highlighted === null}
-                  selected={selected}
-                >
-                  <div style={{ marginBottom: "0.2em" }}>
-                    <span
-                      style={{
-                        color: Color.GREY,
-                        width: "100%",
-                        margin: "auto",
-                        opacity: isOtherMonth ? 0.3 : 1,
-                        fontWeight: 900,
-                        marginLeft: "0.2em",
-                        borderRadius: "1em",
-                        padding: "0.2em",
-                        backgroundColor: isToday ? Color.LIGHT_BLUE : null
-                      }}
-                    >
-                      {dayStart.getDate()}
-                    </span>
-                    <CellSelector
-                      dayStart={dayStart}
-                      dayEnd={dayEnd}
-                      selected={selected}
-                      select={onCellSelect}
-                    />
-                  </div>
-                  <ParkingAssignmentCalendarCell
-                    dayStart={dayStart}
-                    dayEnd={dayEnd}
-                    assignments={assignments}
-                    highlighted={[highlighted, props.assignment.id]}
-                    setHighlightedAssignment={setHighlighted}
-                    setSelectedAssignment={props.setAssignment}
-                  />
-                </Cell>
-              );
-            })}
-        </div>
+        <div className={styles.calendar}>{renderedCells}</div>
       </div>
       <div style={{ position: "relative", height: "100%" }}>
         {!props.assignment ||
