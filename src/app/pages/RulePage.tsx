@@ -167,25 +167,25 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
 
       if (range === "month") {
         filter2.endFilter = {
-          gte: moment(date)
+          gt: moment(date)
             .startOf(range)
             .subtract(7, "days")
             .toString()
         };
         filter2.startFilter = {
-          lte: moment(date)
+          lt: moment(date)
             .endOf(range)
             .add(7, "days")
             .toString()
         };
       } else {
         filter2.endFilter = {
-          gte: moment(date)
+          gt: moment(date)
             .startOf(range)
             .toString()
         };
         filter2.startFilter = {
-          lte: moment(date)
+          lt: moment(date)
             .endOf(range)
             .toString()
         };

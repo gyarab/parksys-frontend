@@ -344,8 +344,8 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
       };
       const assignments = sortedAssignments.filter(
         ({ _start, _end }) =>
-          _start.getTime() <= dayEnd.getTime() &&
-          _end.getTime() >= dayStart.getTime()
+          _start.getTime() < dayEnd.getTime() &&
+          _end.getTime() > dayStart.getTime()
       );
       const isPrevMonth = i < startOffset;
       const isNextMonth = i >= daysInMonth + startOffset;
