@@ -14,17 +14,20 @@ import {
   SET_SELECTED_DAY
 } from "../../redux/modules/rulePageActionCreators";
 import { stylesheet } from "typestyle";
+import { NumberInput } from "../pickers/NumberInput";
+import { ERRORS_SET_PAGE_ERROR } from "../../redux/modules/errorsActionCreators";
 
 interface IDispatchToProps {
   duplicateRuleAssignments: () => MutationTuple<
     any,
-    { start: Date; end: Date; targetStarts: Date[] }
+    { start: Date; end: Date; targetStart: Date; options?: { repeat: number } }
   >;
   deleteRuleAssignments: () => MutationTuple<
     { deleteParkingRuleAssignment: any },
     { start: Date; end: Date }
   >;
   setSelectedDays: (days: SetSelectedDay["payload"]) => void;
+  setPageError: (err: string) => void;
 }
 
 interface IStateToProps {
@@ -65,17 +68,10 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
   const [copyEffect] = props.duplicateRuleAssignments();
   const [deleteEffect] = props.deleteRuleAssignments();
 
-  const [targets, setTargets] = useState<Date[]>([null]);
-  const addTarget = () => {
-    setTargets([...targets, null]);
-  };
-  const deleteTarget = (index: number) => {
-    targets.splice(index, 1);
-    setTargets([...targets]);
-  };
-
+  const [target, setTarget] = useState<Date>(null);
+  const [copyRepeat, setCopyRepeat] = useState(1);
   const clear = () => {
-    setTargets([null]);
+    setTarget(null);
     props.setSelectedDays(null);
     // Refetch
     props.refetch();
@@ -93,13 +89,22 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
       variables: {
         start: new Date(min),
         end: new Date(max),
-        targetStarts: targets
-          .filter(t => t !== null)
-          .map(t => {
-            t.setHours(0, 0, 0, 0);
-            return t;
-          })
+        targetStart: target,
+        options: { repeat: copyRepeat }
       }
+    }).then(result => {
+      const data = result.data.duplicateParkingRuleAssignments;
+      if (data.__typename === "ParkingRuleAssignmentResultError") {
+        const joinedCollisions = data.collisions
+          .map(coll => coll.start.slice(0, 10))
+          .join(", ");
+        console.log(joinedCollisions);
+        props.setPageError(`There are collisions on ${joinedCollisions}`);
+      } else {
+        props.setPageError(null);
+      }
+      console.log(data);
+      return result;
     });
   };
   const deleteAssignments = (): Promise<any> => {
@@ -116,60 +121,54 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
         start: new Date(min - 1), // Ugly yet functional fix
         end: new Date(max + 1)
       }
+    }).then(v => {
+      props.setPageError(null);
+      return v;
     });
   };
   // Could be done by offsetting
   const move = () => {
     copy()
       .then(deleteAssignments)
-      .then(clear);
+      .finally(clear);
   };
 
-  const copyAndClear = () => copy().then(clear);
-  const deleteAssignmentsAndClear = () => deleteAssignments().then(clear);
+  const copyAndClear = () =>
+    copy()
+      .then(clear)
+      .finally(clear);
+  const deleteAssignmentsAndClear = () => deleteAssignments().finally(clear);
 
   const dontCopy = useMemo(
     () =>
-      targets.length === 0 ||
-      targets.findIndex(t => t === null) !== -1 ||
-      Object.keys(props.selectedDays).length === 0,
-    [targets, props.selectedDays]
+      target === null ||
+      Object.keys(props.selectedDays).length === 0 ||
+      copyRepeat < 1,
+    [target, props.selectedDays]
   );
   const dontDelete = Object.keys(props.selectedDays).length === 0;
   return (
     <div>
       <div className={styles.quickActions}>
         <p>Destinations</p>
-        <div className={styles.destinations}>
-          {targets.map((target, i) => (
-            <div key={`${i}_${target}`}>
-              <input
-                type="date"
-                value={
-                  target != null ? target.toISOString().slice(0, 10) : null
-                }
-                onChange={e => {
-                  const value = e.target.value;
-                  targets[i] = new Date(value);
-                  if (isNaN(targets[i].getTime())) {
-                    targets[i] = null;
-                  }
-                  setTargets([...targets]);
-                }}
-              />
-              <Button
-                type="negative"
-                small={true}
-                onClick={() => deleteTarget(i)}
-              >
-                Delete
-              </Button>
-            </div>
-          ))}
-          <Button type="positive" small={true} onClick={addTarget}>
-            Add More
-          </Button>
-        </div>
+        <input
+          type="date"
+          value={target != null ? target.toISOString().slice(0, 10) : null}
+          onChange={e => {
+            const value = e.target.value;
+            const date = new Date(value);
+            if (isNaN(date.getTime())) {
+              setTarget(null);
+            } else {
+              setTarget(date);
+            }
+          }}
+        />
+        <p>Copy Repetitions</p>
+        <NumberInput
+          value={copyRepeat}
+          onChange={value => setCopyRepeat(value)}
+        />
       </div>
       <div className={styles.controls}>
         <Button type="primary" disabled={dontCopy} onClick={copyAndClear}>
@@ -204,7 +203,9 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
 
     deleteRuleAssignments: () =>
       useMutation(RULE_PAGE_DELETE_RULE_ASSIGNMENTS_MUTATION),
-    setSelectedDays: days => dispatch({ type: SET_SELECTED_DAY, payload: days })
+    setSelectedDays: days =>
+      dispatch({ type: SET_SELECTED_DAY, payload: days }),
+    setPageError: err => dispatch({ type: ERRORS_SET_PAGE_ERROR, payload: err })
   };
 };
 
