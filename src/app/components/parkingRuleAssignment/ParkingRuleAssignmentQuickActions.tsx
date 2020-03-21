@@ -98,12 +98,10 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
         const joinedCollisions = data.collisions
           .map(coll => coll.start.slice(0, 10))
           .join(", ");
-        console.log(joinedCollisions);
         props.setPageError(`There are collisions on ${joinedCollisions}`);
       } else {
         props.setPageError(null);
       }
-      console.log(data);
       return result;
     });
   };
@@ -150,10 +148,10 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
   return (
     <div>
       <div className={styles.quickActions}>
-        <p>Destinations</p>
+        <p>Copy Destination</p>
         <input
           type="date"
-          value={target != null ? target.toISOString().slice(0, 10) : null}
+          value={target !== null ? target.toISOString().slice(0, 10) : ""}
           onChange={e => {
             const value = e.target.value;
             const date = new Date(value);
