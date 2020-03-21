@@ -81,13 +81,13 @@ export const RULE_PAGE_COPY_RULE_ASSIGNMENTS_MUTATION = gql`
   mutation duplicateParkingRuleAssignments(
     $start: DateTime!
     $end: DateTime!
-    $targetStart: DateTime!
-    $options: ParkingRuleAssignmentDuplicationOptions
+    $targetStarts: [DateTime!]
+    $options: ParkingRuleAssignmentDuplicationOptions!
   ) {
     duplicateParkingRuleAssignments(
       start: $start
       end: $end
-      targetStart: $targetStart
+      targetStarts: $targetStarts
       options: $options
     ) {
       __typename

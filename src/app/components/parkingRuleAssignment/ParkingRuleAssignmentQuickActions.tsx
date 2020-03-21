@@ -16,11 +16,18 @@ import {
 import { stylesheet } from "typestyle";
 import { NumberInput } from "../pickers/NumberInput";
 import { ERRORS_SET_PAGE_ERROR } from "../../redux/modules/errorsActionCreators";
+import { TwoPicker } from "../pickers/TwoPicker";
+import moment from "moment";
 
 interface IDispatchToProps {
   duplicateRuleAssignments: () => MutationTuple<
     any,
-    { start: Date; end: Date; targetStart: Date; options?: { repeat: number } }
+    {
+      start: Date;
+      end: Date;
+      targetStarts: Date[];
+      options?: { repeat?: number; mode: string };
+    }
   >;
   deleteRuleAssignments: () => MutationTuple<
     { deleteParkingRuleAssignment: any },
@@ -55,7 +62,9 @@ const styles = stylesheet({
   destinations: {
     display: "grid",
     justifyItems: "right",
+    alignItems: "bottom",
     gridRowGap: "0.4em",
+    minHeight: "6em",
     $nest: {
       "> div > button": {
         marginLeft: "0.4em"
@@ -68,7 +77,18 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
   const [copyEffect] = props.duplicateRuleAssignments();
   const [deleteEffect] = props.deleteRuleAssignments();
 
+  const [targetMode, setTargetMode] = useState("MULTI");
   const [target, setTarget] = useState<Date>(null);
+  const [targets, setTargets] = useState<Date[]>([null]);
+
+  const addTarget = () => {
+    setTargets([...targets, null]);
+  };
+  const deleteTarget = (index: number) => {
+    targets.splice(index, 1);
+    setTargets([...targets]);
+  };
+
   const [copyRepeat, setCopyRepeat] = useState(1);
   const clear = () => {
     setTarget(null);
@@ -85,14 +105,26 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
       min = Math.min(Number(sStart), min);
       max = Math.max(sEnd, max);
     });
-    return copyEffect({
-      variables: {
-        start: new Date(min),
-        end: new Date(max),
-        targetStart: target,
-        options: { repeat: copyRepeat }
-      }
-    }).then(result => {
+    const variables = {
+      start: new Date(min),
+      end: new Date(max),
+      targetStarts: undefined,
+      options: { mode: targetMode, repeat: undefined }
+    };
+    if (targetMode === "MULTI") {
+      variables.targetStarts = targets
+        .filter(t => t !== null)
+        .map(t => {
+          t.setHours(0, 0, 0, 0);
+          return t;
+        });
+    } else {
+      // REPEAT
+      variables.targetStarts = [target];
+      variables.options.repeat = copyRepeat;
+    }
+    console.log(variables);
+    return copyEffect({ variables }).then(result => {
       const data = result.data.duplicateParkingRuleAssignments;
       if (data.__typename === "ParkingRuleAssignmentResultError") {
         const joinedCollisions = data.collisions
@@ -139,34 +171,102 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
 
   const dontCopy = useMemo(
     () =>
-      target === null ||
-      Object.keys(props.selectedDays).length === 0 ||
-      copyRepeat < 1,
-    [target, props.selectedDays]
+      (targetMode === "MULTI" &&
+        (targets.every(t => t === null) || targets.length === 0)) ||
+      (targetMode === "REPEAT" && (target === null || copyRepeat < 1)) ||
+      Object.keys(props.selectedDays).length === 0,
+    [target, targets, props.selectedDays, targetMode, copyRepeat]
   );
   const dontDelete = Object.keys(props.selectedDays).length === 0;
   return (
     <div>
       <div className={styles.quickActions}>
-        <p>Copy Destination</p>
-        <input
-          type="date"
-          value={target !== null ? target.toISOString().slice(0, 10) : ""}
-          onChange={e => {
-            const value = e.target.value;
-            const date = new Date(value);
-            if (isNaN(date.getTime())) {
-              setTarget(null);
-            } else {
-              setTarget(date);
-            }
-          }}
-        />
-        <p>Copy Repetitions</p>
-        <NumberInput
-          value={copyRepeat}
-          onChange={value => setCopyRepeat(value)}
-        />
+        <div>
+          <p>Copy Destination</p>
+          <TwoPicker
+            optionLeft="MULTI"
+            optionRight="REPEAT"
+            rightIsSelected={targetMode === "REPEAT"}
+            onChange={value => setTargetMode(value)}
+          />
+        </div>
+        <div className={styles.destinations}>
+          {targetMode === "MULTI" ? (
+            <>
+              {targets.map((target, i) => (
+                <div key={`${i}_${target}`}>
+                  <input
+                    type="date"
+                    value={
+                      target != null ? target.toISOString().slice(0, 10) : null
+                    }
+                    onChange={e => {
+                      const value = e.target.value;
+                      targets[i] = new Date(value);
+                      if (isNaN(targets[i].getTime())) {
+                        targets[i] = null;
+                      }
+                      setTargets([...targets]);
+                    }}
+                  />
+                  <Button
+                    type="negative"
+                    small={true}
+                    onClick={() => deleteTarget(i)}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              ))}
+              <Button type="positive" small={true} onClick={addTarget}>
+                Add More
+              </Button>
+            </>
+          ) : (
+            <>
+              <div
+                style={{
+                  marginTop: "1.1em",
+                  marginBottom: "-1.1em"
+                }}
+              >
+                <input
+                  type="date"
+                  value={
+                    target !== null ? target.toISOString().slice(0, 10) : ""
+                  }
+                  onChange={e => {
+                    const value = e.target.value;
+                    const date = new Date(value);
+                    if (isNaN(date.getTime())) {
+                      setTarget(null);
+                    } else {
+                      setTarget(
+                        moment(value)
+                          .startOf("day")
+                          .toDate()
+                      );
+                    }
+                  }}
+                />
+              </div>
+              <div
+                style={{
+                  display: "grid",
+                  gridColumnGap: "0.5em",
+                  alignItems: "center",
+                  gridTemplateColumns: "auto 5em"
+                }}
+              >
+                <span>Copy Repetitions</span>
+                <NumberInput
+                  value={copyRepeat}
+                  onChange={value => setCopyRepeat(value)}
+                />
+              </div>
+            </>
+          )}
+        </div>
       </div>
       <div className={styles.controls}>
         <Button type="primary" disabled={dontCopy} onClick={copyAndClear}>
