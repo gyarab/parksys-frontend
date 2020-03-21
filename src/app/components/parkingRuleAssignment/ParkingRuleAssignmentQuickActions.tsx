@@ -113,8 +113,8 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
     });
     return deleteEffect({
       variables: {
-        start: new Date(min),
-        end: new Date(max)
+        start: new Date(min - 1), // Ugly yet functional fix
+        end: new Date(max + 1)
       }
     });
   };
