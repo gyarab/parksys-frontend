@@ -120,7 +120,9 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
         });
     } else {
       // REPEAT
-      variables.targetStarts = [target];
+      const date = new Date(target);
+      date.setHours(0, 0, 0, 0);
+      variables.targetStarts = [date];
       variables.options.repeat = copyRepeat;
     }
     console.log(variables);
@@ -241,11 +243,7 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
                     if (isNaN(date.getTime())) {
                       setTarget(null);
                     } else {
-                      setTarget(
-                        moment(value)
-                          .startOf("day")
-                          .toDate()
-                      );
+                      setTarget(date);
                     }
                   }}
                 />
