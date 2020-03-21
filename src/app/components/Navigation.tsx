@@ -30,7 +30,7 @@ const classNames = stylesheet({
   },
   navItem: {
     width: "100%",
-    marginBottom: "10px",
+    marginBottom: "0.4em",
     $nest: {
       a: {
         color: Color.WHITE,
@@ -38,6 +38,7 @@ const classNames = stylesheet({
         fontWeight: "bold",
         width: "100%",
         display: "block",
+        borderRadius: "2px",
         $nest: {
           "&:hover": {
             backgroundColor: Color.GREY

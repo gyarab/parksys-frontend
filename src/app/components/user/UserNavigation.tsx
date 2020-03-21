@@ -50,6 +50,7 @@ const classNames = stylesheet({
     padding: "0.3em",
     backgroundColor: Color.GREY,
     color: Color.WHITE,
+    borderRadius: "3px",
     $nest: {
       "& p": {
         textAlign: "center"

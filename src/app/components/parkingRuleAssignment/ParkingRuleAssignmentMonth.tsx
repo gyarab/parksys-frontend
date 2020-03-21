@@ -12,10 +12,8 @@ import {
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { CloseAction } from "./CloseAction";
-import { ParkingRuleAssignmentCopyPanel } from "./ParkingRuleAssignmentCopyPanel";
+import { ParkingRuleAssignmentQuickActions } from "./ParkingRuleAssignmentQuickActions";
 import { Flag, FlagType } from "../Flag";
-import { ParkingRuleAssignmentMultiDelete } from "./ParkingRuleAssignmentMultiDelete";
-import { TwoPicker } from "../pickers/TwoPicker";
 import { Checkbox, IProps as CheckboxProps } from "../Checkbox";
 
 interface IStateToProps {
@@ -415,8 +413,7 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
         <div>
           <h3>Quick Actions</h3>
 
-          <ParkingRuleAssignmentCopyPanel refetch={props.onNewOrDel} />
-          <ParkingRuleAssignmentMultiDelete refetch={props.onNewOrDel} />
+          <ParkingRuleAssignmentQuickActions refetch={props.onNewOrDel} />
         </div>
       </div>
     </div>
