@@ -15,6 +15,8 @@ import { CloseAction } from "./CloseAction";
 import { ParkingRuleAssignmentCopyPanel } from "./ParkingRuleAssignmentCopyPanel";
 import { Flag, FlagType } from "../Flag";
 import { ParkingRuleAssignmentMultiDelete } from "./ParkingRuleAssignmentMultiDelete";
+import { TwoPicker } from "../pickers/TwoPicker";
+import { Checkbox, IProps as CheckboxProps } from "../Checkbox";
 
 interface IStateToProps {
   selectedDays: IRulePageState["selectedDays"];
@@ -206,62 +208,29 @@ const ParkingAssignmentCalendarCell = ({
 };
 
 const cellSelectorStyles = stylesheet({
-  cellSelector: {
-    border: `2px solid ${Color.LIGHT_GREY}`,
-    borderRadius: "2px",
-    marginRight: "0.3em",
-    float: "right",
-    width: "1.2em",
-    height: "1.2em",
-    transition: "0.2s all ease-out",
-    $nest: {
-      "&:hover": {
-        border: `3px solid ${Color.BLUE}`
-      }
-    }
-  },
-  selectedCellSelectorExact: {
-    borderColor: Color.ORANGE,
-    backgroundColor: Color.ORANGE,
-    $nest: {
-      "&:hover": {
-        border: `3px solid ${Color.LIGHT_RED}`,
-        backgroundColor: "transparent"
-      }
-    }
-  },
-  // Don't change appearance on hover
-  selectedCellSelectorRange: {
-    borderColor: Color.BLUE,
-    backgroundColor: Color.BLUE,
-    $nest: {
-      "&:hover": {
-        border: `3px solid ${Color.BLUE}`,
-        backgroundColor: Color.BLUE
-      }
-    }
-  }
+  checkboxExact: {}
 });
 
 const CellSelector = ({ dayStart, dayEnd, selectMode, select }) => {
-  const selectedClass = ((): string | null => {
+  const selectedClass: CheckboxProps["extraClass"] = (() => {
     switch (selectMode) {
       case "exact":
-        return cellSelectorStyles.selectedCellSelectorExact;
+        return "selectedOrange";
       case "range":
-        return cellSelectorStyles.selectedCellSelectorRange;
+        return "onHoverUnselectable";
       default:
         return null;
     }
   })();
   return (
-    <div
-      className={classes(cellSelectorStyles.cellSelector, selectedClass)}
+    <Checkbox
+      selected={selectMode !== "none"}
       onClick={e => {
         e.stopPropagation();
         select([dayStart, dayEnd]);
       }}
-    ></div>
+      extraClass={selectedClass}
+    />
   );
 };
 
@@ -445,6 +414,7 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
         </div>
         <div>
           <h3>Quick Actions</h3>
+
           <ParkingRuleAssignmentCopyPanel refetch={props.onNewOrDel} />
           <ParkingRuleAssignmentMultiDelete refetch={props.onNewOrDel} />
         </div>

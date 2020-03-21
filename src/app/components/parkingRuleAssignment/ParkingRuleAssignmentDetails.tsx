@@ -18,6 +18,7 @@ import SaveStatus from "../../constants/SaveStatus";
 import { useNumberInput } from "../pickers/NumberInput";
 import { CloseAction } from "./CloseAction";
 import { ERRORS_SET_PAGE_ERROR } from "../../redux/modules/errorsActionCreators";
+import { Checkbox } from "../Checkbox";
 
 const styles = stylesheet({
   options: {
@@ -129,11 +130,7 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
   const [filtersPicker, filters, setFilters] = useVehicleFilterMultiPicker({
     initialModels: props.assignment.vehicleFilters
   });
-  const [
-    activePicker,
-    { value: active },
-    { setValue: setActive }
-  ] = useTwoPicker("NO", "YES", props.assignment.active);
+  const [active, setActive] = useState(props.assignment.active);
 
   const setOriginalValues = () => {
     setStart(new Date(props.assignment.start));
@@ -231,7 +228,7 @@ const ParkingRuleAssignmentDetails = (props: IProps) => {
     <div className={styles.details}>
       <div className={styles.options}>
         <span>Active</span>
-        {activePicker}
+        <Checkbox onClick={() => setActive(!active)} selected={active} />
         <span>Start</span>
         {startPicker}
         <span>End</span>
