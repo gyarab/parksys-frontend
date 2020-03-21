@@ -237,52 +237,11 @@ const cbStyles = stylesheet({
       }
     }
   },
-  rangeTargettable: {
-    borderColor: Color.BLUE,
-    $nest: {
-      "&:hover": {
-        width: 0,
-        height: 0,
-        borderWidth: "0.6em",
-        borderLeftColor: Color.BLUE,
-        borderTopColor: Color.BLUE,
-        borderRightColor: Color.BLACK,
-        borderBottomColor: Color.BLACK
-      }
-    }
-  },
-  rangeTarget: {
-    borderLeftColor: Color.BLUE,
-    borderTopColor: Color.BLUE,
-    borderRightColor: Color.BLACK,
-    borderBottomColor: Color.BLACK
-    // TODO HOVER
-  },
   target: {
     borderColor: Color.BLACK
   },
   exactTargettable: {
     borderColor: Color.ORANGE,
-    $nest: {
-      "&:hover": {
-        width: 0,
-        height: 0,
-        borderWidth: "0.6em",
-        borderLeftColor: Color.ORANGE,
-        borderTopColor: Color.ORANGE,
-        borderRightColor: Color.BLACK,
-        borderBottomColor: Color.BLACK
-      }
-    }
-  },
-  exactTarget: {
-    borderLeftColor: Color.ORANGE,
-    borderTopColor: Color.ORANGE,
-    borderRightColor: Color.BLACK,
-    borderBottomColor: Color.BLACK
-  },
-  targetExactable: {
-    borderColor: Color.BLACK,
     $nest: {
       "&:hover": {
         width: 0,
@@ -313,20 +272,10 @@ const CellSelector = ({
   dayTypeBeingSelected
 }) => {
   const selectedClass: string | null = (() => {
-    if (selectMode.exact && selectMode.target) {
-      return cbStyles.exactTarget;
-    } else if (selectMode.exact && dayTypeBeingSelected === "target") {
-      return cbStyles.exactTargettable;
-    } else if (selectMode.exact) {
+    if (selectMode.exact) {
       return cbStyles.exact;
-    } else if (selectMode.range && selectMode.target) {
-      return cbStyles.rangeTarget;
-    } else if (selectMode.range && dayTypeBeingSelected === "target") {
-      return cbStyles.rangeTargettable;
     } else if (selectMode.range) {
       return cbStyles.range;
-    } else if (selectMode.target && dayTypeBeingSelected === "source") {
-      return cbStyles.targetExactable;
     } else if (selectMode.target) {
       return cbStyles.target;
     } else if (dayTypeBeingSelected === "target") {

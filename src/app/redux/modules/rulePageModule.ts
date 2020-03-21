@@ -109,6 +109,7 @@ const setSelectedDays = (
   const [start, end] = action.payload;
   // Copy
   const selectedDays = { ...state.selectedDays };
+  console.log("WHHT", selectedDays, state.daySelectorMode);
   if (state.selectedDays[start.getTime()] === end.getTime()) {
     // Remove
     delete selectedDays[start.getTime()];
@@ -117,6 +118,7 @@ const setSelectedDays = (
     (state.daySelectorMode === "continuous" &&
       Object.keys(selectedDays).length < 2)
   ) {
+    console.log("HEY");
     selectedDays[start.getTime()] = end.getTime();
   }
   return selectedDays;
@@ -126,10 +128,26 @@ const setTargetDays = (
   state: IRulePageState,
   action: SetSelectedDay
 ): IRulePageState["targetDays"] => {
-  if (action.payload === null) {
+  console.log("TARGET");
+  console.log("TARGET");
+  if (action.payload !== null) {
+    const [start, end] = action.payload;
+    let min: number = Number.POSITIVE_INFINITY;
+    let max: number = Number.NEGATIVE_INFINITY;
+    // O(2)
+    Object.keys(state.selectedDays).forEach(sStart => {
+      const sEnd = state.selectedDays[sStart];
+      min = Math.min(Number(sStart), min);
+      max = Math.max(Number(sEnd), max);
+    });
+    if (min <= start.getTime() && end.getTime() <= max) {
+      return state.targetDays;
+    }
+  } else {
     // Clear
     return initialState.targetDays;
   }
+  console.log("TARGET2");
   const [start, end] = action.payload;
   // Copy
   const targetDays = { ...state.targetDays };
@@ -216,16 +234,25 @@ export function rulePageReducer(
       };
     case SET_SELECTED_DAY:
       if (state.dayTypeBeingSelected === "source") {
-        console.log("srcsrc");
+        const selectedDays = setSelectedDays(state, action);
+        let dayType: IRulePageState["dayTypeBeingSelected"] =
+          state.dayTypeBeingSelected;
+        if (
+          Object.keys(selectedDays).length === 2 &&
+          state.dayTypeBeingSelected === "source"
+        ) {
+          dayType = "target";
+        }
         return {
           ...state,
-          selectedDays: setSelectedDays(state, action)
+          selectedDays: selectedDays,
+          dayTypeBeingSelected: dayType
         };
       } else if (state.dayTypeBeingSelected === "target") {
-        console.log("trgtrg");
+        const targetDays = setTargetDays(state, action);
         return {
           ...state,
-          targetDays: setTargetDays(state, action)
+          targetDays: targetDays
         };
       } else {
         return state;

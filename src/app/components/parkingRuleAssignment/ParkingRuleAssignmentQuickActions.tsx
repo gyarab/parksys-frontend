@@ -38,7 +38,9 @@ interface IDispatchToProps {
     { start: Date; end: Date }
   >;
   setPageError: (err: string) => void;
-  setDayTypeBeingSelected: (t: SetDayTypeBeingSelected["payload"]) => void;
+  setDayTypeBeingSelected: (
+    t: SetDayTypeBeingSelected["payload"] | any
+  ) => void;
   clearTargetDays: () => void;
   clearSelectedDays: () => void;
   setSelectedDays: (days: SetSelectedDay["payload"]) => void;
@@ -213,6 +215,14 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
               )
             }
           />
+          <TwoPicker
+            optionLeft="SOURCE"
+            optionRight="TARGET"
+            rightIsSelected={props.dayTypeBeingSelected === "target"}
+            onChange={value =>
+              props.setDayTypeBeingSelected(value.toLowerCase())
+            }
+          />
         </div>
         <div className={styles.destinations}>
           {Object.keys(props.targetDays)
@@ -234,63 +244,22 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
                 </Button>
               </div>
             ))}
-          {/* {targetMode === "MULTI" ? (
-            <>
-              {Object.keys(props.targetDays).map(t => new Date(Number(t))).map((target, i) => (
-                <div key={`${i}_${target}`}>
-                  {target.toISOString().slice(0, 10)}
-                  <Button
-                    type="negative"
-                    small={true}
-                    onClick={() => props.setSelectedDays([target, target])}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              ))}
-            </> */}
-          <>
-            {/* <div
-                style={{
-                  marginTop: "1.1em",
-                  marginBottom: "-1.1em"}}
-              >
-                <input
-                  type="date"
-                  value={
-                    target !== null ? target.toISOString().slice(0, 10) : ""
-                  }
-                  onChange={e => {
-                    const value = e.target.value;
-                    const date = new Date(value);
-                    if (isNaN(date.getTime())) {
-                      setTarget(null);
-                    } else {
-                      setTarget(date);
-                    }
-                  }}
-                />
-              </div> */}
-            {targetMode === TargetMode.REPEAT ? (
-              <>
-                <div
-                  style={{
-                    display: "grid",
-                    gridColumnGap: "0.5em",
-                    alignItems: "center",
-                    gridTemplateColumns: "auto 5em"
-                  }}
-                >
-                  <span>Copy Repetitions</span>
-                  <NumberInput
-                    value={copyRepeat}
-                    onChange={value => setCopyRepeat(value)}
-                  />
-                </div>
-              </>
-            ) : null}
-          </>
-          <Button onClick={setDayType}>{props.dayTypeBeingSelected}</Button>
+          {targetMode === TargetMode.REPEAT ? (
+            <div
+              style={{
+                display: "grid",
+                gridColumnGap: "0.5em",
+                alignItems: "center",
+                gridTemplateColumns: "auto 5em"
+              }}
+            >
+              <span>Copy Repetitions</span>
+              <NumberInput
+                value={copyRepeat}
+                onChange={value => setCopyRepeat(value)}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
       <div className={styles.controls}>
