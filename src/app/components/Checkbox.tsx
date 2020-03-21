@@ -10,7 +10,7 @@ const styles = stylesheet({
     float: "right",
     width: "1.2em",
     height: "1.2em",
-    transition: "0.2s all ease-out",
+    transition: "0.2s border-color ease-out",
     $nest: {
       "&:hover": {
         border: `3px solid ${Color.BLUE}`
@@ -18,31 +18,15 @@ const styles = stylesheet({
     }
   },
   selected: {
+    width: 0,
+    height: 0,
+    borderWidth: "0.6em",
     borderColor: Color.BLUE,
-    backgroundColor: Color.BLUE,
     $nest: {
       "&:hover": {
-        border: `3px solid ${Color.LIGHT_RED}`,
-        backgroundColor: "transparent"
-      }
-    }
-  },
-  onHoverUnselectable: {
-    borderColor: Color.BLUE,
-    backgroundColor: Color.BLUE,
-    $nest: {
-      "&:hover": {
-        border: `3px solid ${Color.BLUE}`,
-        backgroundColor: Color.BLUE
-      }
-    }
-  },
-  selectedOrange: {
-    borderColor: Color.ORANGE,
-    backgroundColor: Color.ORANGE,
-    $nest: {
-      "&:hover": {
-        border: `3px solid ${Color.LIGHT_RED}`,
+        width: "1.2em",
+        height: "1.2em",
+        borderColor: Color.LIGHT_RED,
         backgroundColor: "transparent"
       }
     }
@@ -52,14 +36,14 @@ const styles = stylesheet({
 export interface IProps {
   onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   selected: boolean;
-  extraClass?: "selectedOrange" | "onHoverUnselectable";
+  extraClass?: string;
 }
 
 export const Checkbox = (props: IProps) => {
   const cls = classes(
     styles.checkbox,
     props.selected ? styles.selected : null,
-    props.extraClass !== null ? styles[props.extraClass] : null
+    props.extraClass
   );
   return <div className={cls} onClick={props.onClick}></div>;
 };

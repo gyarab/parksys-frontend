@@ -65,6 +65,31 @@ export interface SetDaySelectorMode {
   payload: IRulePageState["daySelectorMode"];
 }
 
+export const SET_DAY_TYPE_BEING_SELECTED =
+  "RULE_PAGE/SET_DAY_TYPE_BEING_SELECTED";
+export interface SetDayTypeBeingSelected {
+  type: typeof SET_DAY_TYPE_BEING_SELECTED;
+  payload: IRulePageState["dayTypeBeingSelected"];
+}
+
+export const CLEAR_TARGET_DAYS = "RULE_PAGE/CLEAR_TARGET_DAYS";
+export interface ClearTargetDays {
+  type: typeof CLEAR_TARGET_DAYS;
+  payload: null;
+}
+
+export const CLEAR_SELECTED_DAYS = "RULE_PAGE/CLEAR_SELECTED_DAYS";
+export interface ClearSelectedDays {
+  type: typeof CLEAR_SELECTED_DAYS;
+  payload: null;
+}
+
+export const SET_MAX_TARGET_DAYS = "RULE_PAGE/SET_MAX_TARGET_DAYS";
+export interface SetMaxTargetDays {
+  type: typeof SET_MAX_TARGET_DAYS;
+  payload: number;
+}
+
 export type RulePageActionTypes =
   | ChangeOpenedRuleAssignment
   | SetQueryVars
@@ -74,4 +99,8 @@ export type RulePageActionTypes =
   | SetVehicleFilter
   | SetParkingRule
   | SetSelectedDay
-  | SetDaySelectorMode;
+  | SetDaySelectorMode
+  | SetDayTypeBeingSelected
+  | ClearTargetDays
+  | ClearSelectedDays
+  | SetMaxTargetDays;

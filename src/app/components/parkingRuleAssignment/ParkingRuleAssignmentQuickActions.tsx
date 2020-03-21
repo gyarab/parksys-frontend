@@ -11,13 +11,17 @@ import { IStore } from "../../redux/IStore";
 import { Button } from "../Button";
 import {
   SetSelectedDay,
-  SET_SELECTED_DAY
+  SET_SELECTED_DAY,
+  SetDayTypeBeingSelected,
+  SET_DAY_TYPE_BEING_SELECTED,
+  CLEAR_TARGET_DAYS,
+  CLEAR_SELECTED_DAYS,
+  SET_MAX_TARGET_DAYS
 } from "../../redux/modules/rulePageActionCreators";
 import { stylesheet } from "typestyle";
 import { NumberInput } from "../pickers/NumberInput";
 import { ERRORS_SET_PAGE_ERROR } from "../../redux/modules/errorsActionCreators";
 import { TwoPicker } from "../pickers/TwoPicker";
-import moment from "moment";
 
 interface IDispatchToProps {
   duplicateRuleAssignments: () => MutationTuple<
@@ -33,13 +37,20 @@ interface IDispatchToProps {
     { deleteParkingRuleAssignment: any },
     { start: Date; end: Date }
   >;
-  setSelectedDays: (days: SetSelectedDay["payload"]) => void;
   setPageError: (err: string) => void;
+  setDayTypeBeingSelected: (t: SetDayTypeBeingSelected["payload"]) => void;
+  clearTargetDays: () => void;
+  clearSelectedDays: () => void;
+  setSelectedDays: (days: SetSelectedDay["payload"]) => void;
+  setMaxTargetDays: (n: number) => void;
 }
 
 interface IStateToProps {
   selectedDays: IRulePageState["selectedDays"];
   daySelectorMode: IRulePageState["daySelectorMode"];
+  dayTypeBeingSelected: IRulePageState["dayTypeBeingSelected"];
+  targetDays: IRulePageState["targetDays"];
+  maxTargetDays: IRulePageState["maxTargetDays"];
 }
 
 interface IProps extends IDispatchToProps, IStateToProps {
@@ -73,27 +84,37 @@ const styles = stylesheet({
   }
 });
 
+enum TargetMode {
+  MULTI = -1,
+  REPEAT = 1
+}
+
 const ParkingRuleAssignmentQuickActions = (props: IProps) => {
   const [copyEffect] = props.duplicateRuleAssignments();
   const [deleteEffect] = props.deleteRuleAssignments();
 
-  const [targetMode, setTargetMode] = useState("MULTI");
-  const [target, setTarget] = useState<Date>(null);
-  const [targets, setTargets] = useState<Date[]>([null]);
+  const targetMode =
+    props.maxTargetDays === -1 ? TargetMode.MULTI : TargetMode.REPEAT;
+  // const [target, setTarget] = useState<Date>(null);
+  // const [targets, setTargets] = useState<Date[]>([null]);
 
-  const addTarget = () => {
-    setTargets([...targets, null]);
+  const setTargetMode = (mode: number) => {
+    props.setMaxTargetDays(mode);
+    props.clearTargetDays();
   };
-  const deleteTarget = (index: number) => {
-    targets.splice(index, 1);
-    setTargets([...targets]);
+  const setDayType = () => {
+    if (props.dayTypeBeingSelected === "source") {
+      props.setDayTypeBeingSelected("target");
+    } else if (props.dayTypeBeingSelected === "target") {
+      props.setDayTypeBeingSelected("source");
+    }
   };
 
   const [copyRepeat, setCopyRepeat] = useState(1);
   const clear = () => {
-    setTarget(null);
-    props.setSelectedDays(null);
-    // Refetch
+    props.clearSelectedDays();
+    props.clearTargetDays();
+    props.setDayTypeBeingSelected("source");
     props.refetch();
   };
   const copy = (): Promise<any> => {
@@ -109,23 +130,26 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
       start: new Date(min),
       end: new Date(max),
       targetStarts: undefined,
-      options: { mode: targetMode, repeat: undefined }
+      options: {
+        mode: targetMode === -1 ? "MULTI" : "REPEAT",
+        repeat: undefined
+      }
     };
-    if (targetMode === "MULTI") {
-      variables.targetStarts = targets
-        .filter(t => t !== null)
-        .map(t => {
-          t.setHours(0, 0, 0, 0);
-          return t;
+    if (targetMode === TargetMode.MULTI) {
+      variables.targetStarts = Object.keys(props.targetDays)
+        .filter(key => props.targetDays[key] !== null)
+        .map(key => {
+          const date = new Date(Number(key));
+          date.setHours(0, 0, 0, 0);
+          return date;
         });
     } else {
       // REPEAT
-      const date = new Date(target);
+      const date = new Date(Number(Object.keys(props.targetDays)[0]));
       date.setHours(0, 0, 0, 0);
       variables.targetStarts = [date];
       variables.options.repeat = copyRepeat;
     }
-    console.log(variables);
     return copyEffect({ variables }).then(result => {
       const data = result.data.duplicateParkingRuleAssignments;
       if (data.__typename === "ParkingRuleAssignmentResultError") {
@@ -158,12 +182,6 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
       return v;
     });
   };
-  // Could be done by offsetting
-  const move = () => {
-    copy()
-      .then(deleteAssignments)
-      .finally(clear);
-  };
 
   const copyAndClear = () =>
     copy()
@@ -171,15 +189,15 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
       .finally(clear);
   const deleteAssignmentsAndClear = () => deleteAssignments().finally(clear);
 
-  const dontCopy = useMemo(
-    () =>
-      (targetMode === "MULTI" &&
-        (targets.every(t => t === null) || targets.length === 0)) ||
-      (targetMode === "REPEAT" && (target === null || copyRepeat < 1)) ||
-      Object.keys(props.selectedDays).length === 0,
-    [target, targets, props.selectedDays, targetMode, copyRepeat]
-  );
+  // const dontCopy = useMemo(
+  //   () =>
+  //     (targetMode === "MULTI" &&
+  //     (targetMode === "REPEAT" && (target === null || copyRepeat < 1)) ||
+  //     Object.keys(props.selectedDays).length === 0,
+  //   [target, targets, props.selectedDays, targetMode, copyRepeat]
+  // );
   const dontDelete = Object.keys(props.selectedDays).length === 0;
+  const dontCopy = dontDelete && Object.keys(props.targetDays).length === 0;
   return (
     <div>
       <div className={styles.quickActions}>
@@ -188,49 +206,54 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
           <TwoPicker
             optionLeft="MULTI"
             optionRight="REPEAT"
-            rightIsSelected={targetMode === "REPEAT"}
-            onChange={value => setTargetMode(value)}
+            rightIsSelected={targetMode === TargetMode.REPEAT}
+            onChange={value =>
+              setTargetMode(
+                value === "MULTI" ? TargetMode.MULTI : TargetMode.REPEAT
+              )
+            }
           />
         </div>
         <div className={styles.destinations}>
-          {targetMode === "MULTI" ? (
+          {Object.keys(props.targetDays)
+            .map(t => new Date(Number(t)))
+            .map((target, i) => (
+              <div key={`${i}_${target}`}>
+                {target.toISOString().slice(0, 10)}
+                <Button
+                  type="negative"
+                  small={true}
+                  onClick={() =>
+                    props.setSelectedDays([
+                      target,
+                      new Date(props.targetDays[String(target.getTime())])
+                    ])
+                  }
+                >
+                  Delete
+                </Button>
+              </div>
+            ))}
+          {/* {targetMode === "MULTI" ? (
             <>
-              {targets.map((target, i) => (
+              {Object.keys(props.targetDays).map(t => new Date(Number(t))).map((target, i) => (
                 <div key={`${i}_${target}`}>
-                  <input
-                    type="date"
-                    value={
-                      target != null ? target.toISOString().slice(0, 10) : null
-                    }
-                    onChange={e => {
-                      const value = e.target.value;
-                      targets[i] = new Date(value);
-                      if (isNaN(targets[i].getTime())) {
-                        targets[i] = null;
-                      }
-                      setTargets([...targets]);
-                    }}
-                  />
+                  {target.toISOString().slice(0, 10)}
                   <Button
                     type="negative"
                     small={true}
-                    onClick={() => deleteTarget(i)}
+                    onClick={() => props.setSelectedDays([target, target])}
                   >
                     Delete
                   </Button>
                 </div>
               ))}
-              <Button type="positive" small={true} onClick={addTarget}>
-                Add More
-              </Button>
-            </>
-          ) : (
-            <>
-              <div
+            </> */}
+          <>
+            {/* <div
                 style={{
                   marginTop: "1.1em",
-                  marginBottom: "-1.1em"
-                }}
+                  marginBottom: "-1.1em"}}
               >
                 <input
                   type="date"
@@ -247,31 +270,32 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
                     }
                   }}
                 />
-              </div>
-              <div
-                style={{
-                  display: "grid",
-                  gridColumnGap: "0.5em",
-                  alignItems: "center",
-                  gridTemplateColumns: "auto 5em"
-                }}
-              >
-                <span>Copy Repetitions</span>
-                <NumberInput
-                  value={copyRepeat}
-                  onChange={value => setCopyRepeat(value)}
-                />
-              </div>
-            </>
-          )}
+              </div> */}
+            {targetMode === TargetMode.REPEAT ? (
+              <>
+                <div
+                  style={{
+                    display: "grid",
+                    gridColumnGap: "0.5em",
+                    alignItems: "center",
+                    gridTemplateColumns: "auto 5em"
+                  }}
+                >
+                  <span>Copy Repetitions</span>
+                  <NumberInput
+                    value={copyRepeat}
+                    onChange={value => setCopyRepeat(value)}
+                  />
+                </div>
+              </>
+            ) : null}
+          </>
+          <Button onClick={setDayType}>{props.dayTypeBeingSelected}</Button>
         </div>
       </div>
       <div className={styles.controls}>
         <Button type="primary" disabled={dontCopy} onClick={copyAndClear}>
           Copy
-        </Button>
-        <Button type="primary" disabled={dontCopy} onClick={move}>
-          Move
         </Button>
         <Button
           type="primary"
@@ -288,7 +312,10 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
 const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
   return {
     selectedDays: state.rulePage.selectedDays,
-    daySelectorMode: state.rulePage.daySelectorMode
+    daySelectorMode: state.rulePage.daySelectorMode,
+    dayTypeBeingSelected: state.rulePage.dayTypeBeingSelected,
+    targetDays: state.rulePage.targetDays,
+    maxTargetDays: state.rulePage.maxTargetDays
   };
 };
 
@@ -296,18 +323,22 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
     duplicateRuleAssignments: () =>
       useMutation(RULE_PAGE_COPY_RULE_ASSIGNMENTS_MUTATION),
-
     deleteRuleAssignments: () =>
       useMutation(RULE_PAGE_DELETE_RULE_ASSIGNMENTS_MUTATION),
+    setPageError: payload => dispatch({ type: ERRORS_SET_PAGE_ERROR, payload }),
+    setDayTypeBeingSelected: payload =>
+      dispatch({ type: SET_DAY_TYPE_BEING_SELECTED, payload }),
+    clearTargetDays: () => dispatch({ type: CLEAR_TARGET_DAYS, payload: null }),
+    clearSelectedDays: () =>
+      dispatch({ type: CLEAR_SELECTED_DAYS, payload: null }),
     setSelectedDays: days =>
       dispatch({ type: SET_SELECTED_DAY, payload: days }),
-    setPageError: err => dispatch({ type: ERRORS_SET_PAGE_ERROR, payload: err })
+    setMaxTargetDays: n => dispatch({ type: SET_MAX_TARGET_DAYS, payload: n })
   };
 };
 
 const connected = connect(
   mapStateToProps,
-
   mapDispatchToProps
 )(ParkingRuleAssignmentQuickActions);
 

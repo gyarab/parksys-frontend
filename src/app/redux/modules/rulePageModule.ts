@@ -9,7 +9,12 @@ import {
   SET_PARKING_RULE,
   SET_SELECTED_DAY,
   SetSelectedDay,
-  SET_DAY_SELECTOR_MODE
+  SET_DAY_SELECTOR_MODE,
+  SET_DAY_TYPE_BEING_SELECTED,
+  SetDayTypeBeingSelected,
+  CLEAR_TARGET_DAYS,
+  CLEAR_SELECTED_DAYS,
+  SET_MAX_TARGET_DAYS
 } from "./rulePageActionCreators";
 import moment = require("moment");
 
@@ -56,6 +61,9 @@ export interface IRulePageState {
   };
   selectedDays: { [startTimestamp: number]: number };
   daySelectorMode: "continuous" | "separate" | "none";
+  dayTypeBeingSelected: "target" | "source";
+  targetDays: { [startTimestamp: number]: number };
+  maxTargetDays: number;
 }
 
 const defaultSelectedDay = () => new Date().toISOString().slice(0, 10);
@@ -84,7 +92,10 @@ export const initialState: IRulePageState = {
   selectedVehicleFilter: null,
   selectedParkingRule: null,
   selectedDays: {},
-  daySelectorMode: "continuous"
+  daySelectorMode: "continuous",
+  targetDays: {},
+  maxTargetDays: -1,
+  dayTypeBeingSelected: "source"
 };
 
 const setSelectedDays = (
@@ -109,6 +120,31 @@ const setSelectedDays = (
     selectedDays[start.getTime()] = end.getTime();
   }
   return selectedDays;
+};
+
+const setTargetDays = (
+  state: IRulePageState,
+  action: SetSelectedDay
+): IRulePageState["targetDays"] => {
+  if (action.payload === null) {
+    // Clear
+    return initialState.targetDays;
+  }
+  const [start, end] = action.payload;
+  // Copy
+  const targetDays = { ...state.targetDays };
+  if (state.targetDays[start.getTime()] === end.getTime()) {
+    // Remove
+    delete targetDays[start.getTime()];
+  } else if (
+    state.maxTargetDays === -1 ||
+    Object.keys(targetDays).length < state.maxTargetDays
+  ) {
+    // Add
+    console.log("ADD", Object.keys(targetDays).length, state.maxTargetDays);
+    targetDays[start.getTime()] = end.getTime();
+  }
+  return targetDays;
 };
 
 export function rulePageReducer(
@@ -179,10 +215,21 @@ export function rulePageReducer(
           : null
       };
     case SET_SELECTED_DAY:
-      return {
-        ...state,
-        selectedDays: setSelectedDays(state, action)
-      };
+      if (state.dayTypeBeingSelected === "source") {
+        console.log("srcsrc");
+        return {
+          ...state,
+          selectedDays: setSelectedDays(state, action)
+        };
+      } else if (state.dayTypeBeingSelected === "target") {
+        console.log("trgtrg");
+        return {
+          ...state,
+          targetDays: setTargetDays(state, action)
+        };
+      } else {
+        return state;
+      }
     case SET_DAY_SELECTOR_MODE:
       // Clear selectedDays when mode changes
       if (state.daySelectorMode !== action.payload) {
@@ -191,7 +238,29 @@ export function rulePageReducer(
           daySelectorMode: action.payload,
           selectedDays: initialState.selectedDays
         };
+      } else {
+        return state;
       }
+    case SET_DAY_TYPE_BEING_SELECTED:
+      return {
+        ...state,
+        dayTypeBeingSelected: action.payload
+      };
+    case CLEAR_TARGET_DAYS:
+      return {
+        ...state,
+        targetDays: initialState.targetDays
+      };
+    case CLEAR_SELECTED_DAYS:
+      return {
+        ...state,
+        selectedDays: initialState.selectedDays
+      };
+    case SET_MAX_TARGET_DAYS:
+      return {
+        ...state,
+        maxTargetDays: Math.max(initialState.maxTargetDays, action.payload)
+      };
     default:
       return state;
   }

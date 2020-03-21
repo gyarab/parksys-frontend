@@ -7,7 +7,9 @@ import { IStore } from "../../redux/IStore";
 import { IRulePageState } from "../../redux/modules/rulePageModule";
 import {
   SetSelectedDay,
-  SET_SELECTED_DAY
+  SET_SELECTED_DAY,
+  SetDayTypeBeingSelected,
+  SET_DAY_TYPE_BEING_SELECTED
 } from "../../redux/modules/rulePageActionCreators";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
@@ -19,10 +21,14 @@ import { Checkbox, IProps as CheckboxProps } from "../Checkbox";
 interface IStateToProps {
   selectedDays: IRulePageState["selectedDays"];
   daySelectorMode: IRulePageState["daySelectorMode"];
+  targetDays: IRulePageState["targetDays"];
+  dayTypeBeingSelected: IRulePageState["dayTypeBeingSelected"];
+  maxTargetDays: IRulePageState["maxTargetDays"];
 }
 
 interface IDispatchToProps {
   setSelectedDays: (days: SetSelectedDay["payload"]) => void;
+  setDayTypeBeingSelected: (days: SetDayTypeBeingSelected["payload"]) => void;
 }
 
 interface IProps extends IStateToProps, IDispatchToProps {
@@ -108,12 +114,22 @@ const styles = stylesheet({
       }
     }
   },
+  selectedCellTarget: {
+    boxShadow: `0 0 10px ${Color.BLACK}`,
+    borderColor: Color.BLACK,
+    $nest: {
+      "&:hover": {
+        boxShadow: `0 0 10px ${Color.BLACK}`
+      }
+    }
+  },
   sidePanel: {
     display: "grid",
     gridTemplateColumns: "1fr",
     gridTemplateRows: "10fr 9fr",
     gridRowGap: "0.5em"
-  }
+  },
+  onHoverRed: {}
 });
 
 const Cell = ({
@@ -128,13 +144,14 @@ const Cell = ({
   selectMode: CellSelectMode;
 }) => {
   const selectedClass = ((): string | null => {
-    switch (selectMode) {
-      case "exact":
-        return styles.selectedCellExact;
-      case "range":
-        return styles.selectedCellRange;
-      default:
-        return null;
+    if (selectMode.exact) {
+      return styles.selectedCellExact;
+    } else if (selectMode.range) {
+      return styles.selectedCellRange;
+    } else if (selectMode.target) {
+      return styles.selectedCellTarget;
+    } else {
+      return null;
     }
   })();
   return (
@@ -205,24 +222,120 @@ const ParkingAssignmentCalendarCell = ({
   );
 };
 
-const cellSelectorStyles = stylesheet({
-  checkboxExact: {}
+const cbStyles = stylesheet({
+  exact: {
+    borderColor: Color.ORANGE
+  },
+  range: {
+    borderColor: Color.BLUE,
+    $nest: {
+      "&:hover": {
+        width: 0,
+        height: 0,
+        borderWidth: "0.6em",
+        borderColor: Color.BLUE
+      }
+    }
+  },
+  rangeTargettable: {
+    borderColor: Color.BLUE,
+    $nest: {
+      "&:hover": {
+        width: 0,
+        height: 0,
+        borderWidth: "0.6em",
+        borderLeftColor: Color.BLUE,
+        borderTopColor: Color.BLUE,
+        borderRightColor: Color.BLACK,
+        borderBottomColor: Color.BLACK
+      }
+    }
+  },
+  rangeTarget: {
+    borderLeftColor: Color.BLUE,
+    borderTopColor: Color.BLUE,
+    borderRightColor: Color.BLACK,
+    borderBottomColor: Color.BLACK
+    // TODO HOVER
+  },
+  target: {
+    borderColor: Color.BLACK
+  },
+  exactTargettable: {
+    borderColor: Color.ORANGE,
+    $nest: {
+      "&:hover": {
+        width: 0,
+        height: 0,
+        borderWidth: "0.6em",
+        borderLeftColor: Color.ORANGE,
+        borderTopColor: Color.ORANGE,
+        borderRightColor: Color.BLACK,
+        borderBottomColor: Color.BLACK
+      }
+    }
+  },
+  exactTarget: {
+    borderLeftColor: Color.ORANGE,
+    borderTopColor: Color.ORANGE,
+    borderRightColor: Color.BLACK,
+    borderBottomColor: Color.BLACK
+  },
+  targetExactable: {
+    borderColor: Color.BLACK,
+    $nest: {
+      "&:hover": {
+        width: 0,
+        height: 0,
+        borderWidth: "0.6em",
+        borderLeftColor: Color.ORANGE,
+        borderTopColor: Color.ORANGE,
+        borderRightColor: Color.BLACK,
+        borderBottomColor: Color.BLACK
+      }
+    }
+  },
+  targettable: {
+    $nest: {
+      "&:hover": {
+        backgroundColor: Color.BLACK,
+        borderColor: Color.BLACK
+      }
+    }
+  }
 });
 
-const CellSelector = ({ dayStart, dayEnd, selectMode, select }) => {
-  const selectedClass: CheckboxProps["extraClass"] = (() => {
-    switch (selectMode) {
-      case "exact":
-        return "selectedOrange";
-      case "range":
-        return "onHoverUnselectable";
-      default:
-        return null;
+const CellSelector = ({
+  dayStart,
+  dayEnd,
+  selectMode,
+  select,
+  dayTypeBeingSelected
+}) => {
+  const selectedClass: string | null = (() => {
+    if (selectMode.exact && selectMode.target) {
+      return cbStyles.exactTarget;
+    } else if (selectMode.exact && dayTypeBeingSelected === "target") {
+      return cbStyles.exactTargettable;
+    } else if (selectMode.exact) {
+      return cbStyles.exact;
+    } else if (selectMode.range && selectMode.target) {
+      return cbStyles.rangeTarget;
+    } else if (selectMode.range && dayTypeBeingSelected === "target") {
+      return cbStyles.rangeTargettable;
+    } else if (selectMode.range) {
+      return cbStyles.range;
+    } else if (selectMode.target && dayTypeBeingSelected === "source") {
+      return cbStyles.targetExactable;
+    } else if (selectMode.target) {
+      return cbStyles.target;
+    } else if (dayTypeBeingSelected === "target") {
+      return cbStyles.targettable;
     }
   })();
   return (
     <Checkbox
-      selected={selectMode !== "none"}
+      selected={selectMode.exact || selectMode.range || selectMode.target}
       onClick={e => {
         e.stopPropagation();
         select([dayStart, dayEnd]);
@@ -232,18 +345,23 @@ const CellSelector = ({ dayStart, dayEnd, selectMode, select }) => {
   );
 };
 
-type CellSelectMode = "exact" | "range" | "none";
+type CellSelectMode = {
+  exact?: boolean;
+  range?: boolean;
+  target?: boolean;
+};
 
 const isCellSelected = (
   start: Date,
   end: Date,
   selectorMode: IProps["daySelectorMode"],
-  selectedDays: IProps["selectedDays"]
+  selectedDays: IProps["selectedDays"],
+  targetDays: IProps["targetDays"]
 ): CellSelectMode => {
+  const selectMode: CellSelectMode = {};
   if (selectedDays[start.getTime()] === end.getTime()) {
-    return "exact";
-  }
-  if (selectorMode == "continuous") {
+    selectMode.exact = true;
+  } else if (selectorMode == "continuous") {
     let min: number = Number.POSITIVE_INFINITY;
     let max: number = Number.NEGATIVE_INFINITY;
     // O(2)
@@ -253,10 +371,13 @@ const isCellSelected = (
       max = Math.max(sEnd, max);
     });
     if (min <= start.getTime() && end.getTime() <= max) {
-      return "range";
+      selectMode.range = true;
     }
   }
-  return "none";
+  if (targetDays[start.getTime()] === end.getTime()) {
+    selectMode.target = true;
+  }
+  return selectMode;
 };
 
 const ParkingRuleAssignmentMonth = (props: IProps) => {
@@ -282,6 +403,12 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
         .sort((a, b) => b._length - a._length),
     [props.data]
   );
+
+  const numTargetDays = Object.keys(props.targetDays).length;
+  const showCellSelector1 =
+    props.dayTypeBeingSelected === "target" &&
+    (props.maxTargetDays > numTargetDays || props.maxTargetDays === -1);
+  console.log(showCellSelector1, props.maxTargetDays);
 
   const startOffset = weekdayToOffsetStart[monthStart.weekday()];
   const endOffset = weekdayToOffsetEnd[end.weekday()];
@@ -321,8 +448,16 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
         dayStart,
         dayEnd,
         props.daySelectorMode,
-        props.selectedDays
+        props.selectedDays,
+        props.targetDays
       );
+      const showCellSelector =
+        showCellSelector1 ||
+        selectMode.exact ||
+        selectMode.range ||
+        selectMode.target ||
+        props.daySelectorMode !== "continuous" ||
+        Object.keys(props.selectedDays).length !== 2;
       const isToday =
         dayStart.getTime() <= now.getTime() &&
         now.getTime() <= dayEnd.getTime();
@@ -349,16 +484,15 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
             >
               {dayStart.getDate()}
             </span>
-            {selectMode === "none" &&
-            props.daySelectorMode === "continuous" &&
-            Object.keys(props.selectedDays).length === 2 ? null : (
+            {showCellSelector ? (
               <CellSelector
                 dayStart={dayStart}
                 dayEnd={dayEnd}
                 select={props.setSelectedDays}
                 selectMode={selectMode}
+                dayTypeBeingSelected={props.dayTypeBeingSelected}
               />
-            )}
+            ) : null}
           </div>
           <ParkingAssignmentCalendarCell
             dayStart={dayStart}
@@ -412,7 +546,6 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
         </div>
         <div>
           <h3>Quick Actions</h3>
-
           <ParkingRuleAssignmentQuickActions refetch={props.onNewOrDel} />
         </div>
       </div>
@@ -422,14 +555,20 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
 
 const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
   return {
+    targetDays: state.rulePage.targetDays,
     selectedDays: state.rulePage.selectedDays,
-    daySelectorMode: state.rulePage.daySelectorMode
+    daySelectorMode: state.rulePage.daySelectorMode,
+    dayTypeBeingSelected: state.rulePage.dayTypeBeingSelected,
+    maxTargetDays: state.rulePage.maxTargetDays
   };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
-    setSelectedDays: days => dispatch({ type: SET_SELECTED_DAY, payload: days })
+    setSelectedDays: days =>
+      dispatch({ type: SET_SELECTED_DAY, payload: days }),
+    setDayTypeBeingSelected: days =>
+      dispatch({ type: SET_DAY_TYPE_BEING_SELECTED, payload: days })
   };
 };
 
