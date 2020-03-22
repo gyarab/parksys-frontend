@@ -155,8 +155,10 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
     return copyEffect({ variables }).then(result => {
       const data = result.data.duplicateParkingRuleAssignments;
       if (data.__typename === "ParkingRuleAssignmentResultError") {
-        const joinedCollisions = data.collisions
-          .map(coll => coll.start.slice(0, 10))
+        const justDates = data.collisions.map(coll => coll.start.slice(0, 10));
+        const joinedCollisions = justDates
+          .filter((value, i) => justDates.indexOf(value) === i)
+          .sort()
           .join(", ");
         props.setPageError(`There are collisions on ${joinedCollisions}`);
       } else {
