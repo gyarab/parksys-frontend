@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 import { Color } from "../../constants";
-import { stylesheet, classes } from "typestyle";
+import { stylesheet } from "typestyle";
 
 const r = "5px";
+const hover = {
+  $nest: {
+    "&:hover": {
+      backgroundColor: Color.LBLUE,
+      color: "black"
+    }
+  }
+};
 const tpStyles = stylesheet({
   twoPicker: {
     display: "grid",
@@ -13,7 +21,8 @@ const tpStyles = stylesheet({
         borderTopLeftRadius: r,
         borderBottomLeftRadius: r,
         textAlign: "left",
-        borderRight: "2px solid black"
+        borderRight: "2px solid black",
+        ...hover
       },
       ".left.selected": {
         backgroundColor: Color.LIGHT_RED
@@ -21,7 +30,8 @@ const tpStyles = stylesheet({
       ".right": {
         borderTopRightRadius: r,
         borderBottomRightRadius: r,
-        textAlign: "right"
+        textAlign: "right",
+        ...hover
       },
       ".right.selected": {
         backgroundColor: Color.AQUAMARINE

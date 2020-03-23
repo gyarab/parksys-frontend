@@ -18,7 +18,12 @@ const classNames = stylesheet({
   },
   primary: {
     backgroundColor: Color.BLUE,
-    color: Color.BLACK
+    color: Color.BLACK,
+    $nest: {
+      "&:hover": {
+        backgroundColor: Color.LBLUE
+      }
+    }
   },
   secondary: {
     backgroundColor: Color.WHITE,
@@ -26,11 +31,21 @@ const classNames = stylesheet({
   },
   negative: {
     backgroundColor: Color.LIGHT_RED,
-    color: Color.BLACK
+    color: Color.BLACK,
+    $nest: {
+      "&:hover": {
+        backgroundColor: Color.LRED
+      }
+    }
   },
   positive: {
     backgroundColor: Color.AQUAMARINE,
-    color: Color.BLACK
+    color: Color.BLACK,
+    $nest: {
+      "&:hover": {
+        backgroundColor: Color.LIGHT_BLUE
+      }
+    }
   },
   small: {
     padding: "10px 12px"
