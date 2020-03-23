@@ -19,11 +19,11 @@ import { Flag, FlagType } from "../Flag";
 import { Checkbox, IProps as CheckboxProps } from "../Checkbox";
 
 interface IStateToProps {
-  selectedDays: IRulePageState["selectedDays"];
+  selectedDays: IRulePageState["sourceDays"];
   daySelectorMode: IRulePageState["daySelectorMode"];
-  targetDays: IRulePageState["targetDays"];
+  targetDays: IRulePageState["destinationDays"];
   dayTypeBeingSelected: IRulePageState["dayTypeBeingSelected"];
-  maxTargetDays: IRulePageState["maxTargetDays"];
+  maxTargetDays: IRulePageState["maxDestinationDays"];
 }
 
 interface IDispatchToProps {
@@ -355,9 +355,8 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
 
   const numTargetDays = Object.keys(props.targetDays).length;
   const showCellSelector1 =
-    props.dayTypeBeingSelected === "target" &&
+    props.dayTypeBeingSelected === "destination" &&
     (props.maxTargetDays > numTargetDays || props.maxTargetDays === -1);
-  console.log(showCellSelector1, props.maxTargetDays);
 
   const startOffset = weekdayToOffsetStart[monthStart.weekday()];
   const endOffset = weekdayToOffsetEnd[end.weekday()];
@@ -504,11 +503,11 @@ const ParkingRuleAssignmentMonth = (props: IProps) => {
 
 const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
   return {
-    targetDays: state.rulePage.targetDays,
-    selectedDays: state.rulePage.selectedDays,
+    targetDays: state.rulePage.destinationDays,
+    selectedDays: state.rulePage.sourceDays,
     daySelectorMode: state.rulePage.daySelectorMode,
     dayTypeBeingSelected: state.rulePage.dayTypeBeingSelected,
-    maxTargetDays: state.rulePage.maxTargetDays
+    maxTargetDays: state.rulePage.maxDestinationDays
   };
 };
 

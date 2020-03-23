@@ -49,11 +49,11 @@ interface IDispatchToProps {
 }
 
 interface IStateToProps {
-  selectedDays: IRulePageState["selectedDays"];
+  selectedDays: IRulePageState["sourceDays"];
   daySelectorMode: IRulePageState["daySelectorMode"];
   dayTypeBeingSelected: IRulePageState["dayTypeBeingSelected"];
-  targetDays: IRulePageState["targetDays"];
-  maxTargetDays: IRulePageState["maxTargetDays"];
+  destinationDays: IRulePageState["destinationDays"];
+  maxTargetDays: IRulePageState["maxDestinationDays"];
 }
 
 interface IProps extends IDispatchToProps, IStateToProps {
@@ -141,8 +141,8 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
       }
     };
     if (targetMode === TargetMode.MULTI) {
-      variables.targetStarts = Object.keys(props.targetDays)
-        .filter(key => props.targetDays[key] !== null)
+      variables.targetStarts = Object.keys(props.destinationDays)
+        .filter(key => props.destinationDays[key] !== null)
         .map(key => {
           const date = new Date(Number(key));
           date.setHours(0, 0, 0, 0);
@@ -150,7 +150,7 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
         });
     } else {
       // REPEAT
-      const date = new Date(Number(Object.keys(props.targetDays)[0]));
+      const date = new Date(Number(Object.keys(props.destinationDays)[0]));
       date.setHours(0, 0, 0, 0);
       variables.targetStarts = [date];
       variables.options.repeat = copyRepeat;
@@ -204,7 +204,8 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
   //   [target, targets, props.selectedDays, targetMode, copyRepeat]
   // );
   const dontDelete = Object.keys(props.selectedDays).length === 0;
-  const dontCopy = dontDelete && Object.keys(props.targetDays).length === 0;
+  const dontCopy =
+    dontDelete || Object.keys(props.destinationDays).length === 0;
   return (
     <div>
       <div className={styles.quickActions}>
@@ -213,11 +214,9 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
           <TwoPicker
             optionLeft="SOURCE"
             optionRight="DESTINATION"
-            rightIsSelected={props.dayTypeBeingSelected === "target"}
+            rightIsSelected={props.dayTypeBeingSelected === "destination"}
             onChange={value =>
-              props.setDayTypeBeingSelected(
-                value === "DESTINATION" ? "target" : "source"
-              )
+              props.setDayTypeBeingSelected(value.toLowerCase())
             }
             bothPositive={true}
           />
@@ -253,8 +252,8 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
         </div>
         <div className={styles.destinations}>
           <span>Copy Destinations</span>
-          {Object.keys(props.targetDays).length > 0 ? (
-            Object.keys(props.targetDays)
+          {Object.keys(props.destinationDays).length > 0 ? (
+            Object.keys(props.destinationDays)
               .map(t => new Date(Number(t)))
               .map((target, i) => (
                 <div key={`${i}_${target}`}>
@@ -265,7 +264,9 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
                     onClick={() =>
                       props.setSelectedDays([
                         target,
-                        new Date(props.targetDays[String(target.getTime())])
+                        new Date(
+                          props.destinationDays[String(target.getTime())]
+                        )
                       ])
                     }
                   >
@@ -296,11 +297,11 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
 
 const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
   return {
-    selectedDays: state.rulePage.selectedDays,
+    selectedDays: state.rulePage.sourceDays,
     daySelectorMode: state.rulePage.daySelectorMode,
     dayTypeBeingSelected: state.rulePage.dayTypeBeingSelected,
-    targetDays: state.rulePage.targetDays,
-    maxTargetDays: state.rulePage.maxTargetDays
+    destinationDays: state.rulePage.destinationDays,
+    maxTargetDays: state.rulePage.maxDestinationDays
   };
 };
 

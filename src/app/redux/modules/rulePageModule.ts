@@ -29,6 +29,8 @@ export interface IRulePageStateSimulation {
   };
 }
 
+type DayList = { [startTimestamp: number]: number };
+
 export interface IRulePageState {
   queryVariables: {
     date: string;
@@ -59,11 +61,11 @@ export interface IRulePageState {
     centsPerUnitTime?: number;
     unitTime?: string;
   };
-  selectedDays: { [startTimestamp: number]: number };
+  sourceDays: DayList;
   daySelectorMode: "continuous" | "separate" | "none";
-  dayTypeBeingSelected: "target" | "source";
-  targetDays: { [startTimestamp: number]: number };
-  maxTargetDays: number;
+  dayTypeBeingSelected: "destination" | "source";
+  destinationDays: DayList;
+  maxDestinationDays: number;
 }
 
 const defaultSelectedDay = () => new Date().toISOString().slice(0, 10);
@@ -91,15 +93,15 @@ export const initialState: IRulePageState = {
   },
   selectedVehicleFilter: null,
   selectedParkingRule: null,
-  selectedDays: {},
+  sourceDays: {},
   daySelectorMode: "continuous",
-  targetDays: {},
-  maxTargetDays: -1,
+  destinationDays: {},
+  maxDestinationDays: -1,
   dayTypeBeingSelected: "source"
 };
 
 const sourceDaysMinMax = (
-  selectedDays: IRulePageState["selectedDays"]
+  selectedDays: IRulePageState["sourceDays"]
 ): [number, number] => {
   let min: number = Number.POSITIVE_INFINITY;
   let max: number = Number.NEGATIVE_INFINITY;
@@ -112,19 +114,42 @@ const sourceDaysMinMax = (
   return [min, max];
 };
 
-const setSelectedDays = (
+const verifyNoDayIntersectionMM = (
+  [min, max]: [number, number],
+  dest: IRulePageState["destinationDays"]
+): boolean => {
+  return Object.keys(dest).some(start => {
+    const end = dest[start];
+    return min <= Number(start) && end <= max;
+  });
+};
+
+const verifyNoDayIntersection = (
+  src: IRulePageState["sourceDays"],
+  dest: IRulePageState["destinationDays"]
+): boolean => {
+  return verifyNoDayIntersectionMM(sourceDaysMinMax(src), dest);
+};
+
+const theOtherHasIt = (
+  action: SetSelectedDay,
+  days: IRulePageState["destinationDays"] | IRulePageState["sourceDays"]
+): boolean => {
+  return days[action.payload[0].getTime()] === action.payload[1].getTime();
+};
+
+const setSourceDays = (
   state: IRulePageState,
   action: SetSelectedDay
-): IRulePageState["selectedDays"] => {
+): IRulePageState["sourceDays"] => {
   if (action.payload === null) {
     // Clear
-    return initialState.selectedDays;
+    return initialState.sourceDays;
   }
   const [start, end] = action.payload;
   // Copy
-  const selectedDays = { ...state.selectedDays };
-  console.log("WHHT", selectedDays, state.daySelectorMode);
-  if (state.selectedDays[start.getTime()] === end.getTime()) {
+  const selectedDays = { ...state.sourceDays };
+  if (state.sourceDays[start.getTime()] === end.getTime()) {
     // Remove
     delete selectedDays[start.getTime()];
   } else if (
@@ -132,42 +157,85 @@ const setSelectedDays = (
     (state.daySelectorMode === "continuous" &&
       Object.keys(selectedDays).length < 2)
   ) {
-    console.log("HEY");
     selectedDays[start.getTime()] = end.getTime();
   }
   return selectedDays;
 };
 
-const setTargetDays = (
+const setDestinationDays = (
   state: IRulePageState,
   action: SetSelectedDay
-): IRulePageState["targetDays"] => {
+): IRulePageState["destinationDays"] => {
   if (action.payload !== null) {
     const [start, end] = action.payload;
-    const [min, max] = sourceDaysMinMax(state.selectedDays);
+    const [min, max] = sourceDaysMinMax(state.sourceDays);
     if (min <= start.getTime() && end.getTime() <= max) {
-      return state.targetDays;
+      return state.destinationDays;
     }
   } else {
     // Clear
-    return initialState.targetDays;
+    return initialState.destinationDays;
   }
-  console.log("TARGET2");
   const [start, end] = action.payload;
   // Copy
-  const targetDays = { ...state.targetDays };
-  if (state.targetDays[start.getTime()] === end.getTime()) {
+  const targetDays = { ...state.destinationDays };
+  if (state.destinationDays[start.getTime()] === end.getTime()) {
     // Remove
     delete targetDays[start.getTime()];
   } else if (
-    state.maxTargetDays === -1 ||
-    Object.keys(targetDays).length < state.maxTargetDays
+    state.maxDestinationDays === -1 ||
+    Object.keys(targetDays).length < state.maxDestinationDays
   ) {
     // Add
-    console.log("ADD", Object.keys(targetDays).length, state.maxTargetDays);
     targetDays[start.getTime()] = end.getTime();
   }
   return targetDays;
+};
+
+const setSelectedDays = (
+  state: IRulePageState,
+  action: SetSelectedDay
+): IRulePageState => {
+  if (state.dayTypeBeingSelected === "source") {
+    if (theOtherHasIt(action, state.destinationDays)) {
+      return {
+        ...state,
+        dayTypeBeingSelected: "destination",
+        destinationDays: setDestinationDays(state, action)
+      };
+    }
+    const sourceDays = setSourceDays(state, action);
+    let dayType: IRulePageState["dayTypeBeingSelected"] =
+      state.dayTypeBeingSelected;
+    if (Object.keys(sourceDays).length === 2) {
+      dayType = "destination";
+      // Verify position
+      if (verifyNoDayIntersection(sourceDays, state.destinationDays)) {
+        return {
+          ...state
+        };
+      }
+    }
+    return {
+      ...state,
+      sourceDays: sourceDays,
+      dayTypeBeingSelected: dayType
+    };
+  } else if (state.dayTypeBeingSelected === "destination") {
+    if (theOtherHasIt(action, state.sourceDays)) {
+      return {
+        ...state,
+        dayTypeBeingSelected: "source",
+        sourceDays: setSourceDays(state, action)
+      };
+    }
+    return {
+      ...state,
+      destinationDays: setDestinationDays(state, action)
+    };
+  } else {
+    return state;
+  }
 };
 
 export function rulePageReducer(
@@ -238,67 +306,13 @@ export function rulePageReducer(
           : null
       };
     case SET_SELECTED_DAY:
-      if (state.dayTypeBeingSelected === "source") {
-        if (
-          state.targetDays[action.payload[0].getTime()] ===
-          action.payload[1].getTime()
-        ) {
-          // The other has it
-          return {
-            ...state,
-            dayTypeBeingSelected: "target",
-            targetDays: setTargetDays(state, action)
-          };
-        }
-        const selectedDays = setSelectedDays(state, action);
-        let dayType: IRulePageState["dayTypeBeingSelected"] =
-          state.dayTypeBeingSelected;
-        if (Object.keys(selectedDays).length === 2) {
-          dayType = "target";
-          // Verify position
-          const [min, max] = sourceDaysMinMax(selectedDays);
-          if (
-            Object.keys(state.targetDays).some(start => {
-              const end = state.targetDays[start];
-              return min <= Number(start) && end <= max;
-            })
-          ) {
-            return {
-              ...state
-            };
-          }
-        }
-        return {
-          ...state,
-          selectedDays: selectedDays,
-          dayTypeBeingSelected: dayType
-        };
-      } else if (state.dayTypeBeingSelected === "target") {
-        if (
-          state.selectedDays[action.payload[0].getTime()] ===
-          action.payload[1].getTime()
-        ) {
-          // The other has it
-          return {
-            ...state,
-            dayTypeBeingSelected: "source",
-            selectedDays: setSelectedDays(state, action)
-          };
-        }
-        return {
-          ...state,
-          targetDays: setTargetDays(state, action)
-        };
-      } else {
-        return state;
-      }
+      return setSelectedDays(state, action);
     case SET_DAY_SELECTOR_MODE:
-      // Clear selectedDays when mode changes
       if (state.daySelectorMode !== action.payload) {
         return {
           ...state,
           daySelectorMode: action.payload,
-          selectedDays: initialState.selectedDays
+          sourceDays: initialState.sourceDays
         };
       } else {
         return state;
@@ -307,25 +321,24 @@ export function rulePageReducer(
       return {
         ...state,
         dayTypeBeingSelected: action.payload
-        // dayTypeBeingSelected:
-        //   Object.keys(state.selectedDays).length === 2
-        //     ? action.payload
-        //     : state.dayTypeBeingSelected
       };
     case CLEAR_TARGET_DAYS:
       return {
         ...state,
-        targetDays: initialState.targetDays
+        destinationDays: initialState.destinationDays
       };
     case CLEAR_SELECTED_DAYS:
       return {
         ...state,
-        selectedDays: initialState.selectedDays
+        sourceDays: initialState.sourceDays
       };
     case SET_MAX_TARGET_DAYS:
       return {
         ...state,
-        maxTargetDays: Math.max(initialState.maxTargetDays, action.payload)
+        maxDestinationDays: Math.max(
+          initialState.maxDestinationDays,
+          action.payload
+        )
       };
     default:
       return state;
