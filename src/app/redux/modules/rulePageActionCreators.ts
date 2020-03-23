@@ -90,6 +90,12 @@ export interface SetMaxTargetDays {
   payload: number;
 }
 
+export const SET_ERROR = "RULE_PAGE/SET_ERROR";
+export interface SetError {
+  type: typeof SET_ERROR;
+  payload: string | null;
+}
+
 export type RulePageActionTypes =
   | ChangeOpenedRuleAssignment
   | SetQueryVars
@@ -103,4 +109,5 @@ export type RulePageActionTypes =
   | SetDayTypeBeingSelected
   | ClearTargetDays
   | ClearSelectedDays
-  | SetMaxTargetDays;
+  | SetMaxTargetDays
+  | SetError;

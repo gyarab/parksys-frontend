@@ -25,11 +25,13 @@ import { VehicleFilterWidget } from "../components/editors/VehicleFilterEditor";
 import { ParkingRuleWidget } from "../components/editors/ParkingRuleEditor";
 import { Color } from "../constants";
 import { ParkingRuleAssignmentMonth } from "../components/parkingRuleAssignment/ParkingRuleAssignmentMonth";
+import { FlagType, Flag } from "../components/Flag";
 
 export interface IStateToProps {
   queryVariables: IRulePageState["queryVariables"];
   ruleAssignmentSimulation: IRulePageStateSimulation;
   selectedAssignment: IRulePageState["openedRuleAssignment"];
+  error: IRulePageState["error"];
 }
 
 export interface IDispatchToProps {
@@ -86,14 +88,26 @@ const RulePage = (props: IProps) => {
 
   return (
     <div>
-      <ParkingRuleAssignmentFilter
-        onChange={values => {
-          props.setQueryVariables(values);
-          props.setAssignment(null);
-          refetch();
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "auto 1fr",
+          justifyItems: "left",
+          gridColumnGap: "0.5em"
         }}
-        values={props.queryVariables}
-      />
+      >
+        <ParkingRuleAssignmentFilter
+          onChange={values => {
+            props.setQueryVariables(values);
+            props.setAssignment(null);
+            refetch();
+          }}
+          values={props.queryVariables}
+        />
+        {props.error ? (
+          <Flag text={props.error} type={FlagType.NEGATIVE} />
+        ) : null}
+      </div>
       <hr />
       {error ? (
         <p>ERROR: {error.toString()}</p>
@@ -153,7 +167,8 @@ const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
   return {
     queryVariables: state.rulePage.queryVariables,
     ruleAssignmentSimulation: state.rulePage.ruleAssignmentSimulation,
-    selectedAssignment: state.rulePage.openedRuleAssignment
+    selectedAssignment: state.rulePage.openedRuleAssignment,
+    error: state.rulePage.error
   };
 };
 

@@ -14,7 +14,8 @@ import {
   SetDayTypeBeingSelected,
   CLEAR_TARGET_DAYS,
   CLEAR_SELECTED_DAYS,
-  SET_MAX_TARGET_DAYS
+  SET_MAX_TARGET_DAYS,
+  SET_ERROR
 } from "./rulePageActionCreators";
 import moment = require("moment");
 
@@ -66,6 +67,7 @@ export interface IRulePageState {
   dayTypeBeingSelected: "destination" | "source";
   destinationDays: DayList;
   maxDestinationDays: number;
+  error: string | null;
 }
 
 const defaultSelectedDay = () => new Date().toISOString().slice(0, 10);
@@ -97,7 +99,8 @@ export const initialState: IRulePageState = {
   daySelectorMode: "continuous",
   destinationDays: {},
   maxDestinationDays: -1,
-  dayTypeBeingSelected: "source"
+  dayTypeBeingSelected: "source",
+  error: null
 };
 
 const sourceDaysMinMax = (
@@ -165,16 +168,16 @@ const setSourceDays = (
 const setDestinationDays = (
   state: IRulePageState,
   action: SetSelectedDay
-): IRulePageState["destinationDays"] => {
+): [IRulePageState["destinationDays"], string] => {
   if (action.payload !== null) {
     const [start, end] = action.payload;
     const [min, max] = sourceDaysMinMax(state.sourceDays);
     if (min <= start.getTime() && end.getTime() <= max) {
-      return state.destinationDays;
+      return [state.destinationDays, "Source and Destination days intersect."];
     }
   } else {
     // Clear
-    return initialState.destinationDays;
+    return [initialState.destinationDays, null];
   }
   const [start, end] = action.payload;
   // Copy
@@ -189,7 +192,7 @@ const setDestinationDays = (
     // Add
     targetDays[start.getTime()] = end.getTime();
   }
-  return targetDays;
+  return [targetDays, null];
 };
 
 const setSelectedDays = (
@@ -201,7 +204,7 @@ const setSelectedDays = (
       return {
         ...state,
         dayTypeBeingSelected: "destination",
-        destinationDays: setDestinationDays(state, action)
+        destinationDays: setDestinationDays(state, action)[0]
       };
     }
     const sourceDays = setSourceDays(state, action);
@@ -212,7 +215,8 @@ const setSelectedDays = (
       // Verify position
       if (verifyNoDayIntersection(sourceDays, state.destinationDays)) {
         return {
-          ...state
+          ...state,
+          error: "Source and Destination days intersect."
         };
       }
     }
@@ -229,16 +233,18 @@ const setSelectedDays = (
         sourceDays: setSourceDays(state, action)
       };
     }
+    const [destinationDays, error] = setDestinationDays(state, action);
     return {
       ...state,
-      destinationDays: setDestinationDays(state, action)
+      destinationDays,
+      error
     };
   } else {
     return state;
   }
 };
 
-export function rulePageReducer(
+function _rulePageReducer(
   state: IRulePageState = initialState,
   action: RulePageActionTypes
 ): IRulePageState {
@@ -343,4 +349,25 @@ export function rulePageReducer(
     default:
       return state;
   }
+}
+
+export function rulePageReducer(
+  state: IRulePageState = initialState,
+  action: RulePageActionTypes
+): IRulePageState {
+  if (action.type === SET_ERROR) {
+    return {
+      ...state,
+      error: action.payload
+    };
+  }
+  // Ugly, but it works
+  const maskedError = `${state.error} `;
+  state.error = maskedError;
+  const newState = _rulePageReducer(state, action);
+  // Error has not changed
+  if (maskedError === newState.error) {
+    newState.error = null;
+  }
+  return newState;
 }
