@@ -2,6 +2,7 @@ import React from "react";
 import { OptionPicker } from "../pickers/OptionPicker";
 import { IRulePageState } from "../../redux/modules/rulePageModule";
 import { TwoPicker } from "../pickers/TwoPicker";
+import { stylesheet } from "typestyle";
 
 export interface IValues {
   day?: string;
@@ -13,6 +14,17 @@ export interface IProps {
   onChange: (values: IRulePageState["queryVariables"]) => void;
   values?: IRulePageState["queryVariables"];
 }
+
+const styles = stylesheet({
+  praFilter: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, auto auto)",
+    gridColumnGap: "0.4em",
+    alignItems: "center"
+  }
+});
+
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export const ParkingRuleAssignmentFilter = (props: IProps) => {
   const onChange = e => {
@@ -29,32 +41,29 @@ export const ParkingRuleAssignmentFilter = (props: IProps) => {
     onChange({ target: { value, name } });
   };
   return (
-    <div>
-      <label>
-        Day
-        <input
-          type="date"
-          name="date"
-          value={props.values.date}
-          onChange={e => {
-            if (e.target.value === "") return;
-            onChange(e);
-          }}
-        />
-      </label>
-      <label>
-        Day
-        <OptionPicker
-          name="range"
-          options={["DAY", "MONTH"]}
-          selectedOption={
-            !!props.values.range ? props.values.range.toUpperCase() : "DAY"
-          }
-          onChange={({ value, name }) =>
-            onOptionPickerChange({ name, value: value.toLowerCase() })
+    <div className={styles.praFilter}>
+      <span>Range</span>
+      <div style={{ marginRight: "3em" }}>
+        <TwoPicker
+          bothPositive={true}
+          optionLeft={"DAY"}
+          optionRight={"MONTH"}
+          rightIsSelected={props.values.range === "month"}
+          onChange={value =>
+            onOptionPickerChange({ name: "range", value: value.toLowerCase() })
           }
         />
-      </label>
+      </div>
+      <span>Select {capitalize(props.values.range)}</span>
+      <input
+        type="date"
+        name="date"
+        value={props.values.date}
+        onChange={e => {
+          if (e.target.value === "") return;
+          onChange(e);
+        }}
+      />
     </div>
   );
 };
