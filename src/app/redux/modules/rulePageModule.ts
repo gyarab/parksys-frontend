@@ -98,6 +98,20 @@ export const initialState: IRulePageState = {
   dayTypeBeingSelected: "source"
 };
 
+const sourceDaysMinMax = (
+  selectedDays: IRulePageState["selectedDays"]
+): [number, number] => {
+  let min: number = Number.POSITIVE_INFINITY;
+  let max: number = Number.NEGATIVE_INFINITY;
+  // O(2)
+  Object.keys(selectedDays).forEach(sStart => {
+    const sEnd = selectedDays[sStart];
+    min = Math.min(Number(sStart), min);
+    max = Math.max(sEnd, max);
+  });
+  return [min, max];
+};
+
 const setSelectedDays = (
   state: IRulePageState,
   action: SetSelectedDay
@@ -128,18 +142,9 @@ const setTargetDays = (
   state: IRulePageState,
   action: SetSelectedDay
 ): IRulePageState["targetDays"] => {
-  console.log("TARGET");
-  console.log("TARGET");
   if (action.payload !== null) {
     const [start, end] = action.payload;
-    let min: number = Number.POSITIVE_INFINITY;
-    let max: number = Number.NEGATIVE_INFINITY;
-    // O(2)
-    Object.keys(state.selectedDays).forEach(sStart => {
-      const sEnd = state.selectedDays[sStart];
-      min = Math.min(Number(sStart), min);
-      max = Math.max(Number(sEnd), max);
-    });
+    const [min, max] = sourceDaysMinMax(state.selectedDays);
     if (min <= start.getTime() && end.getTime() <= max) {
       return state.targetDays;
     }
@@ -234,14 +239,34 @@ export function rulePageReducer(
       };
     case SET_SELECTED_DAY:
       if (state.dayTypeBeingSelected === "source") {
+        if (
+          state.targetDays[action.payload[0].getTime()] ===
+          action.payload[1].getTime()
+        ) {
+          // The other has it
+          return {
+            ...state,
+            dayTypeBeingSelected: "target",
+            targetDays: setTargetDays(state, action)
+          };
+        }
         const selectedDays = setSelectedDays(state, action);
         let dayType: IRulePageState["dayTypeBeingSelected"] =
           state.dayTypeBeingSelected;
-        if (
-          Object.keys(selectedDays).length === 2 &&
-          state.dayTypeBeingSelected === "source"
-        ) {
+        if (Object.keys(selectedDays).length === 2) {
           dayType = "target";
+          // Verify position
+          const [min, max] = sourceDaysMinMax(selectedDays);
+          if (
+            Object.keys(state.targetDays).some(start => {
+              const end = state.targetDays[start];
+              return min <= Number(start) && end <= max;
+            })
+          ) {
+            return {
+              ...state
+            };
+          }
         }
         return {
           ...state,
@@ -249,10 +274,20 @@ export function rulePageReducer(
           dayTypeBeingSelected: dayType
         };
       } else if (state.dayTypeBeingSelected === "target") {
-        const targetDays = setTargetDays(state, action);
+        if (
+          state.selectedDays[action.payload[0].getTime()] ===
+          action.payload[1].getTime()
+        ) {
+          // The other has it
+          return {
+            ...state,
+            dayTypeBeingSelected: "source",
+            selectedDays: setSelectedDays(state, action)
+          };
+        }
         return {
           ...state,
-          targetDays: targetDays
+          targetDays: setTargetDays(state, action)
         };
       } else {
         return state;
@@ -272,6 +307,10 @@ export function rulePageReducer(
       return {
         ...state,
         dayTypeBeingSelected: action.payload
+        // dayTypeBeingSelected:
+        //   Object.keys(state.selectedDays).length === 2
+        //     ? action.payload
+        //     : state.dayTypeBeingSelected
       };
     case CLEAR_TARGET_DAYS:
       return {

@@ -121,12 +121,10 @@ const graphMaker = (title, data, maxX, type?) => (
       chart: { title },
       height: 500,
       series: {
-        // Gives each series an axis name that matches the Y-axis below.
         0: { axis: "# of Sessions" },
         1: { axis: "Revenue" }
       },
       axes: {
-        // Adds labels to each axis; they don't have to match the axis names.
         y: {
           "# of Sessions": { label: "# of Sessions" },
           Revenue: { label: "Revenue" }
@@ -314,7 +312,7 @@ const StatisticsPage = (props: IProps): JSX.Element => {
   const [calendarGraphW, setCalendarGraphW] = useState(0);
   useEffect(() => {
     setCalendarGraphW(5);
-    setTimeout(() => setCalendarGraphW(0), 1);
+    setTimeout(() => setCalendarGraphW(0), 5);
   }, [props.graphPeriod, props.selectedPeriod]);
 
   return (

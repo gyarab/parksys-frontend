@@ -22,6 +22,7 @@ import { stylesheet } from "typestyle";
 import { NumberInput } from "../pickers/NumberInput";
 import { ERRORS_SET_PAGE_ERROR } from "../../redux/modules/errorsActionCreators";
 import { TwoPicker } from "../pickers/TwoPicker";
+import { Color } from "../../constants";
 
 interface IDispatchToProps {
   duplicateRuleAssignments: () => MutationTuple<
@@ -62,8 +63,16 @@ interface IProps extends IDispatchToProps, IStateToProps {
 const styles = stylesheet({
   quickActions: {
     display: "grid",
-    gridTemplateColumns: "auto auto",
-    paddingRight: "1.5em"
+    gridTemplateColumns: "5fr 4fr",
+    paddingRight: "1.5em",
+    marginTop: "-1.2em",
+    $nest: {
+      "> div > span": {
+        paddingTop: "1.2em",
+        paddingBottom: "0.4em",
+        display: "inline-block"
+      }
+    }
   },
   controls: {
     display: "grid",
@@ -74,6 +83,7 @@ const styles = stylesheet({
   },
   destinations: {
     display: "grid",
+    gridTemplateRows: "3em auto",
     justifyItems: "right",
     alignItems: "bottom",
     gridRowGap: "0.4em",
@@ -103,13 +113,6 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
   const setTargetMode = (mode: number) => {
     props.setMaxTargetDays(mode);
     props.clearTargetDays();
-  };
-  const setDayType = () => {
-    if (props.dayTypeBeingSelected === "source") {
-      props.setDayTypeBeingSelected("target");
-    } else if (props.dayTypeBeingSelected === "target") {
-      props.setDayTypeBeingSelected("source");
-    }
   };
 
   const [copyRepeat, setCopyRepeat] = useState(1);
@@ -206,7 +209,19 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
     <div>
       <div className={styles.quickActions}>
         <div>
-          <p>Copy Destination</p>
+          <span>Currently Selecting</span>
+          <TwoPicker
+            optionLeft="SOURCE"
+            optionRight="DESTINATION"
+            rightIsSelected={props.dayTypeBeingSelected === "target"}
+            onChange={value =>
+              props.setDayTypeBeingSelected(
+                value === "DESTINATION" ? "target" : "source"
+              )
+            }
+            bothPositive={true}
+          />
+          <span>Copy Mode</span>
           <TwoPicker
             optionLeft="MULTI"
             optionRight="REPEAT"
@@ -216,43 +231,16 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
                 value === "MULTI" ? TargetMode.MULTI : TargetMode.REPEAT
               )
             }
+            bothPositive={true}
           />
-          <TwoPicker
-            optionLeft="SOURCE"
-            optionRight="TARGET"
-            rightIsSelected={props.dayTypeBeingSelected === "target"}
-            onChange={value =>
-              props.setDayTypeBeingSelected(value.toLowerCase())
-            }
-          />
-        </div>
-        <div className={styles.destinations}>
-          {Object.keys(props.targetDays)
-            .map(t => new Date(Number(t)))
-            .map((target, i) => (
-              <div key={`${i}_${target}`}>
-                {target.toISOString().slice(0, 10)}
-                <Button
-                  type="negative"
-                  small={true}
-                  onClick={() =>
-                    props.setSelectedDays([
-                      target,
-                      new Date(props.targetDays[String(target.getTime())])
-                    ])
-                  }
-                >
-                  Delete
-                </Button>
-              </div>
-            ))}
           {targetMode === TargetMode.REPEAT ? (
             <div
               style={{
                 display: "grid",
                 gridColumnGap: "0.5em",
                 alignItems: "center",
-                gridTemplateColumns: "auto 5em"
+                gridTemplateColumns: "auto 5em",
+                marginTop: "1.2em"
               }}
             >
               <span>Copy Repetitions</span>
@@ -262,6 +250,32 @@ const ParkingRuleAssignmentQuickActions = (props: IProps) => {
               />
             </div>
           ) : null}
+        </div>
+        <div className={styles.destinations}>
+          <span>Copy Destinations</span>
+          {Object.keys(props.targetDays).length > 0 ? (
+            Object.keys(props.targetDays)
+              .map(t => new Date(Number(t)))
+              .map((target, i) => (
+                <div key={`${i}_${target}`}>
+                  {target.toISOString().slice(0, 10)}
+                  <Button
+                    type="negative"
+                    small={true}
+                    onClick={() =>
+                      props.setSelectedDays([
+                        target,
+                        new Date(props.targetDays[String(target.getTime())])
+                      ])
+                    }
+                  >
+                    Delete
+                  </Button>
+                </div>
+              ))
+          ) : (
+            <span style={{ color: Color.LIGHT_GREY }}>Empty</span>
+          )}
         </div>
       </div>
       <div className={styles.controls}>

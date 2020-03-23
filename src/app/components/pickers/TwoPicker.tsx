@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Color } from "../../constants";
-import { stylesheet } from "typestyle";
+import { stylesheet, classes } from "typestyle";
 
 const r = "5px";
 const tpStyles = stylesheet({
@@ -43,18 +43,24 @@ export const TwoPicker = ({
   optionRight,
   rightIsSelected,
   onChange,
-  disabled = false
+  disabled = false,
+  bothPositive = false
 }: {
   optionLeft: string;
   optionRight: string;
   rightIsSelected: boolean;
   onChange: (value: string) => any;
   disabled?: boolean;
+  bothPositive?: boolean;
 }) => {
   return (
     <div className={tpStyles.twoPicker}>
       <div
         className={!rightIsSelected && !disabled ? "left selected" : "left"}
+        style={{
+          backgroundColor:
+            bothPositive && !rightIsSelected ? Color.AQUAMARINE : ""
+        }}
         onClick={() => onChange(optionLeft)}
       >
         {optionLeft}
