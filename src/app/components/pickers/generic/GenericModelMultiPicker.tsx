@@ -151,7 +151,7 @@ export const GenericModelMultiPicker = <T extends unknown = any>(
   const [loadGql, { data, loading, called, error }] = useLazyQuery(
     gProps.QUERY,
     {
-      fetchPolicy: props.fetchPolicy
+      fetchPolicy: props.fetchPolicy || "cache-and-network"
     }
   );
   // This value differs from props.licensePlate when the input is focused

@@ -307,7 +307,7 @@ const mapStateToProps = (state: Pick<IStore, "rulePage">): IStateToProps => {
 const mapDispatchToProps = (dispatch: Dispatch): IDispatchToProps => {
   return {
     setSelectedDay: newDay =>
-      dispatch({ type: SET_QUERY_VARS, payload: { day: newDay } }),
+      dispatch({ type: SET_QUERY_VARS, payload: { date: newDay } }),
     setOpenedNewRuleAssignment: payload =>
       dispatch({ type: CHANGE_OPENED_NEW_RULE_ASSIGNMENT, payload })
   };

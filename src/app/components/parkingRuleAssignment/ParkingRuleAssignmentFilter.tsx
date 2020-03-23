@@ -54,7 +54,7 @@ export const ParkingRuleAssignmentFilter = (props: IProps) => {
           }
         />
       </div>
-      <span>Select {capitalize(props.values.range)}</span>
+      <span>Select a {capitalize(props.values.range)}</span>
       <input
         type="date"
         name="date"

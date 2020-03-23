@@ -9,7 +9,7 @@ import {
 import { Flag } from "../Flag";
 
 const renderModel = model => (
-  <div>
+  <div style={{ paddingTop: "0.7em", paddingBottom: "0.6em" }}>
     <span>
       <Flag text={model.licensePlate} /> {model.numParkingSessions} sessions
     </span>
