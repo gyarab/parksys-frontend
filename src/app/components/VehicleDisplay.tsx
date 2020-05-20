@@ -8,17 +8,17 @@ import { BackgroundChange } from "./BackgroundChange";
 const styles = stylesheet({
   vehicleDisplay: {
     display: "grid",
-    gridTemplateColumns: "auto auto"
-  }
+    gridTemplateColumns: "auto auto",
+  },
 });
 
 export const VehicleDisplay = ({ vehicle: vehicle_, setParkingSession }) => {
   const { data, loading, error } = useQuery(VEHICLE_SESSIONS_BY_ID_QUERY, {
     variables: { id: vehicle_.id },
-    pollInterval: 5000
+    pollInterval: 5000,
   });
   const [session, setSession_] = useState(null);
-  const setSession = session => {
+  const setSession = (session) => {
     setSession_(session);
     setParkingSession(session);
   };
@@ -30,7 +30,7 @@ export const VehicleDisplay = ({ vehicle: vehicle_, setParkingSession }) => {
   }
   const vehicle = {
     ...data.vehicle,
-    ...vehicle_
+    ...vehicle_,
   };
   return (
     <>
@@ -66,8 +66,8 @@ export const VehicleDisplay = ({ vehicle: vehicle_, setParkingSession }) => {
           </h4>
           <VehicleParkingSessionPicker
             options={{
-              variables: { licensePlate: vehicle.licensePlate },
-              pollInterval: 5000
+              variables: { id: vehicle.id },
+              pollInterval: 5000,
             }}
             model={session}
             onSelect={setSession}

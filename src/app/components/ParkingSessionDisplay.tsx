@@ -15,36 +15,36 @@ const styles = stylesheet({
     gridTemplateColumns: "auto auto",
     $nest: {
       table: {
-        marginBottom: "1em"
+        marginBottom: "1em",
       },
       h4: {
         display: "inline-block",
         marginTop: 0,
-        textDecoration: "underline"
-      }
-    }
+        textDecoration: "underline",
+      },
+    },
   },
   captureImage: {
     position: "relative",
     $nest: {
       "&:hover": {
-        cursor: "pointer"
+        cursor: "pointer",
       },
       img: {
         position: "absolute",
         top: "100%",
         left: 0,
-        boxShadow: "0px 0px 4px 2px #666"
-      }
-    }
+        boxShadow: "0px 0px 4px 2px #666",
+      },
+    },
   },
   assignmentRow: {
     $nest: {
       "&:hover": {
-        backgroundColor: Color.LIGHT_GREY
-      }
-    }
-  }
+        backgroundColor: Color.LIGHT_GREY,
+      },
+    },
+  },
 });
 
 const CaptureImage = ({ image, text }) => {
@@ -55,11 +55,11 @@ const CaptureImage = ({ image, text }) => {
     if (!imageData && !!image) {
       // fetch
       imageGetter(image)
-        .then(response => response.blob())
-        .then(blob => {
+        .then((response) => response.blob())
+        .then((blob) => {
           setImageData(URL.createObjectURL(blob));
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     }
@@ -85,7 +85,7 @@ const HIGHLIGHT_COLOR = "#ececec";
 export const ParkingSessionDisplay = ({ session: { id } }) => {
   const { data, loading, error } = useQuery(PARKING_SESSION_BY_ID_QUERY, {
     variables: { id },
-    pollInterval: 5000
+    pollInterval: 5000,
   });
   const [highlightedAssignment, setHighlightedAssignment] = useState(null);
   useEffect(() => {
@@ -173,7 +173,7 @@ export const ParkingSessionDisplay = ({ session: { id } }) => {
                       backgroundColor:
                         highlightedAssignment === i
                           ? HIGHLIGHT_COLOR
-                          : "default"
+                          : "default",
                     }}
                   >
                     <td style={{ color: Color.LIGHT_GREY }}>{i + 1}</td>
@@ -214,7 +214,7 @@ export const ParkingSessionDisplay = ({ session: { id } }) => {
                         backgroundColor:
                           highlightedAssignment === i
                             ? HIGHLIGHT_COLOR
-                            : "default"
+                            : "default",
                       }}
                     >
                       <td style={{ color: Color.LIGHT_GREY }}>{i + 1}</td>

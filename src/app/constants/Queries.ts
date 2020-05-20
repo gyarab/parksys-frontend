@@ -3,7 +3,7 @@ import {
   PARKING_RULE_ASSIGNMENT_FRAGMENT,
   VEHICLE_FILTER_FRAGMENT,
   PARKING_RULE_FRAGMENT,
-  USER_FRAGMENT
+  USER_FRAGMENT,
 } from "./Fragments";
 
 export const DEVICE_QUERY = gql`
@@ -226,7 +226,7 @@ export const STATS_PAGE = {
         }
       }
     }
-  `
+  `,
 };
 
 // Parking Session
@@ -258,27 +258,25 @@ export const PARKING_SESSIONS_PAGED_QUERY = gql`
   }
 `;
 
-export const VEHICLES_PARKING_SESSIONS_PAGED_QUERY = gql`
+export const VEHICLES_BY_ID_PARKING_SESSIONS_PAGED_QUERY = gql`
   query vehiclesSessions(
     $page: PositiveInt
     $limit: PositiveInt
-    $licensePlate: String!
+    $id: ID!
     $filter: DateFilterInput
   ) {
-    vehicle: vehicleSearch(search: { licensePlate: $licensePlate }) {
-      data {
-        parkingSessions(limit: $limit, page: $page, filter: $filter) {
-          data {
-            id
-            checkOut {
-              time
-            }
-            checkIn {
-              time
-            }
-            active
-            finalFee
+    vehicle(id: $id) {
+      parkingSessions(limit: $limit, page: $page, filter: $filter) {
+        data {
+          id
+          checkOut {
+            time
           }
+          checkIn {
+            time
+          }
+          active
+          finalFee
         }
       }
     }

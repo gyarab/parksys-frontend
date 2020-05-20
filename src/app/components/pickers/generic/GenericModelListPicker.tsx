@@ -7,7 +7,7 @@ import { useQuery } from "@apollo/react-hooks";
 const styles = stylesheet({
   pagingControl: {
     display: "grid",
-    gridTemplateColumns: "auto auto"
+    gridTemplateColumns: "auto auto",
   },
   modelListPicker: {
     border: `1px solid ${Color.LIGHT_GREY}`,
@@ -20,27 +20,27 @@ const styles = stylesheet({
         // flex: "0 1 4em",
         $nest: {
           button: {
-            marginLeft: "0.3em"
-          }
-        }
+            marginLeft: "0.3em",
+          },
+        },
       },
       ".selectedModel": {
         marginTop: "0.2em",
         padding: "0.1em 0 0.1em 0.5em",
         backgroundColor: `#ddd`,
-        flex: "0 1 auto"
+        flex: "0 1 auto",
       },
       ".modelList": {
         marginTop: "0.2em",
         overflowY: "auto",
-        flex: "1 1 auto"
-      }
-    }
+        flex: "1 1 auto",
+      },
+    },
   },
   modelList: {
     $nest: {
       "div + div": {
-        borderTop: `1px solid ${Color.LIGHT_GREY}`
+        borderTop: `1px solid ${Color.LIGHT_GREY}`,
       },
       div: {
         height: "auto",
@@ -48,15 +48,15 @@ const styles = stylesheet({
         paddingLeft: "0.2em",
         $nest: {
           "&:hover": {
-            backgroundColor: "#eee"
-          }
-        }
-      }
-    }
+            backgroundColor: "#eee",
+          },
+        },
+      },
+    },
   },
   empty: {
-    color: "#999"
-  }
+    color: "#999",
+  },
 });
 
 interface IListInputProps {
@@ -134,8 +134,8 @@ export const GenericModelListPicker = (gProps: IGListProps) => {
       variables: {
         ...(gProps.identifierToOptions(identifier, page) || { variables: {} })
           .variables,
-        ...(props.options || { variables: {} }).variables
-      }
+        ...(props.options || { variables: {} }).variables,
+      },
     };
     const { loading, error, data, refetch } = useQuery(gProps.QUERY, options);
     const onSelect = (model: any) => {
@@ -163,7 +163,7 @@ export const GenericModelListPicker = (gProps: IGListProps) => {
             key={0}
             value={identifier}
             disabled={disabled}
-            onChange={e => {
+            onChange={(e) => {
               setPage(1);
               setIdentifier(e.target.value);
             }}
@@ -228,7 +228,7 @@ export const useGenericListPickerFromListPicker = (
     const render = (
       <PickerInstance
         model={!!model ? model : null}
-        onSelect={model => {
+        onSelect={(model) => {
           setModel(model);
         }}
         disabled={disabled}
